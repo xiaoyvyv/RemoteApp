@@ -1,0 +1,3 @@
+<resources>
+    <string name="business_ui_common_timeout">网络连接超时，请稍后再试</string>
+</resources>

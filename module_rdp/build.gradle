@@ -1,0 +1,58 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    buildFeatures {
+        viewBinding = true
+    }
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [AROUTER_MODULE_NAME: project.getName()]
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    // 限定资源前缀
+    resourcePrefix "rdp_"
+}
+
+dependencies {
+    api project(':librdp')
+    implementation project(':common_business')
+
+    implementation 'androidx.appcompat:appcompat:' + rootProject.ext.appcompatVersion
+    implementation 'com.google.android.material:material:' + rootProject.ext.materialVersion
+    implementation 'androidx.constraintlayout:constraintlayout:' + rootProject.ext.constraintlayoutVersion
+
+    implementation 'com.alibaba:arouter-api:' + rootProject.ext.arouterVersion
+    annotationProcessor 'com.alibaba:arouter-compiler:' + rootProject.ext.arouterVersion
+
+    testImplementation 'junit:junit:' + rootProject.ext.junitVersion
+    androidTestImplementation 'androidx.test.ext:junit:' + rootProject.ext.extJunitVersion
+    androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.ext.espressoVersion
+}

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--没有选中的样式-->
+    <style name="main_bottom_nav_normal">
+        <item name="android:textColor">@color/ui_text_c1</item>
+        <item name="android:textSize">@dimen/ui_font_12</item>
+    </style>
+    <!--选中的样式-->
+    <style name="main_bottom_nav_selected">
+        <item name="android:textColor">@color/ui_text_c1</item>
+        <item name="android:textSize">@dimen/ui_font_12</item>
+    </style>
+</resources>

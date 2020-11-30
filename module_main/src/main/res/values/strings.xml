@@ -1,0 +1,10 @@
+<resources>
+    <!-- 启动页 -->
+    <string name="main_splash_title">远程控制终端，随时随地云上游。</string>
+    <string name="main_splash_enter">进入</string>
+
+    <!-- 首页 -->
+    <string name="main_home_rdp">Windows桌面</string>
+    <string name="main_home_ssh">SSH终端</string>
+    <string name="main_home_ftp">FTP管理器</string>
+</resources>

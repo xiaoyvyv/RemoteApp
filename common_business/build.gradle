@@ -1,0 +1,79 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+
+    buildFeatures {
+        viewBinding = true
+    }
+
+    defaultConfig {
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [AROUTER_MODULE_NAME: project.getName()]
+                arguments += [
+                        "room.schemaLocation"  : "$projectDir/schemas".toString(),
+                        "room.incremental"     : "true",
+                        "room.expandProjection": "true"]
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    // 限定资源前缀
+    resourcePrefix "business_"
+}
+
+dependencies {
+    api project(':common_ui')
+
+    // 腾讯Bugly
+    api 'com.tencent.bugly:crashreport:' + rootProject.ext.buglyCrashVersion
+
+    // RxAndroid
+    api 'io.reactivex.rxjava3:rxandroid:' + rootProject.ext.rxAndroidVersion
+    api 'io.reactivex.rxjava3:rxjava:' + rootProject.ext.rxAndroidVersion
+    // RxAndroid自动解绑订阅
+    api 'com.uber.autodispose2:autodispose-android:' + rootProject.ext.autoDisposeVersion
+    api 'com.uber.autodispose2:autodispose-androidx-lifecycle:' + rootProject.ext.autoDisposeVersion
+    // 数据库
+    implementation 'androidx.room:room-runtime:' + rootProject.ext.roomVersion
+    annotationProcessor 'androidx.room:room-compiler:' + rootProject.ext.roomVersion
+
+    // 调试环境查看数据库
+    debugImplementation 'com.amitshekhar.android:debug-db:' + rootProject.ext.debugDbVersion;
+
+    implementation 'androidx.appcompat:appcompat:' + rootProject.ext.appcompatVersion
+    implementation 'com.google.android.material:material:' + rootProject.ext.materialVersion
+    implementation 'androidx.constraintlayout:constraintlayout:' + rootProject.ext.constraintlayoutVersion
+    implementation 'androidx.appcompat:appcompat:1.2.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+
+    implementation 'com.alibaba:arouter-api:' + rootProject.ext.arouterVersion
+    annotationProcessor 'com.alibaba:arouter-compiler:' + rootProject.ext.arouterVersion
+
+    testImplementation 'junit:junit:' + rootProject.ext.junitVersion
+    androidTestImplementation 'androidx.test.ext:junit:' + rootProject.ext.extJunitVersion
+    androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.ext.espressoVersion
+}

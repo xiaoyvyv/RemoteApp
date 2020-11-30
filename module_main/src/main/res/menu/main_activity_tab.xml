@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:icon="@drawable/main_selector_rdp"
+        android:id="@+id/main_home_rdp"
+        android:title="@string/main_home_rdp" />
+
+    <item
+        android:icon="@drawable/main_selector_ssh"
+        android:id="@+id/main_home_ssh"
+        android:title="@string/main_home_ssh" />
+
+    <item
+        android:icon="@drawable/main_selector_ftp"
+        android:id="@+id/main_home_ftp"
+        android:title="@string/main_home_ftp" />
+</menu>

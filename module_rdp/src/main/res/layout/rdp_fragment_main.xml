@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rv_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/v_divider"
+        tools:listitem="@layout/rdp_fragment_main_item" />
+
+    <com.xiaoyv.ui.toolbar.AppToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tl_group"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_size_40"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar"
+        app:tabContentStart="@dimen/ui_size_20"
+        app:tabIndicatorFullWidth="false"
+        app:tabIndicatorHeight="@dimen/ui_size_0"
+        app:tabMode="scrollable"
+        app:tabUnboundedRipple="true" />
+
+    <View
+        android:id="@+id/v_divider"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_size_0.5"
+        android:layout_marginStart="@dimen/ui_size_20"
+        android:layout_marginEnd="@dimen/ui_size_20"
+        android:background="@color/ui_system_divider"
+        app:layout_constraintTop_toBottomOf="@+id/tl_group" />
+
+    <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
+        android:id="@+id/fab_add"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/ui_size_16"
+        android:contentDescription="@string/rdp_main_title"
+        app:cornerRadius="@dimen/ui_size_18"
+        app:icon="@drawable/ui_icon_add"
+        app:iconSize="@dimen/ui_size_24"
+        app:iconTint="@color/ui_system_c5"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

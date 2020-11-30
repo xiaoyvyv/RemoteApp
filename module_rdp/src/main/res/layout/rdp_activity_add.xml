@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <com.xiaoyv.ui.toolbar.AppToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.xiaoyv.ui.setting.AppSettingView
+        android:id="@+id/asv_label"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.xiaoyv.ui.setting.AppSettingView
+        android:id="@+id/asv_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.xiaoyv.ui.setting.AppSettingView
+        android:id="@+id/asv_ip"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.xiaoyv.ui.setting.AppSettingView
+        android:id="@+id/asv_port"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.xiaoyv.ui.setting.AppSettingView
+        android:id="@+id/asv_account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <com.xiaoyv.ui.setting.AppSettingView
+        android:id="@+id/asv_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

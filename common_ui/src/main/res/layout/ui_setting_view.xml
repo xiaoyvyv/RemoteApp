@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/cl_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="false"
+    android:focusable="true">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/ui_size_20"
+        android:paddingTop="@dimen/ui_size_12"
+        android:paddingEnd="@dimen/ui_size_20"
+        android:paddingBottom="@dimen/ui_size_12"
+        android:text="@string/ui_view_setting_title"
+        android:textColor="@color/ui_text_c1"
+        android:textSize="@dimen/ui_font_16"
+        app:layout_constraintEnd_toStartOf="@+id/sm_switch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_desc"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/ui_size_20"
+        android:paddingEnd="@dimen/ui_size_20"
+        android:paddingBottom="@dimen/ui_size_12"
+        android:textColor="@color/ui_text_c2"
+        android:textSize="@dimen/ui_font_14"
+        app:layout_constraintEnd_toStartOf="@+id/sm_switch"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tv_title"
+        tools:text="设置内容" />
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/sm_switch"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:paddingStart="@dimen/ui_size_50"
+        android:paddingEnd="@dimen/ui_size_20"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <View
+        android:id="@+id/v_divider"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/ui_size_0.5"
+        android:background="@color/ui_system_divider"
+        app:layout_constraintBottom_toBottomOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

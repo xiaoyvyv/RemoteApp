@@ -1,0 +1,11 @@
+include ':common_ui'
+include ':common_business'
+include ':module_main'
+include ':module_rdp'
+include ':module_ssh'
+include ':module_ftp'
+include ':libftp'
+include ':libssh'
+include ':librdp'
+include ':app'
+rootProject.name = "RemoteApp"

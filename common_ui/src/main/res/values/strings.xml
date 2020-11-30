@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ui_view_toolbar_title">请设置标题栏文字</string>
+    <string name="ui_common_timeout">网络走丢了，请稍后再试</string>
+
+    <string name="ui_view_setting_title">请设置选项文字</string>
+    <string name="ui_view_setting_input_title">请输入内容</string>
+    <string name="ui_view_setting_input_done">确定</string>
+    <string name="ui_view_setting_input_clear">取消</string>
+</resources>

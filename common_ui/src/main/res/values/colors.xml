@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 主题色 -->
+    <color name="ui_theme_c0">#213352</color>
+    <color name="ui_theme_c1">#26d1e0</color>
+    <color name="ui_theme_c2">#92e8ef</color>
+    <color name="ui_theme_c3">#00bfcf</color>
+
+    <!-- 系统色 -->
+    <color name="ui_system_c0">#000000</color>
+    <color name="ui_system_c1">#333333</color>
+    <color name="ui_system_c2">#666666</color>
+    <color name="ui_system_c3">#999999</color>
+    <color name="ui_system_c4">#cccccc</color>
+    <color name="ui_system_c5">#ffffff</color>
+
+    <!-- 系统界面 -->
+    <color name="ui_system_background">#ffffff</color>
+    <color name="ui_system_divider">#ebebeb</color>
+    <color name="ui_system_button">#f3f3f5</color>
+    <color name="ui_system_error">#e02020</color>
+    <color name="ui_system_black">#000000</color>
+
+    <!-- 字体颜色 -->
+    <color name="ui_text_c0">@color/ui_system_c0</color>
+    <color name="ui_text_c1">@color/ui_system_c1</color>
+    <color name="ui_text_c2">@color/ui_system_c2</color>
+    <color name="ui_text_c3">@color/ui_system_c3</color>
+    <color name="ui_text_c4">@color/ui_system_c4</color>
+    <color name="ui_text_c5">@color/ui_system_c5</color>
+
+</resources>
