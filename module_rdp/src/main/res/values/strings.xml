@@ -2,6 +2,9 @@
 <resources>
     <string name="rdp_main_title">Windows 远程桌面</string>
     <string name="rdp_main_group">默认组</string>
+    <string name="rdp_main_connect">连接</string>
+    <string name="rdp_main_edit">编辑</string>
+    <string name="rdp_main_delete">删除</string>
 
     <!--添加或编辑界面-->
     <string name="rdp_add_title">添加远程 Windows</string>
@@ -20,7 +23,10 @@
     <string name="rdp_add_password_hint">Windows 密码</string>
     <string name="rdp_add_success">远程 Windows 保存成功</string>
 
-    <string name="search_label" translatable="false">aFreeRDP</string>
+
+
+
+    <string name="search_label">aFreeRDP</string>
     <string name="search_settings_description">Remote Computers</string>
 
 </resources>

@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.TimeUtils;
 import com.drakeet.multitype.ItemViewBinder;
+import com.xiaoyv.busines.base.BaseItemBinder;
 import com.xiaoyv.busines.room.entity.RdpEntity;
 import com.xiaoyv.rdp.databinding.RdpFragmentMainItemBinding;
 
@@ -21,8 +22,7 @@ import org.jetbrains.annotations.NotNull;
  * @author why
  * @since 2020/11/29
  **/
-public class RdpListBinder extends ItemViewBinder<RdpEntity, RdpListBinder.ViewHolder> {
-
+public class RdpListBinder extends BaseItemBinder<RdpEntity, RdpListBinder.ViewHolder> {
 
     @NotNull
     @Override
@@ -36,6 +36,7 @@ public class RdpListBinder extends ItemViewBinder<RdpEntity, RdpListBinder.ViewH
         viewHolder.binding.tvLabel.setText(rdpEntity.label);
         viewHolder.binding.tvAccount.setText(rdpEntity.account);
         viewHolder.binding.tvTime.setText(TimeUtils.getFriendlyTimeSpanByNow(rdpEntity.lastTime));
+        addClickListener(viewHolder, viewHolder.binding.getRoot());
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

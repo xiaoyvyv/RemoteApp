@@ -29,4 +29,10 @@
     <color name="ui_text_c4">@color/ui_system_c4</color>
     <color name="ui_text_c5">@color/ui_system_c5</color>
 
+
+    <!-- 状态颜色 -->
+    <color name="ui_status_success">#00ff00</color>
+    <color name="ui_status_warning">#00ff00</color>
+    <color name="ui_status_error">#00ff00</color>
+
 </resources>

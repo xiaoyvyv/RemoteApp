@@ -2,35 +2,36 @@ package com.xiaoyv.rdp.main.view;
 
 import android.view.View;
 
+import androidx.appcompat.app.AlertDialog;
+
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.ArrayUtils;
+import com.blankj.utilcode.util.ColorUtils;
+import com.blankj.utilcode.util.ObjectUtils;
+import com.blankj.utilcode.util.ResourceUtils;
 import com.blankj.utilcode.util.StringUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.drakeet.multitype.MultiTypeAdapter;
 import com.google.android.material.tabs.TabLayout;
+import com.xiaoyv.busines.base.BaseItemBinder;
 import com.xiaoyv.busines.base.BaseMvpFragment;
 import com.xiaoyv.busines.base.BaseSubscriber;
 import com.xiaoyv.busines.config.NavigationPath;
 import com.xiaoyv.busines.exception.RxException;
-import com.xiaoyv.busines.room.database.DateBaseManger;
 import com.xiaoyv.busines.room.entity.RdpEntity;
 import com.xiaoyv.rdp.R;
 import com.xiaoyv.rdp.databinding.RdpFragmentMainBinding;
 import com.xiaoyv.rdp.main.adapter.RdpListBinder;
 import com.xiaoyv.rdp.main.contract.RdpListContract;
 import com.xiaoyv.rdp.main.presenter.RdpListPresenter;
+import com.xiaoyv.ui.dialog.OptionsDialog;
 import com.xiaoyv.ui.listener.SimpleRefreshListener;
 import com.xiaoyv.ui.listener.SimpleTabSelectListener;
 
 import java.util.List;
-import java.util.Random;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.schedulers.Schedulers;
 import me.everything.android.ui.overscroll.IOverScrollDecor;
-import me.everything.android.ui.overscroll.IOverScrollState;
-import me.everything.android.ui.overscroll.ListenerStubs;
 import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
 
 /**
@@ -75,25 +76,20 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
         multiTypeAdapter = new MultiTypeAdapter();
         multiTypeAdapter.register(RdpEntity.class, rdpBinder);
         binding.rvContent.setAdapter(multiTypeAdapter);
-        presenter.v2pQueryLocalRdp();
     }
+
 
     @Override
     protected void initListener() {
+        rdpBinder.setOnItemChildClickListener((view, dataBean, position) -> {
+            OptionsDialog optionsDialog = OptionsDialog.get(activity);
+            optionsDialog.setOptions(StringUtils.getStringArray(R.array.rdp_context_menu));
+            optionsDialog.setLastTextColor(ColorUtils.getColor(R.color.ui_text_c0));
+            optionsDialog.show();
+        });
+
         binding.fabAdd.setOnClickListener(v -> {
             ARouter.getInstance().build(NavigationPath.PATH_RDO_ADD_ACTIVITY).navigation();
-//
-//            Observable.create(emitter -> {
-//                RdpEntity rdpEntity = new RdpEntity();
-//                rdpEntity.group = "Linux";
-//                rdpEntity.ip = "192.168.31.0" + new Random().nextInt(255);
-//                DateBaseManger.get().getRdpDao().insert(rdpEntity);
-//            }).observeOn(AndroidSchedulers.mainThread())
-//                    .subscribeOn(Schedulers.io())
-//                    .to(bindLifecycle())
-//                    .subscribe(o -> {
-//                        presenter.v2pQueryLocalRdp();
-//                    });
         });
 
         binding.tlGroup.addOnTabSelectedListener(new SimpleTabSelectListener() {
@@ -107,11 +103,21 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
         scrollDecor.setOverScrollUpdateListener(new SimpleRefreshListener() {
             @Override
             public void onRefresh() {
-                String group = String.valueOf(binding.tlGroup.getTabAt(binding.tlGroup.getSelectedTabPosition()).getText());
-                presenter.v2pQueryLocalRdpByGroup(group);
+                TabLayout.Tab tab = binding.tlGroup.getTabAt(binding.tlGroup.getSelectedTabPosition());
+                if (tab != null) {
+                    String group = String.valueOf(tab.getText());
+                    presenter.v2pQueryLocalRdpByGroup(group);
+                }
             }
         });
 
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        presenter.v2pQueryLocalRdp();
     }
 
     @Override
@@ -125,6 +131,10 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
             @Override
             public void onSuccess(List<String> groups) {
                 binding.tlGroup.removeAllTabs();
+                if (ObjectUtils.isEmpty(groups)) {
+                    binding.tlGroup.setVisibility(View.GONE);
+                    return;
+                }
                 for (String group : groups) {
                     binding.tlGroup.addTab(binding.tlGroup.newTab().setText(group));
                 }
