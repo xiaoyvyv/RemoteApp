@@ -1,26 +1,26 @@
 package com.xiaoyv.rdp.main.view;
 
+import android.util.Log;
 import android.view.View;
-
-import androidx.appcompat.app.AlertDialog;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.blankj.utilcode.util.ArrayUtils;
 import com.blankj.utilcode.util.ColorUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ObjectUtils;
-import com.blankj.utilcode.util.ResourceUtils;
 import com.blankj.utilcode.util.StringUtils;
-import com.blankj.utilcode.util.ToastUtils;
+import com.blankj.utilcode.util.ThreadUtils;
 import com.drakeet.multitype.MultiTypeAdapter;
 import com.google.android.material.tabs.TabLayout;
-import com.xiaoyv.busines.base.BaseItemBinder;
 import com.xiaoyv.busines.base.BaseMvpFragment;
 import com.xiaoyv.busines.base.BaseSubscriber;
 import com.xiaoyv.busines.config.NavigationPath;
 import com.xiaoyv.busines.exception.RxException;
+import com.xiaoyv.busines.room.database.DateBaseManger;
 import com.xiaoyv.busines.room.entity.RdpEntity;
+import com.xiaoyv.busines.utils.ScanUtils;
 import com.xiaoyv.rdp.R;
+import com.xiaoyv.rdp.add.AddRdpActivity;
 import com.xiaoyv.rdp.databinding.RdpFragmentMainBinding;
 import com.xiaoyv.rdp.main.adapter.RdpListBinder;
 import com.xiaoyv.rdp.main.contract.RdpListContract;
@@ -81,11 +81,45 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
 
     @Override
     protected void initListener() {
-        rdpBinder.setOnItemChildClickListener((view, dataBean, position) -> {
+        rdpBinder.setOnItemChildClickListener((view, dataBean, adapterPos, longClick) -> {
+            // 连接
+            if (!longClick) {
+                ThreadUtils.executeByFixed(10, new ScanUtils.ScanIpTask());
+                return;
+            }
             OptionsDialog optionsDialog = OptionsDialog.get(activity);
+            optionsDialog.setCancelable(true);
             optionsDialog.setOptions(StringUtils.getStringArray(R.array.rdp_context_menu));
-            optionsDialog.setLastTextColor(ColorUtils.getColor(R.color.ui_text_c0));
+            optionsDialog.setLastTextColor(ColorUtils.getColor(R.color.ui_status_error));
             optionsDialog.show();
+            optionsDialog.setOnItemChildClickListener(position -> {
+                // 连接
+                if (position == 0 || !longClick) {
+                    return;
+                }
+                // 编辑
+                if (position == 1) {
+                }
+                // 删除
+                if (position == 2) {
+                    multiTypeAdapter.getItems().remove(adapterPos);
+                    multiTypeAdapter.notifyItemRemoved(adapterPos);
+                    multiTypeAdapter.notifyItemRangeChanged(adapterPos, multiTypeAdapter.getItemCount());
+                    // 保存配置信息
+                    ThreadUtils.executeByCached(new ThreadUtils.SimpleTask<Boolean>() {
+                        @Override
+                        public Boolean doInBackground() {
+                            DateBaseManger.get().getRdpDao().delete(dataBean);
+                            return true;
+                        }
+
+                        @Override
+                        public void onSuccess(Boolean result) {
+                            presenter.v2pQueryLocalRdp();
+                        }
+                    });
+                }
+            });
         });
 
         binding.fabAdd.setOnClickListener(v -> {
@@ -110,7 +144,6 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
                 }
             }
         });
-
     }
 
 
@@ -135,6 +168,7 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
                     binding.tlGroup.setVisibility(View.GONE);
                     return;
                 }
+                binding.tlGroup.setVisibility(View.VISIBLE);
                 for (String group : groups) {
                     binding.tlGroup.addTab(binding.tlGroup.newTab().setText(group));
                 }
@@ -147,4 +181,5 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
         multiTypeAdapter.setItems(rdpEntities);
         multiTypeAdapter.notifyDataSetChanged();
     }
+
 }

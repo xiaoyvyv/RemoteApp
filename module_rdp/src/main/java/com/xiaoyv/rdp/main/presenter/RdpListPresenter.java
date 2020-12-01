@@ -2,11 +2,13 @@ package com.xiaoyv.rdp.main.presenter;
 
 import androidx.annotation.NonNull;
 
+import com.alibaba.android.arouter.launcher.ARouter;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ObjectUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.xiaoyv.busines.base.BaseSubscriber;
 import com.xiaoyv.busines.base.ImplBasePresenter;
+import com.xiaoyv.busines.config.NavigationPath;
 import com.xiaoyv.busines.exception.RxException;
 import com.xiaoyv.busines.room.entity.RdpEntity;
 import com.xiaoyv.rdp.R;
@@ -15,11 +17,9 @@ import com.xiaoyv.rdp.main.model.RdpListModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableEmitter;
 import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 
 /**
@@ -45,13 +45,14 @@ public class RdpListPresenter extends ImplBasePresenter<RdpListContract.View> im
 
                     @Override
                     public void onError(RxException e) {
-                        getView().p2vShowEmptyView();
+                        getView().p2vGetStatusView().showTryAgain(StringUtils.getString(R.string.rdp_main_list_empty),
+                                StringUtils.getString(R.string.rdp_main_add_now), v -> ARouter.getInstance().build(NavigationPath.PATH_RDO_ADD_ACTIVITY).navigation());
                     }
 
                     @Override
                     public void onSuccess(List<RdpEntity> rdpEntities) {
                         if (ObjectUtils.isEmpty(rdpEntities)) {
-                            getView().p2vShowEmptyView();
+                            onError(null);
                             return;
                         }
                         getView().p2vShowNormalView();
@@ -75,7 +76,6 @@ public class RdpListPresenter extends ImplBasePresenter<RdpListContract.View> im
 
                     @Override
                     public void onSuccess(List<RdpEntity> rdpEntities) {
-                        LogUtils.e(rdpEntities.size(), group);
                         if (ObjectUtils.isEmpty(rdpEntities)) {
                             getView().p2vShowEmptyView();
                             return;

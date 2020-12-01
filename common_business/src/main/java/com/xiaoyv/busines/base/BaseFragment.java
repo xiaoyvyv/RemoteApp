@@ -16,6 +16,7 @@ import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.xiaoyv.business.R;
 import com.xiaoyv.business.databinding.BusinessFragmentRootBinding;
+import com.xiaoyv.ui.status.ContentStatusView;
 
 /**
  * BaseFragment
@@ -24,6 +25,7 @@ import com.xiaoyv.business.databinding.BusinessFragmentRootBinding;
  * @since 2020/11/28
  **/
 public abstract class BaseFragment extends Fragment implements IBaseView {
+    private BusinessFragmentRootBinding rootBinding;
     protected View rootView;
     protected Activity activity;
     protected boolean isLoaded = true;
@@ -42,7 +44,7 @@ public abstract class BaseFragment extends Fragment implements IBaseView {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         if (rootView == null) {
-            BusinessFragmentRootBinding rootBinding = BusinessFragmentRootBinding.inflate(inflater, container, false);
+            rootBinding = BusinessFragmentRootBinding.inflate(inflater, container, false);
             rootBinding.flRoot.addView(createContentView());
             rootView = rootBinding.getRoot();
         }
@@ -53,6 +55,7 @@ public abstract class BaseFragment extends Fragment implements IBaseView {
     protected abstract View createContentView();
 
     protected void initArgumentsData(Bundle arguments) {
+
     }
 
     protected abstract void initView();
@@ -98,7 +101,7 @@ public abstract class BaseFragment extends Fragment implements IBaseView {
 
     @Override
     public void p2vShowLoading(String msg) {
-        LogUtils.v("p2vShowLoading:"+msg);
+        LogUtils.v("p2vShowLoading:" + msg);
     }
 
     @Override
@@ -108,26 +111,32 @@ public abstract class BaseFragment extends Fragment implements IBaseView {
 
     @Override
     public void p2vShowNormalView() {
-        LogUtils.v("p2vShowNormalView");
+        rootBinding.csvStatus.hideAll();
     }
 
     @Override
     public void p2vShowEmptyView() {
-        LogUtils.v("p2vShowEmptyView");
+        rootBinding.csvStatus.showEmpty();
     }
 
     @Override
     public void p2vShowLoadingView() {
-        LogUtils.v("p2vShowLoadingView");
+        rootBinding.csvStatus.showLoading();
     }
 
     @Override
     public void p2vShowRetryView() {
-        LogUtils.v("p2vShowRetryView");
+        rootBinding.csvStatus.showTryAgain(v -> p2vClickStatusView());
+    }
+
+
+    @Override
+    public void p2vClickStatusView() {
+
     }
 
     @Override
-    public void p2vClickStatusView(View view, int type) {
-
+    public ContentStatusView p2vGetStatusView() {
+        return rootBinding.csvStatus;
     }
 }

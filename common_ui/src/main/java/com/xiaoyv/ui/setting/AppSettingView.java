@@ -73,6 +73,8 @@ public class AppSettingView extends FrameLayout {
         });
         binding.clRoot.setOnClickListener(v -> {
             inputBinding.tvTitle.setText(getTitle());
+            inputBinding.etValue.setText(getMessage());
+            inputBinding.etValue.setSelection(0, getMessage().length());
             inputDialog.show();
             Window window = inputDialog.getWindow();
             if (window != null) {
@@ -121,7 +123,7 @@ public class AppSettingView extends FrameLayout {
         return this;
     }
 
-    public AppSettingView setInputTypeNumber(int maxLength) {
+    public AppSettingView setInputNumberType(int maxLength) {
         inputBinding.etValue.setKeyListener(new DigitsKeyListener(false, true));
         inputBinding.etValue.setFilters(new InputFilter[]{new InputFilter.LengthFilter(maxLength)});
         return this;

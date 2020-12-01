@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.blankj.utilcode.util.ColorUtils;
-import com.blankj.utilcode.util.LogUtils;
 import com.drakeet.multitype.ItemViewBinder;
 import com.xiaoyv.ui.R;
 import com.xiaoyv.ui.databinding.UiDialogOptionsItemBinding;
@@ -77,7 +76,6 @@ public class OptionsDialogItemBinder extends ItemViewBinder<String, OptionsDialo
                 this.clickListener.onItemChildClick(getPosition(viewHolder));
             }
         });
-
         if (getPosition(viewHolder) == getAdapterItems().size() - 1) {
             viewHolder.itemBinding.uiView.setVisibility(View.GONE);
             viewHolder.itemBinding.tvOptions.setTextColor(lastTextColor);
@@ -103,7 +101,7 @@ public class OptionsDialogItemBinder extends ItemViewBinder<String, OptionsDialo
         /**
          * 选项点击事件
          *
-         * @param position 事件
+         * @param position    事件
          */
         void onItemChildClick(int position);
     }

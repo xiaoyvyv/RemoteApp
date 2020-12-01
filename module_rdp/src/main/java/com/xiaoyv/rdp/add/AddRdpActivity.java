@@ -21,6 +21,12 @@ import com.xiaoyv.rdp.databinding.RdpActivityAddBinding;
 @Route(path = NavigationPath.PATH_RDO_ADD_ACTIVITY)
 public class AddRdpActivity extends BaseActivity {
     private RdpActivityAddBinding binding;
+    private String label;
+    private String group;
+    private String ip;
+    private String port;
+    private String account;
+    private String password;
 
     @Override
     protected View createContentView() {
@@ -33,16 +39,19 @@ public class AddRdpActivity extends BaseActivity {
         binding.asvLabel.setTitle(StringUtils.getString(R.string.rdp_add_label))
                 .setHint(StringUtils.getString(R.string.rdp_add_label_hint));
         binding.asvGroup.setTitle(StringUtils.getString(R.string.rdp_add_group))
+                .setMessage(StringUtils.getString(R.string.rdp_add_group_default))
                 .setHint(StringUtils.getString(R.string.rdp_add_group_hint));
         binding.asvIp.setTitle(StringUtils.getString(R.string.rdp_add_ip))
                 .setHint(getString(R.string.rdp_add_ip_hint));
         binding.asvPort.setTitle(StringUtils.getString(R.string.rdp_add_port))
-                .setInputTypeNumber(5)
+                .setMessage(StringUtils.getString(R.string.rdp_add_port_default))
+                .setInputNumberType(5)
                 .setHint(StringUtils.getString(R.string.rdp_add_port_hint));
         binding.asvAccount.setTitle(StringUtils.getString(R.string.rdp_add_account))
                 .setHint(StringUtils.getString(R.string.rdp_add_account_hint));
         binding.asvPassword.setTitle(StringUtils.getString(R.string.rdp_add_password))
                 .setHint(StringUtils.getString(R.string.rdp_add_password_hint));
+
     }
 
     @Override
@@ -51,12 +60,29 @@ public class AddRdpActivity extends BaseActivity {
                 .setStartClickListener(v -> onBackPressed())
                 .setEndIcon(R.drawable.rdp_icon_save)
                 .setEndClickListener(v -> {
-                    String label = binding.asvLabel.getMessage();
-                    String group = binding.asvGroup.getMessage();
-                    String ip = binding.asvIp.getMessage();
-                    String port = binding.asvPort.getMessage();
-                    String account = binding.asvAccount.getMessage();
-                    String password = binding.asvPassword.getMessage();
+                    label = binding.asvLabel.getMessage();
+                    group = binding.asvGroup.getMessage();
+                    ip = binding.asvIp.getMessage();
+                    port = binding.asvPort.getMessage();
+                    account = binding.asvAccount.getMessage();
+                    password = binding.asvPassword.getMessage();
+
+                    if (StringUtils.isEmpty(label)) {
+                        p2vShowToast(StringUtils.getString(R.string.rdp_add_label_empty));
+                        return;
+                    }
+                    if (StringUtils.isEmpty(ip)) {
+                        p2vShowToast(StringUtils.getString(R.string.rdp_add_ip_empty));
+                        return;
+                    }
+                    if (StringUtils.isEmpty(account)) {
+                        p2vShowToast(StringUtils.getString(R.string.rdp_add_account_empty));
+                        return;
+                    }
+
+                    port = StringUtils.isEmpty(port) ? StringUtils.getString(R.string.rdp_add_port_default) : port;
+                    group = StringUtils.isEmpty(group) ? StringUtils.getString(R.string.rdp_add_group_default) : group;
+
                     // 保存配置信息
                     ThreadUtils.executeByCached(new ThreadUtils.SimpleTask<Boolean>() {
                         @Override
@@ -76,7 +102,11 @@ public class AddRdpActivity extends BaseActivity {
                         @Override
                         public void onSuccess(Boolean result) {
                             p2vShowToast(StringUtils.getString(R.string.rdp_add_success));
-                            onBackPressed();
+                            ThreadUtils.runOnUiThreadDelayed(() -> {
+                                if (!AddRdpActivity.this.isFinishing()) {
+                                    AddRdpActivity.this.finish();
+                                }
+                            }, 1000);
                         }
                     });
                 });

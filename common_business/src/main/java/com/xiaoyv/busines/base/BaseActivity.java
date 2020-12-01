@@ -12,6 +12,7 @@ import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SnackbarUtils;
 import com.xiaoyv.business.databinding.BusinessActivityRootBinding;
+import com.xiaoyv.ui.status.ContentStatusView;
 
 /**
  * BaseActivity
@@ -73,7 +74,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseVie
 
     @Override
     public void p2vShowLoading(String msg) {
-        LogUtils.v("p2vShowLoading:"+msg);
+        LogUtils.v("p2vShowLoading:" + msg);
     }
 
     @Override
@@ -83,25 +84,36 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseVie
 
     @Override
     public void p2vShowNormalView() {
-        LogUtils.v("p2vShowNormalView");
+        rootBinding.getRoot().setVisibility(View.VISIBLE);
+        rootBinding.csvStatus.hideAll();
     }
 
     @Override
     public void p2vShowEmptyView() {
-        LogUtils.v("p2vShowEmptyView");
+        rootBinding.getRoot().setVisibility(View.GONE);
+        rootBinding.csvStatus.showEmpty();
     }
 
     @Override
     public void p2vShowLoadingView() {
-        LogUtils.v("p2vShowLoadingView");
+        rootBinding.getRoot().setVisibility(View.GONE);
+        rootBinding.csvStatus.showLoading();
     }
 
     @Override
     public void p2vShowRetryView() {
-        LogUtils.v("p2vShowRetryView");
+        rootBinding.getRoot().setVisibility(View.GONE);
+        rootBinding.csvStatus.showTryAgain(v -> p2vClickStatusView());
     }
 
     @Override
-    public void p2vClickStatusView(View view, int type) {
+    public void p2vClickStatusView() {
+
     }
+
+    @Override
+    public ContentStatusView p2vGetStatusView() {
+        return rootBinding.csvStatus;
+    }
+
 }

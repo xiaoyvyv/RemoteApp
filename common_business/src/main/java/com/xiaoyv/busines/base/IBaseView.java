@@ -2,6 +2,8 @@ package com.xiaoyv.busines.base;
 
 import android.view.View;
 
+import com.xiaoyv.ui.status.ContentStatusView;
+
 /**
  * BaseView
  *
@@ -26,5 +28,7 @@ public interface IBaseView {
 
     void p2vShowRetryView();
 
-    void p2vClickStatusView(View view, int type);
+    void p2vClickStatusView();
+
+    ContentStatusView p2vGetStatusView();
 }

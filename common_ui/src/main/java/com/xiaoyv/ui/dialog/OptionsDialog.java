@@ -24,8 +24,8 @@ import java.util.List;
  * @since 2020/12/01
  **/
 public class OptionsDialog extends AlertDialog {
-    private final Context context;
     private final UiDialogOptionsBinding binding;
+    private OptionsDialogItemBinder.OnItemChildClickListener clickListener;
     private MultiTypeAdapter multiTypeAdapter;
     private OptionsDialogItemBinder defaultBinder;
     private boolean canCloseable = true;
@@ -41,7 +41,6 @@ public class OptionsDialog extends AlertDialog {
 
     protected OptionsDialog(@NonNull Context context, int themeResId) {
         super(context, themeResId);
-        this.context = context;
         this.binding = UiDialogOptionsBinding.inflate(LayoutInflater.from(context));
         setView(this.binding.getRoot());
         init();
@@ -49,7 +48,6 @@ public class OptionsDialog extends AlertDialog {
 
     protected OptionsDialog(@NonNull Context context, boolean cancelable, @Nullable OnCancelListener cancelListener) {
         super(context, cancelable, cancelListener);
-        this.context = context;
         this.binding = UiDialogOptionsBinding.inflate(LayoutInflater.from(context));
         setView(this.binding.getRoot());
         init();
@@ -63,6 +61,9 @@ public class OptionsDialog extends AlertDialog {
         defaultBinder.setOnItemChildClickListener(position -> {
             if (canCloseable) {
                 dismiss();
+            }
+            if (clickListener != null) {
+                clickListener.onItemChildClick(position);
             }
         });
     }
@@ -84,7 +85,7 @@ public class OptionsDialog extends AlertDialog {
     }
 
     public void setOnItemChildClickListener(OptionsDialogItemBinder.OnItemChildClickListener clickListener) {
-        this.defaultBinder.setOnItemChildClickListener(clickListener);
+        this.clickListener = clickListener;
     }
 
     public void setOptions(List<String> options) {
@@ -111,7 +112,7 @@ public class OptionsDialog extends AlertDialog {
 
     @Override
     public void setCancelable(boolean flag) {
-        super.setCancelable(flag);
         this.canCloseable = flag;
+        super.setCancelable(flag);
     }
 }
