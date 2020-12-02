@@ -1,20 +1,10 @@
-/*
-   Android Mouse Input Mapping
-
-   Copyright 2013 Thincast Technologies GmbH, Author: Martin Fleisz
-
-   This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-   If a copy of the MPL was not distributed with this file, You can obtain one at
-   http://mozilla.org/MPL/2.0/.
-*/
-
-package com.freerdp.freerdpcore.utils;
+package com.xiaoyv.librdp.mapper;
 
 import android.content.Context;
 
 import com.freerdp.freerdpcore.presentation.ApplicationSettingsActivity;
 
-public class Mouse {
+public class MouseMapper {
 
     private final static int PTRFLAGS_LBUTTON = 0x1000;
     private final static int PTRFLAGS_RBUTTON = 0x2000;
@@ -26,17 +16,19 @@ public class Mouse {
     private final static int PTRFLAGS_WHEEL_NEGATIVE = 0x0100;
 
     public static int getLeftButtonEvent(Context context, boolean down) {
-        if (ApplicationSettingsActivity.getSwapMouseButtons(context))
+        if (ApplicationSettingsActivity.getSwapMouseButtons(context)) {
             return (PTRFLAGS_RBUTTON | (down ? PTRFLAGS_DOWN : 0));
-        else
+        } else {
             return (PTRFLAGS_LBUTTON | (down ? PTRFLAGS_DOWN : 0));
+        }
     }
 
     public static int getRightButtonEvent(Context context, boolean down) {
-        if (ApplicationSettingsActivity.getSwapMouseButtons(context))
+        if (ApplicationSettingsActivity.getSwapMouseButtons(context)) {
             return (PTRFLAGS_LBUTTON | (down ? PTRFLAGS_DOWN : 0));
-        else
+        } else {
             return (PTRFLAGS_RBUTTON | (down ? PTRFLAGS_DOWN : 0));
+        }
     }
 
     public static int getMoveEvent() {
@@ -50,10 +42,11 @@ public class Mouse {
         if (ApplicationSettingsActivity.getInvertScrolling(context))
             down = !down;
 
-        if (down)
+        if (down) {
             flags |= (PTRFLAGS_WHEEL_NEGATIVE | 0x0088);
-        else
+        } else {
             flags |= 0x0078;
+        }
         return flags;
     }
 }

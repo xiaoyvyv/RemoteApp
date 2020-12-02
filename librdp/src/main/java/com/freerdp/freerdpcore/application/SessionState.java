@@ -18,7 +18,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.freerdp.freerdpcore.domain.BookmarkBase;
-import com.freerdp.freerdpcore.services.LibFreeRDP;
+import com.xiaoyv.librdp.jni.LibFreeRDP;
 
 public class SessionState implements Parcelable {
     public static final Parcelable.Creator<SessionState> CREATOR =

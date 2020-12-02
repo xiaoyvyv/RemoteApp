@@ -43,20 +43,22 @@ import com.freerdp.freerdpcore.application.SessionState;
 import com.freerdp.freerdpcore.domain.BookmarkBase;
 import com.freerdp.freerdpcore.domain.ConnectionReference;
 import com.freerdp.freerdpcore.domain.ManualBookmark;
-import com.freerdp.freerdpcore.services.LibFreeRDP;
+import com.xiaoyv.librdp.jni.LibFreeRDP;
 import com.freerdp.freerdpcore.utils.ClipboardManagerProxy;
-import com.freerdp.freerdpcore.utils.KeyboardMapper;
-import com.freerdp.freerdpcore.utils.Mouse;
+import com.xiaoyv.librdp.mapper.KeyboardMapper;
+import com.xiaoyv.librdp.mapper.MouseMapper;
 import com.xiaoyv.librdp.R;
+import com.xiaoyv.librdp.view.FreeScrollView;
+import com.xiaoyv.librdp.view.SessionView;
+import com.xiaoyv.librdp.view.TouchPointerView;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-@SuppressWarnings("deprecation")
 public class SessionActivity extends AppCompatActivity
         implements LibFreeRDP.UIEventListener, KeyboardView.OnKeyboardActionListener,
-        ScrollView2D.ScrollView2DListener, KeyboardMapper.KeyProcessingListener,
+        FreeScrollView.ScrollView2DListener, KeyboardMapper.KeyProcessingListener,
         SessionView.SessionViewListener, TouchPointerView.TouchPointerListener,
         ClipboardManagerProxy.OnClipboardChangedListener {
     public static final String PARAM_CONNECTION_REFERENCE = "conRef";
@@ -100,7 +102,7 @@ public class SessionActivity extends AppCompatActivity
     private boolean toggleMouseButtons = false;
 
     private LibFreeRDPBroadcastReceiver libFreeRDPBroadcastReceiver;
-    private ScrollView2D scrollView;
+    private FreeScrollView scrollView;
     // keyboard visibility flags
     private boolean sysKeyboardVisible = false;
     private boolean extKeyboardVisible = false;
@@ -251,7 +253,7 @@ public class SessionActivity extends AppCompatActivity
         modifiersKeyboardView.setKeyboard(modifiersKeyboard);
         modifiersKeyboardView.setOnKeyboardActionListener(this);
 
-        scrollView = (ScrollView2D) findViewById(R.id.sessionScrollView);
+        scrollView = (FreeScrollView) findViewById(R.id.sessionScrollView);
         scrollView.setScrollViewListener(this);
         uiHandler = new UIHandler();
         libFreeRDPBroadcastReceiver = new LibFreeRDPBroadcastReceiver();
@@ -342,7 +344,7 @@ public class SessionActivity extends AppCompatActivity
         unregisterReceiver(libFreeRDPBroadcastReceiver);
 
         // remove clipboard listener
-        mClipboardManager.removeClipboardboardChangedListener(this);
+        mClipboardManager.removeClipboardChangedListener(this);
 
         // free session
         GlobalApp.freeSession(session.getInstance());
@@ -465,8 +467,7 @@ public class SessionActivity extends AppCompatActivity
         thread.start();
     }
 
-    // binds the current session to the activity by wiring it up with the
-    // sessionView and updating all internal objects accordingly
+    //通过将当前会话与// sessionView连接起来并相应地更新所有内部对象，从而将当前会话绑定到活动
     private void bindSession() {
         Log.v(TAG, "bindSession called");
         session.setUIEventListener(this);
@@ -521,7 +522,7 @@ public class SessionActivity extends AppCompatActivity
             modifiersKeyboardView.setVisibility(View.GONE);
 
             // clear any active key modifiers)
-            keyboardMapper.clearlAllModifiers();
+            keyboardMapper.clearAllModifiers();
         }
 
         sysKeyboardVisible = showSystemKeyboard;
@@ -574,7 +575,7 @@ public class SessionActivity extends AppCompatActivity
             discardedMoveEvents = 0;
 
         if (discardedMoveEvents > MAX_DISCARDED_MOVE_EVENTS)
-            LibFreeRDP.sendCursorEvent(session.getInstance(), x, y, Mouse.getMoveEvent());
+            LibFreeRDP.sendCursorEvent(session.getInstance(), x, y, MouseMapper.getMoveEvent());
         else
             uiHandler.sendMessageDelayed(Message.obtain(null, UIHandler.SEND_MOVE_EVENT, x, y),
                     SEND_MOVE_EVENT_TIMEOUT);
@@ -869,8 +870,8 @@ public class SessionActivity extends AppCompatActivity
     }
 
     @Override
-    public int OnVerifiyCertificate(String commonName, String subject, String issuer,
-                                    String fingerprint, boolean mismatch) {
+    public int OnVerifyCertificate(String commonName, String subject, String issuer,
+                                   String fingerprint, boolean mismatch) {
         // see if global settings says accept all
         if (ApplicationSettingsActivity.getAcceptAllCertificates(this))
             return 0;
@@ -944,7 +945,7 @@ public class SessionActivity extends AppCompatActivity
     }
 
     @Override
-    public void onScrollChanged(ScrollView2D scrollView, int x, int y, int oldx, int oldy) {
+    public void onScrollChanged(FreeScrollView scrollView, int x, int y, int oldx, int oldy) {
         zoomControls.setIsZoomInEnabled(!sessionView.isAtMaxZoom());
         zoomControls.setIsZoomOutEnabled(!sessionView.isAtMinZoom());
         if (!ApplicationSettingsActivity.getHideZoomControls(this) &&
@@ -971,8 +972,8 @@ public class SessionActivity extends AppCompatActivity
             cancelDelayedMoveEvent();
 
         LibFreeRDP.sendCursorEvent(session.getInstance(), x, y,
-                toggleMouseButtons ? Mouse.getRightButtonEvent(this, down)
-                        : Mouse.getLeftButtonEvent(this, down));
+                toggleMouseButtons ? MouseMapper.getRightButtonEvent(this, down)
+                        : MouseMapper.getLeftButtonEvent(this, down));
 
         if (!down)
             toggleMouseButtons = false;
@@ -990,7 +991,7 @@ public class SessionActivity extends AppCompatActivity
 
     @Override
     public void onSessionViewScroll(boolean down) {
-        LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0, Mouse.getScrollEvent(this, down));
+        LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0, MouseMapper.getScrollEvent(this, down));
     }
 
     // ****************************************************************************
@@ -1015,20 +1016,20 @@ public class SessionActivity extends AppCompatActivity
     public void onTouchPointerLeftClick(int x, int y, boolean down) {
         Point p = mapScreenCoordToSessionCoord(x, y);
         LibFreeRDP.sendCursorEvent(session.getInstance(), p.x, p.y,
-                Mouse.getLeftButtonEvent(this, down));
+                MouseMapper.getLeftButtonEvent(this, down));
     }
 
     @Override
     public void onTouchPointerRightClick(int x, int y, boolean down) {
         Point p = mapScreenCoordToSessionCoord(x, y);
         LibFreeRDP.sendCursorEvent(session.getInstance(), p.x, p.y,
-                Mouse.getRightButtonEvent(this, down));
+                MouseMapper.getRightButtonEvent(this, down));
     }
 
     @Override
     public void onTouchPointerMove(int x, int y) {
         Point p = mapScreenCoordToSessionCoord(x, y);
-        LibFreeRDP.sendCursorEvent(session.getInstance(), p.x, p.y, Mouse.getMoveEvent());
+        LibFreeRDP.sendCursorEvent(session.getInstance(), p.x, p.y, MouseMapper.getMoveEvent());
 
         if (ApplicationSettingsActivity.getAutoScrollTouchPointer(this) &&
                 !uiHandler.hasMessages(UIHandler.SCROLLING_REQUESTED)) {
@@ -1039,7 +1040,7 @@ public class SessionActivity extends AppCompatActivity
 
     @Override
     public void onTouchPointerScroll(boolean down) {
-        LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0, Mouse.getScrollEvent(this, down));
+        LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0, MouseMapper.getScrollEvent(this, down));
     }
 
     @Override
@@ -1066,11 +1067,11 @@ public class SessionActivity extends AppCompatActivity
                 final float vScroll = e.getAxisValue(MotionEvent.AXIS_VSCROLL);
                 if (vScroll < 0) {
                     LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0,
-                            Mouse.getScrollEvent(this, false));
+                            MouseMapper.getScrollEvent(this, false));
                 }
                 if (vScroll > 0) {
                     LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0,
-                            Mouse.getScrollEvent(this, true));
+                            MouseMapper.getScrollEvent(this, true));
                 }
                 break;
         }
@@ -1123,7 +1124,7 @@ public class SessionActivity extends AppCompatActivity
                 }
                 case SEND_MOVE_EVENT: {
                     LibFreeRDP.sendCursorEvent(session.getInstance(), msg.arg1, msg.arg2,
-                            Mouse.getMoveEvent());
+                            MouseMapper.getMoveEvent());
                     break;
                 }
                 case SHOW_DIALOG: {

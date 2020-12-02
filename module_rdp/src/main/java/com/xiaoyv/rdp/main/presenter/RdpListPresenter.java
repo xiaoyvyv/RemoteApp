@@ -37,7 +37,6 @@ public class RdpListPresenter extends ImplBasePresenter<RdpListContract.View> im
 
     @Override
     public void v2pQueryLocalRdp() {
-        getView().p2vShowLoadingView();
         model.p2mQueryLocalRdp()
                 .compose(bindTransformer())
                 .to(bindLifecycle())
@@ -55,7 +54,6 @@ public class RdpListPresenter extends ImplBasePresenter<RdpListContract.View> im
                             onError(null);
                             return;
                         }
-                        getView().p2vShowNormalView();
                         getView().p2vQueryLocalRdp(rdpEntities);
                     }
                 });
@@ -63,7 +61,6 @@ public class RdpListPresenter extends ImplBasePresenter<RdpListContract.View> im
 
     @Override
     public void v2pQueryLocalRdpByGroup(String group) {
-        getView().p2vShowLoadingView();
         model.p2mQueryLocalRdpByGroup(group)
                 .compose(bindTransformer())
                 .to(bindLifecycle())
@@ -80,7 +77,6 @@ public class RdpListPresenter extends ImplBasePresenter<RdpListContract.View> im
                             getView().p2vShowEmptyView();
                             return;
                         }
-                        getView().p2vShowNormalView();
                         getView().p2vQueryLocalRdpByGroup(rdpEntities, group);
                     }
                 });

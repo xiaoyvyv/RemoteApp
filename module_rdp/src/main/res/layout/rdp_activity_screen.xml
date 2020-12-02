@@ -1,67 +1,62 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-/*
-   Session screen layout
-
-   Copyright 2013 Thincast Technologies GmbH, Author: Martin Fleisz
-
-   This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0. 
-   If a copy of the MPL was not distributed with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
-*/
- -->
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/session_root_view"
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cl_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- childs are specified bottom-up so that we have a correct z-order in our final layout -->
-    <android.inputmethodservice.KeyboardView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/extended_keyboard"
+    <android.inputmethodservice.KeyboardView
+        android:id="@+id/kv_keyboard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <com.xiaoyv.librdp.view.FreeScrollView
-        android:id="@+id/sessionScrollView"
+        android:id="@+id/fsv_scroll"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@id/extended_keyboard"
         android:layout_alignParentTop="true"
         android:drawingCacheQuality="low"
         android:fillViewport="true"
         android:isScrollContainer="true"
-        android:scrollbars="horizontal|vertical">
+        android:scrollbars="horizontal|vertical"
+        app:layout_constraintTop_toTopOf="parent">
 
         <com.xiaoyv.librdp.view.SessionView
-            android:id="@+id/sessionView"
+            android:id="@+id/sv_session"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawingCacheQuality="low"
             android:focusable="true"
             android:focusableInTouchMode="true" />
-
     </com.xiaoyv.librdp.view.FreeScrollView>
 
     <com.xiaoyv.librdp.view.TouchPointerView
-        android:id="@+id/touchPointerView"
+        android:id="@+id/tpv_pointer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@drawable/touch_pointer_default"
         android:visibility="invisible" />
 
     <android.widget.ZoomControls
-        android:id="@+id/zoomControls"
+        android:id="@+id/zc_controls"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@id/sessionScrollView"
-        android:layout_centerHorizontal="true" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/fsv_scroll" />
 
-    <android.inputmethodservice.KeyboardView xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/extended_keyboard_header"
+    <android.inputmethodservice.KeyboardView
+        android:id="@+id/kv_keyboard_header"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:visibility="gone" />
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</RelativeLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>

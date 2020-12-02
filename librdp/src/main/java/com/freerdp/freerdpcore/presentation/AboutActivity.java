@@ -10,7 +10,7 @@ import android.webkit.WebView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.freerdp.freerdpcore.services.LibFreeRDP;
+import com.xiaoyv.librdp.jni.LibFreeRDP;
 import com.xiaoyv.librdp.R;
 
 import java.io.BufferedReader;

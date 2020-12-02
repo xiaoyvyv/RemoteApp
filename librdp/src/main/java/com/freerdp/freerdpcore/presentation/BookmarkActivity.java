@@ -28,8 +28,8 @@ import com.freerdp.freerdpcore.domain.BookmarkBase;
 import com.freerdp.freerdpcore.domain.ConnectionReference;
 import com.freerdp.freerdpcore.domain.ManualBookmark;
 import com.freerdp.freerdpcore.services.BookmarkBaseGateway;
-import com.freerdp.freerdpcore.services.LibFreeRDP;
-import com.freerdp.freerdpcore.utils.RDPFileParser;
+import com.xiaoyv.librdp.jni.LibFreeRDP;
+import com.xiaoyv.librdp.utils.RdpFileParser;
 import com.xiaoyv.librdp.R;
 
 import java.io.File;
@@ -93,7 +93,7 @@ public class BookmarkActivity extends PreferenceActivity implements OnSharedPref
                         bookmark.setLabel(file);
 
                         try {
-                            RDPFileParser rdpFile = new RDPFileParser(file);
+                            RdpFileParser rdpFile = new RdpFileParser(file);
                             updateBookmarkFromFile((ManualBookmark) bookmark, rdpFile);
 
                             bookmark.setLabel(new File(file).getName());
@@ -188,7 +188,7 @@ public class BookmarkActivity extends PreferenceActivity implements OnSharedPref
         }
     }
 
-    private void updateBookmarkFromFile(ManualBookmark bookmark, RDPFileParser rdpFile) {
+    private void updateBookmarkFromFile(ManualBookmark bookmark, RdpFileParser rdpFile) {
         String s;
         Integer i;
 

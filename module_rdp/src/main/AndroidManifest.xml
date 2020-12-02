@@ -3,7 +3,22 @@
     package="com.xiaoyv.rdp">
 
     <application>
-        <activity android:name=".add.AddRdpActivity"/>
+        <activity android:name=".add.AddRdpActivity" />
+        <activity
+            android:name=".screen.view.ScreenActivity"
+            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|density|screenLayout|navigation"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
 
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="*"
+                    android:scheme="freerdp" />
+            </intent-filter>
+        </activity>
     </application>
 </manifest>

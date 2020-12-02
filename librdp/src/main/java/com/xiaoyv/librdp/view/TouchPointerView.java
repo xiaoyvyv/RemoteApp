@@ -1,34 +1,30 @@
-/*
-   Android Touch Pointer view
+package com.xiaoyv.librdp.view;
 
-   Copyright 2013 Thincast Technologies GmbH, Author: Martin Fleisz
-
-   This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-   If a copy of the MPL was not distributed with this file, You can obtain one at
-   http://mozilla.org/MPL/2.0/.
-*/
-
-package com.freerdp.freerdpcore.presentation;
-
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 
 import com.freerdp.freerdpcore.utils.GestureDetector;
 import com.xiaoyv.librdp.R;
 
+/**
+ * 模拟鼠标自定义视图
+ */
 public class TouchPointerView extends AppCompatImageView {
 
     private static final int POINTER_ACTION_CURSOR = 0;
     private static final int POINTER_ACTION_CLOSE = 3;
 
-    // the touch pointer consists of 9 quadrants with the following functionality:
+    // 触摸指针由9个象限组成，具有以下功能：
     //
     // -------------
     // | 0 | 1 | 2 |
@@ -38,10 +34,10 @@ public class TouchPointerView extends AppCompatImageView {
     // | 6 | 7 | 8 |
     // -------------
     //
-    // 0 ... contains the actual pointer (the tip must be centered in the quadrant)
-    // 1 ... is left empty
-    // 2, 3, 5, 6, 7, 8 ... function quadrants that issue a callback
-    // 4 ... pointer center used for left clicks and to drag the pointer
+    // 0 ... 包含实际指针（尖端必须在象限的中心）
+    // 1 ... 留空
+    // 2, 3, 5, 6, 7, 8 ... 发出回调的功能象限
+    // 4 ... 中心位置，用于左键单击和拖动指针
     private static final int POINTER_ACTION_RCLICK = 2;
     private static final int POINTER_ACTION_LCLICK = 4;
     private static final int POINTER_ACTION_MOVE = 4;
@@ -52,13 +48,13 @@ public class TouchPointerView extends AppCompatImageView {
     private static final float SCROLL_DELTA = 10.0f;
     private static final int DEFAULT_TOUCH_POINTER_RESTORE_DELAY = 150;
     private RectF pointerRect;
-    private RectF pointerAreaRects[] = new RectF[9];
+    private final RectF[] pointerAreaRectArray = new RectF[9];
     private Matrix translationMatrix;
     private boolean pointerMoving = false;
     private boolean pointerScrolling = false;
     private TouchPointerListener listener = null;
-    private UIHandler uiHandler = new UIHandler();
-    // gesture detection
+    private final UIHandler uiHandler = new UIHandler(Looper.getMainLooper());
+    // 手势检测
     private GestureDetector gestureDetector;
 
     public TouchPointerView(Context context) {
@@ -84,7 +80,7 @@ public class TouchPointerView extends AppCompatImageView {
         setScaleType(ScaleType.MATRIX);
         setImageMatrix(translationMatrix);
 
-        // init rects
+        // 初始化
         final float rectSizeWidth = (float) getDrawable().getIntrinsicWidth() / 3.0f;
         final float rectSizeHeight = (float) getDrawable().getIntrinsicWidth() / 3.0f;
         for (int i = 0; i < 3; i++) {
@@ -93,7 +89,7 @@ public class TouchPointerView extends AppCompatImageView {
                 int top = (int) (i * rectSizeHeight);
                 int right = left + (int) rectSizeWidth;
                 int bottom = top + (int) rectSizeHeight;
-                pointerAreaRects[i * 3 + j] = new RectF(left, top, right, bottom);
+                pointerAreaRectArray[i * 3 + j] = new RectF(left, top, right, bottom);
             }
         }
         pointerRect =
@@ -149,67 +145,67 @@ public class TouchPointerView extends AppCompatImageView {
         setImageResource(resId);
     }
 
-    // returns the pointer area with the current translation matrix applied
+    // 返回具有当前转换矩阵的指针区域
+    @SuppressWarnings("SameParameterValue")
     private RectF getCurrentPointerArea(int area) {
-        RectF transRect = new RectF(pointerAreaRects[area]);
+        RectF transRect = new RectF(pointerAreaRectArray[area]);
         translationMatrix.mapRect(transRect);
         return transRect;
     }
 
     private boolean pointerAreaTouched(MotionEvent event, int area) {
-        RectF transRect = new RectF(pointerAreaRects[area]);
+        RectF transRect = new RectF(pointerAreaRectArray[area]);
         translationMatrix.mapRect(transRect);
-        if (transRect.contains(event.getX(), event.getY()))
-            return true;
-        return false;
+        return transRect.contains(event.getX(), event.getY());
     }
 
     private boolean pointerTouched(MotionEvent event) {
         RectF transRect = new RectF(pointerRect);
         translationMatrix.mapRect(transRect);
-        if (transRect.contains(event.getX(), event.getY()))
-            return true;
-        return false;
+        return transRect.contains(event.getX(), event.getY());
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        // check if pointer is being moved or if we are in scroll mode or if the pointer is touched
-        if (!pointerMoving && !pointerScrolling && !pointerTouched(event))
+        // 检查指针是否正在移动，或者我们是否处于滚动模式，或者是否触摸了指针
+        if (!pointerMoving && !pointerScrolling && !pointerTouched(event)) {
             return false;
+        }
         return gestureDetector.onTouchEvent(event);
     }
 
     @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        // ensure touch pointer is visible
-        if (changed)
+        // 确保触摸指针可见
+        if (changed) {
             ensureVisibility(right - left, bottom - top);
+        }
     }
 
-    // touch pointer listener - is triggered if an action field is
+    // 触摸指针侦听器-如果操作字段为
     public interface TouchPointerListener {
-        abstract void onTouchPointerClose();
+        void onTouchPointerClose();
 
-        abstract void onTouchPointerLeftClick(int x, int y, boolean down);
+        void onTouchPointerLeftClick(int x, int y, boolean down);
 
-        abstract void onTouchPointerRightClick(int x, int y, boolean down);
+        void onTouchPointerRightClick(int x, int y, boolean down);
 
-        abstract void onTouchPointerMove(int x, int y);
+        void onTouchPointerMove(int x, int y);
 
-        abstract void onTouchPointerScroll(boolean down);
+        void onTouchPointerScroll(boolean down);
 
-        abstract void onTouchPointerToggleKeyboard();
+        void onTouchPointerToggleKeyboard();
 
-        abstract void onTouchPointerToggleExtKeyboard();
+        void onTouchPointerToggleExtKeyboard();
 
-        abstract void onTouchPointerResetScrollZoom();
+        void onTouchPointerResetScrollZoom();
     }
 
     private class UIHandler extends Handler {
 
-        UIHandler() {
-            super();
+        public UIHandler(@NonNull Looper looper) {
+            super(looper);
         }
 
         @Override
@@ -269,18 +265,18 @@ public class TouchPointerView extends AppCompatImageView {
 
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             if (pointerMoving) {
-                // move pointer graphics
+                // 移动指针图形
                 movePointer((int) (e2.getX() - prevEvent.getX()),
                         (int) (e2.getY() - prevEvent.getY()));
                 prevEvent.recycle();
                 prevEvent = MotionEvent.obtain(e2);
 
-                // send move notification
+                // 发送移动通知
                 RectF rect = getCurrentPointerArea(POINTER_ACTION_CURSOR);
                 listener.onTouchPointerMove((int) rect.centerX(), (int) rect.centerY());
                 return true;
             } else if (pointerScrolling) {
-                // calc if user scrolled up or down (or if any scrolling happened at all)
+                // 计算用户向上或向下滚动（或根本没有滚动）
                 float deltaY = e2.getY() - prevEvent.getY();
                 if (deltaY > SCROLL_DELTA) {
                     listener.onTouchPointerScroll(true);
@@ -297,7 +293,7 @@ public class TouchPointerView extends AppCompatImageView {
         }
 
         public boolean onSingleTapUp(MotionEvent e) {
-            // look what area got touched and fire actions accordingly
+            // 看什么地方被触摸，并采取相应的行动
             if (pointerAreaTouched(e, POINTER_ACTION_CLOSE))
                 listener.onTouchPointerClose();
             else if (pointerAreaTouched(e, POINTER_ACTION_LCLICK)) {
@@ -325,7 +321,7 @@ public class TouchPointerView extends AppCompatImageView {
         }
 
         public boolean onDoubleTap(MotionEvent e) {
-            // issue a double click notification if performed in center quadrant
+            // 如果在中心象限中执行，则发出双击通知
             if (pointerAreaTouched(e, POINTER_ACTION_LCLICK)) {
                 RectF rect = getCurrentPointerArea(POINTER_ACTION_CURSOR);
                 listener.onTouchPointerLeftClick((int) rect.centerX(), (int) rect.centerY(), true);

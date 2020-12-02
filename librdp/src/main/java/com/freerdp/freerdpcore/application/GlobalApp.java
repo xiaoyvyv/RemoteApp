@@ -21,7 +21,7 @@ import com.freerdp.freerdpcore.domain.BookmarkBase;
 import com.freerdp.freerdpcore.presentation.ApplicationSettingsActivity;
 import com.freerdp.freerdpcore.services.BookmarkDB;
 import com.freerdp.freerdpcore.services.HistoryDB;
-import com.freerdp.freerdpcore.services.LibFreeRDP;
+import com.xiaoyv.librdp.jni.LibFreeRDP;
 import com.freerdp.freerdpcore.services.ManualBookmarkGateway;
 import com.freerdp.freerdpcore.services.QuickConnectHistoryGateway;
 
@@ -34,7 +34,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 public class GlobalApp extends Application implements LibFreeRDP.EventListener {
-    // event notification defines
+    // 事件通知定义
     public static final String EVENT_TYPE = "EVENT_TYPE";
     public static final String EVENT_PARAM = "EVENT_PARAM";
     public static final String EVENT_STATUS = "EVENT_STATUS";
@@ -43,7 +43,7 @@ public class GlobalApp extends Application implements LibFreeRDP.EventListener {
     public static final int FREERDP_EVENT_CONNECTION_SUCCESS = 1;
     public static final int FREERDP_EVENT_CONNECTION_FAILURE = 2;
     public static final int FREERDP_EVENT_DISCONNECTED = 3;
-    private static final String TAG = "GlobalApp";
+    public static final String TAG = "GlobalApp";
     public static boolean ConnectedTo3G = false;
     private static Map<Long, SessionState> sessionMap;
     private static BookmarkDB bookmarkDB;
@@ -85,13 +85,13 @@ public class GlobalApp extends Application implements LibFreeRDP.EventListener {
     // RDP session handling
     static public SessionState createSession(BookmarkBase bookmark, Context context) {
         SessionState session = new SessionState(LibFreeRDP.newInstance(context), bookmark);
-        sessionMap.put(Long.valueOf(session.getInstance()), session);
+        sessionMap.put(session.getInstance(), session);
         return session;
     }
 
     static public SessionState createSession(Uri openUri, Context context) {
         SessionState session = new SessionState(LibFreeRDP.newInstance(context), openUri);
-        sessionMap.put(Long.valueOf(session.getInstance()), session);
+        sessionMap.put(session.getInstance(), session);
         return session;
     }
 
@@ -181,7 +181,7 @@ public class GlobalApp extends Application implements LibFreeRDP.EventListener {
         public void run() {
             Log.v("DisconnectTask", "Doing action");
 
-            // disconnect any running rdp session
+            // 断开任何正在运行的rdp会话
             Collection<SessionState> sessions = GlobalApp.getSessions();
             for (SessionState session : sessions) {
                 LibFreeRDP.disconnect(session.getInstance());

@@ -1,4 +1,4 @@
-package com.freerdp.freerdpcore.services;
+package com.xiaoyv.librdp.jni;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -22,7 +22,6 @@ import java.util.Locale;
  * @author why
  * @since 2020/11/21
  */
-@SuppressWarnings("UnusedReturnValue")
 public class LibFreeRDP {
     private static final String TAG = "LibFreeRDP";
     private static EventListener listener;
@@ -449,7 +448,7 @@ public class LibFreeRDP {
             return 0;
         UIEventListener uiEventListener = s.getUIEventListener();
         if (uiEventListener != null)
-            return uiEventListener.OnVerifiyCertificate(commonName, subject, issuer, fingerprint,
+            return uiEventListener.OnVerifyCertificate(commonName, subject, issuer, fingerprint,
                     hostMismatch);
         return 0;
     }
@@ -499,7 +498,7 @@ public class LibFreeRDP {
         return freerdp_get_version();
     }
 
-    public static interface EventListener {
+    public interface EventListener {
         void OnPreConnect(long instance);
 
         void OnConnectionSuccess(long instance);
@@ -511,7 +510,7 @@ public class LibFreeRDP {
         void OnDisconnected(long instance);
     }
 
-    public static interface UIEventListener {
+    public interface UIEventListener {
         void OnSettingsChanged(int width, int height, int bpp);
 
         boolean OnAuthenticate(StringBuilder username, StringBuilder domain,
@@ -520,8 +519,8 @@ public class LibFreeRDP {
         boolean OnGatewayAuthenticate(StringBuilder username, StringBuilder domain,
                                       StringBuilder password);
 
-        int OnVerifiyCertificate(String commonName, String subject, String issuer,
-                                 String fingerprint, boolean mismatch);
+        int OnVerifyCertificate(String commonName, String subject, String issuer,
+                                String fingerprint, boolean mismatch);
 
         int OnVerifyChangedCertificate(String commonName, String subject, String issuer,
                                        String fingerprint, String oldSubject, String oldIssuer,

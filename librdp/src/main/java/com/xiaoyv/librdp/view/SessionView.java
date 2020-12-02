@@ -1,5 +1,6 @@
-package com.freerdp.freerdpcore.presentation;
+package com.xiaoyv.librdp.view;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -13,13 +14,19 @@ import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
 
 import com.freerdp.freerdpcore.application.SessionState;
+import com.freerdp.freerdpcore.presentation.SessionActivity;
 import com.freerdp.freerdpcore.utils.DoubleGestureDetector;
 import com.freerdp.freerdpcore.utils.GestureDetector;
 
 import java.util.Stack;
 
+/**
+ * 远程连接自定义视图
+ */
 public class SessionView extends View {
     public static final float MAX_SCALE_FACTOR = 3.0f;
     public static final float MIN_SCALE_FACTOR = 1.0f;
@@ -70,8 +77,12 @@ public class SessionView extends View {
         invScaleMatrix = new Matrix();
         invalidRegionF = new RectF();
 
-        setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
+        WindowInsetsController controller = getWindowInsetsController();
+        if (controller != null) {
+            controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
+            controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
+        }
     }
 
     public void setScaleGestureDetector(ScaleGestureDetector scaleGestureDetector) {
@@ -154,8 +165,8 @@ public class SessionView extends View {
         return res;
     }
 
-    public void setTouchPointerPadding(int widht, int height) {
-        touchPointerPaddingWidth = widht;
+    public void setTouchPointerPadding(int width, int height) {
+        touchPointerPaddingWidth = width;
         touchPointerPaddingHeight = height;
         requestLayout();
     }
@@ -216,6 +227,7 @@ public class SessionView extends View {
         return mappedEvent;
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         boolean res = gestureDetector.onTouchEvent(event);
@@ -224,17 +236,17 @@ public class SessionView extends View {
     }
 
     public interface SessionViewListener {
-        abstract void onSessionViewBeginTouch();
+        void onSessionViewBeginTouch();
 
-        abstract void onSessionViewEndTouch();
+        void onSessionViewEndTouch();
 
-        abstract void onSessionViewLeftTouch(int x, int y, boolean down);
+        void onSessionViewLeftTouch(int x, int y, boolean down);
 
-        abstract void onSessionViewRightTouch(int x, int y, boolean down);
+        void onSessionViewRightTouch(int x, int y, boolean down);
 
-        abstract void onSessionViewMove(int x, int y);
+        void onSessionViewMove(int x, int y);
 
-        abstract void onSessionViewScroll(boolean down);
+        void onSessionViewScroll(boolean down);
     }
 
     private class SessionGestureListener extends GestureDetector.SimpleOnGestureListener {

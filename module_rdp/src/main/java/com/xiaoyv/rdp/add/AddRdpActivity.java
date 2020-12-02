@@ -101,15 +101,9 @@ public class AddRdpActivity extends BaseActivity {
 
                         @Override
                         public void onSuccess(Boolean result) {
-                            p2vShowToast(StringUtils.getString(R.string.rdp_add_success));
-                            ThreadUtils.runOnUiThreadDelayed(() -> {
-                                if (!AddRdpActivity.this.isFinishing()) {
-                                    AddRdpActivity.this.finish();
-                                }
-                            }, 1000);
+                            onBackPressed();
                         }
                     });
                 });
-
     }
 }

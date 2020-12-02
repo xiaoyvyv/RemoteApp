@@ -1,4 +1,4 @@
-package com.freerdp.freerdpcore.presentation;
+package com.xiaoyv.librdp.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -34,7 +34,7 @@ import java.util.List;
  * using the two together is possible to achieve the effect of a text view
  * within a larger container.
  */
-public class ScrollView2D extends FrameLayout {
+public class FreeScrollView extends FrameLayout {
 
     static final int ANIMATED_SCROLL_GAP = 250;
     static final float MAX_SCROLL_FACTOR = 0.5f;
@@ -82,17 +82,17 @@ public class ScrollView2D extends FrameLayout {
     private int mMinimumVelocity;
     private int mMaximumVelocity;
 
-    public ScrollView2D(Context context) {
+    public FreeScrollView(Context context) {
         super(context);
         initTwoDScrollView();
     }
 
-    public ScrollView2D(Context context, AttributeSet attrs) {
+    public FreeScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initTwoDScrollView();
     }
 
-    public ScrollView2D(Context context, AttributeSet attrs, int defStyle) {
+    public FreeScrollView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initTwoDScrollView();
     }
@@ -251,8 +251,9 @@ public class ScrollView2D extends FrameLayout {
         if (cantScroll()) {
             if (isFocused()) {
                 View currentFocused = findFocus();
-                if (currentFocused == this)
+                if (currentFocused == this) {
                     currentFocused = null;
+                }
                 View nextFocused =
                         FocusFinder.getInstance().findNextFocus(this, currentFocused, View.FOCUS_DOWN);
                 return nextFocused != null && nextFocused != this &&
@@ -433,8 +434,9 @@ public class ScrollView2D extends FrameLayout {
                         deltaY = 0;
                     }
                 }
-                if (deltaY != 0 || deltaX != 0)
+                if (deltaY != 0 || deltaX != 0) {
                     scrollBy(deltaX, deltaY);
+                }
                 break;
             case MotionEvent.ACTION_UP:
                 final VelocityTracker velocityTracker = mVelocityTracker;
@@ -584,9 +586,9 @@ public class ScrollView2D extends FrameLayout {
      * component is a good candidate for focus, this scrollview reclaims the
      * focus.</p>
      *
-     * @param direction the scroll direction: {@link android.view.View#FOCUS_UP}
+     * @param direction the scroll direction: {@link View#FOCUS_UP}
      *                  to go the top of the view or
-     *                  {@link android.view.View#FOCUS_DOWN} to go the bottom
+     *                  {@link View#FOCUS_DOWN} to go the bottom
      * @return true if the key event is consumed by this method, false otherwise
      */
     public boolean fullScroll(int direction, boolean horizontal) {
@@ -629,9 +631,9 @@ public class ScrollView2D extends FrameLayout {
      * to a component visible in this area. If no component can be focused in
      * the new visible area, the focus is reclaimed by this scrollview.</p>
      *
-     * @param directionY the scroll direction: {@link android.view.View#FOCUS_UP}
+     * @param directionY the scroll direction: {@link View#FOCUS_UP}
      *                   to go upward
-     *                   {@link android.view.View#FOCUS_DOWN} to downward
+     *                   {@link View#FOCUS_DOWN} to downward
      * @param top        the top offset of the new area to be made visible
      * @param bottom     the bottom offset of the new area to be made visible
      * @return true if the key event is consumed by this method, false otherwise
@@ -675,8 +677,9 @@ public class ScrollView2D extends FrameLayout {
      */
     public boolean arrowScroll(int direction, boolean horizontal) {
         View currentFocused = findFocus();
-        if (currentFocused == this)
+        if (currentFocused == this) {
             currentFocused = null;
+        }
         View nextFocused = FocusFinder.getInstance().findNextFocus(this, currentFocused, direction);
         final int maxJump =
                 horizontal ? getMaxScrollAmountHorizontal() : getMaxScrollAmountVertical();
@@ -907,8 +910,9 @@ public class ScrollView2D extends FrameLayout {
      * @return The scroll delta.
      */
     protected int computeScrollDeltaToGetChildRectOnScreen(Rect rect) {
-        if (getChildCount() == 0)
+        if (getChildCount() == 0) {
             return 0;
+        }
         int height = getHeight();
         int screenTop = getScrollY();
         int screenBottom = screenTop + height;
@@ -975,7 +979,7 @@ public class ScrollView2D extends FrameLayout {
      * When looking for focus in children of a scroll view, need to be a little
      * more careful not to give focus to something that is scrolled off screen.
      * <p>
-     * This is more expensive than the default {@link android.view.ViewGroup}
+     * This is more expensive than the default {@link ViewGroup}
      * implementation, otherwise this behavior might have been made the default.
      */
     @Override
@@ -1032,8 +1036,9 @@ public class ScrollView2D extends FrameLayout {
         super.onSizeChanged(w, h, oldw, oldh);
 
         View currentFocused = findFocus();
-        if (null == currentFocused || this == currentFocused)
+        if (null == currentFocused || this == currentFocused) {
             return;
+        }
 
         // If the currently-focused view was visible on the screen when the
         // screen was at the old height, then scroll the screen to make that
@@ -1154,6 +1159,6 @@ public class ScrollView2D extends FrameLayout {
 
     // interface to receive notifications when the view is scrolled
     public interface ScrollView2DListener {
-        void onScrollChanged(ScrollView2D scrollView, int x, int y, int oldx, int oldy);
+        void onScrollChanged(FreeScrollView scrollView, int x, int y, int oldx, int oldy);
     }
 }
