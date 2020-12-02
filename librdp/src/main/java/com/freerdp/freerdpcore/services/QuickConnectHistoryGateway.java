@@ -1,5 +1,3 @@
-
-
 package com.freerdp.freerdpcore.services;
 
 import android.database.Cursor;
@@ -9,6 +7,7 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.freerdp.freerdpcore.domain.BookmarkBase;
 import com.freerdp.freerdpcore.domain.QuickConnectBookmark;
 
@@ -16,7 +15,7 @@ import java.util.ArrayList;
 
 public class QuickConnectHistoryGateway {
     private final static String TAG = "QuickConnectHistoryGateway";
-    private SQLiteOpenHelper historyDB;
+    private final SQLiteOpenHelper historyDB;
 
     public QuickConnectHistoryGateway(SQLiteOpenHelper historyDB) {
         this.historyDB = historyDB;
@@ -57,7 +56,7 @@ public class QuickConnectHistoryGateway {
         try {
             db.execSQL(insertHistoryItem);
         } catch (SQLException e) {
-            Log.v(TAG, e.toString());
+			Log.e("SQLException", e.getMessage(), e);
         }
     }
 

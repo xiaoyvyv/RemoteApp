@@ -1,13 +1,3 @@
-/*
-   Android Shortcut activity
-
-   Copyright 2013 Thincast Technologies GmbH, Author: Martin Fleisz
-
-   This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-   If a copy of the MPL was not distributed with this file, You can obtain one at
-   http://mozilla.org/MPL/2.0/.
-*/
-
 package com.freerdp.freerdpcore.presentation;
 
 import android.app.AlertDialog;
@@ -115,30 +105,27 @@ public class ShortcutsActivity extends ListActivity {
                 .setView(input)
                 .setPositiveButton(
                         android.R.string.ok,
-                        new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String label = input.getText().toString();
-                                if (label.length() == 0)
-                                    label = paramDefaultLabel;
+                        (dialog, which) -> {
+                            String label = input.getText().toString();
+                            if (label.length() == 0)
+                                label = paramDefaultLabel;
 
-                                Intent shortcutIntent = new Intent(Intent.ACTION_VIEW);
-                                shortcutIntent.setClassName(paramContext,
-                                        SessionRequestHandlerActivity.class.getName());
-                                shortcutIntent.setData(Uri.parse(paramStrRef));
+                            Intent shortcutIntent = new Intent(Intent.ACTION_VIEW);
+                            shortcutIntent.setClassName(paramContext,
+                                    SessionRequestHandlerActivity.class.getName());
+                            shortcutIntent.setData(Uri.parse(paramStrRef));
 
-                                // Then, set up the container intent (the response to the caller)
-                                Intent intent = new Intent();
-                                intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
-                                intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, label);
-                                Parcelable iconResource = Intent.ShortcutIconResource.fromContext(
-                                        paramContext, R.drawable.icon_launcher_freerdp);
-                                intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource);
+                            // Then, set up the container intent (the response to the caller)
+                            Intent intent = new Intent();
+                            intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, shortcutIntent);
+                            intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, label);
+                            Parcelable iconResource = Intent.ShortcutIconResource.fromContext(
+                                    paramContext, R.drawable.icon_launcher_freerdp);
+                            intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, iconResource);
 
-                                // Now, return the result to the launcher
-                                setResult(RESULT_OK, intent);
-                                finish();
-                            }
+                            // Now, return the result to the launcher
+                            setResult(RESULT_OK, intent);
+                            finish();
                         })
                 .setNegativeButton(android.R.string.cancel,
                         new DialogInterface.OnClickListener() {

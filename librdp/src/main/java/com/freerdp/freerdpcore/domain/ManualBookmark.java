@@ -4,9 +4,6 @@ import android.content.SharedPreferences;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * 手动
- */
 public class ManualBookmark extends BookmarkBase {
     public static final Parcelable.Creator<ManualBookmark> CREATOR =
             new Parcelable.Creator<ManualBookmark>() {
@@ -123,12 +120,7 @@ public class ManualBookmark extends BookmarkBase {
         gatewaySettings.setDomain(sharedPrefs.getString("bookmark.gateway_domain", ""));
     }
 
-    // Cloneable    @RecentlyNonNull
-    public Object clone() {
-        return super.clone();
-    }
-
-    // Gateway Settings class
+    // 网关设置类
     public static class GatewaySettings implements Parcelable {
         public static final Parcelable.Creator<GatewaySettings> CREATOR =
                 new Parcelable.Creator<GatewaySettings>() {

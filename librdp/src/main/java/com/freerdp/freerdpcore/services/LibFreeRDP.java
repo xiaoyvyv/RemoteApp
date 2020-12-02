@@ -1,4 +1,4 @@
-package com.xiaoyv.librdp.jni;
+package com.freerdp.freerdpcore.services;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -16,12 +16,6 @@ import com.freerdp.freerdpcore.presentation.ApplicationSettingsActivity;
 import java.util.ArrayList;
 import java.util.Locale;
 
-/**
- * Android FreeRDP JNI Wrapper
- *
- * @author why
- * @since 2020/11/21
- */
 public class LibFreeRDP {
     private static final String TAG = "LibFreeRDP";
     private static EventListener listener;
@@ -40,12 +34,11 @@ public class LibFreeRDP {
                 "freerdp3",
                 "freerdp-client3",
                 "freerdp-android3"};
-
-        final String libraryPath = System.getProperty("java.library.path");
+        final String LD_PATH = System.getProperty("java.library.path");
 
         for (String lib : libraries) {
             try {
-                Log.v(TAG, "Trying to load library " + lib + " from libraryPath: " + libraryPath);
+                Log.v(TAG, "Trying to load library " + lib + " from LD_PATH: " + LD_PATH);
                 System.loadLibrary(lib);
             } catch (UnsatisfiedLinkError e) {
                 Log.e(TAG, "Failed to load library " + lib + ": " + e.toString());
@@ -176,7 +169,7 @@ public class LibFreeRDP {
         String hostname = bookmark.<ManualBookmark>get().getHostname();
 
         args.add("/v:" + hostname);
-        args.add("/port:" + port);
+        args.add("/port:" + String.valueOf(port));
 
         arg = bookmark.getUsername();
         if (!arg.isEmpty()) {
@@ -191,8 +184,8 @@ public class LibFreeRDP {
             args.add("/p:" + arg);
         }
 
-        args.add(String.format(Locale.getDefault(), "/size:%dx%d", screenSettings.getWidth(), screenSettings.getHeight()));
-        args.add("/bpp:" + screenSettings.getColors());
+		args.add(String.format(Locale.CANADA, "/size:%dx%d", screenSettings.getWidth(), screenSettings.getHeight()));
+        args.add("/bpp:" + String.valueOf(screenSettings.getColors()));
 
         if (advanced.getConsoleMode()) {
             args.add("/admin");
@@ -232,7 +225,7 @@ public class LibFreeRDP {
         args.add(addFlag("wallpaper", flags.getWallpaper()));
         args.add(addFlag("window-drag", flags.getFullWindowDrag()));
         args.add(addFlag("menu-anims", flags.getMenuAnimations()));
-        args.add(addFlag("themes", flags.getTheming()));
+        args.add(addFlag("themes", flags.getTheme()));
         args.add(addFlag("fonts", flags.getFontSmoothing()));
         args.add(addFlag("aero", flags.getDesktopComposition()));
         args.add(addFlag("glyph-cache", false));
@@ -262,7 +255,7 @@ public class LibFreeRDP {
             ManualBookmark.GatewaySettings gateway =
                     bookmark.<ManualBookmark>get().getGatewaySettings();
 
-            args.add(String.format(Locale.getDefault(), "/g:%s:%d", gateway.getHostname(), gateway.getPort()));
+            args.add(String.format("/g:%s:%d", gateway.getHostname(), gateway.getPort()));
 
             arg = gateway.getUsername();
             if (!arg.isEmpty()) {
@@ -281,7 +274,7 @@ public class LibFreeRDP {
 		/* 0 ... local
 		   1 ... remote
 		   2 ... disable */
-        args.add("/audio-mode:" + advanced.getRedirectSound());
+        args.add("/audio-mode:" + String.valueOf(advanced.getRedirectSound()));
         if (advanced.getRedirectSound() == 0) {
             args.add("/sound");
         }
@@ -292,7 +285,7 @@ public class LibFreeRDP {
 
         args.add("/cert-ignore");
         args.add("/log-level:" + debug.getDebugLevel());
-        String[] arrayArgs = args.toArray(new String[0]);
+        String[] arrayArgs = args.toArray(new String[args.size()]);
         return freerdp_parse_arguments(inst, arrayArgs);
     }
 
@@ -348,7 +341,7 @@ public class LibFreeRDP {
             }
         }
 
-        String[] arrayArgs = args.toArray(new String[0]);
+        String[] arrayArgs = args.toArray(new String[args.size()]);
         return freerdp_parse_arguments(inst, arrayArgs);
     }
 
@@ -448,7 +441,7 @@ public class LibFreeRDP {
             return 0;
         UIEventListener uiEventListener = s.getUIEventListener();
         if (uiEventListener != null)
-            return uiEventListener.OnVerifyCertificate(commonName, subject, issuer, fingerprint,
+            return uiEventListener.OnVerifiyCertificate(commonName, subject, issuer, fingerprint,
                     hostMismatch);
         return 0;
     }
@@ -498,7 +491,7 @@ public class LibFreeRDP {
         return freerdp_get_version();
     }
 
-    public interface EventListener {
+    public static interface EventListener {
         void OnPreConnect(long instance);
 
         void OnConnectionSuccess(long instance);
@@ -510,7 +503,7 @@ public class LibFreeRDP {
         void OnDisconnected(long instance);
     }
 
-    public interface UIEventListener {
+    public static interface UIEventListener {
         void OnSettingsChanged(int width, int height, int bpp);
 
         boolean OnAuthenticate(StringBuilder username, StringBuilder domain,
@@ -519,8 +512,8 @@ public class LibFreeRDP {
         boolean OnGatewayAuthenticate(StringBuilder username, StringBuilder domain,
                                       StringBuilder password);
 
-        int OnVerifyCertificate(String commonName, String subject, String issuer,
-                                String fingerprint, boolean mismatch);
+        int OnVerifiyCertificate(String commonName, String subject, String issuer,
+                                 String fingerprint, boolean mismatch);
 
         int OnVerifyChangedCertificate(String commonName, String subject, String issuer,
                                        String fingerprint, String oldSubject, String oldIssuer,

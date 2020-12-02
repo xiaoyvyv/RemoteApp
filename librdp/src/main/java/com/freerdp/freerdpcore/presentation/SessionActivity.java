@@ -43,14 +43,14 @@ import com.freerdp.freerdpcore.application.SessionState;
 import com.freerdp.freerdpcore.domain.BookmarkBase;
 import com.freerdp.freerdpcore.domain.ConnectionReference;
 import com.freerdp.freerdpcore.domain.ManualBookmark;
-import com.xiaoyv.librdp.jni.LibFreeRDP;
+import com.freerdp.freerdpcore.services.LibFreeRDP;
 import com.freerdp.freerdpcore.utils.ClipboardManagerProxy;
-import com.xiaoyv.librdp.mapper.KeyboardMapper;
-import com.xiaoyv.librdp.mapper.MouseMapper;
+import com.freerdp.freerdpcore.mapper.KeyboardMapper;
+import com.freerdp.freerdpcore.mapper.MouseMapper;
+import com.freerdp.freerdpcore.view.FreeScrollView;
+import com.freerdp.freerdpcore.view.SessionView;
+import com.freerdp.freerdpcore.view.TouchPointerView;
 import com.xiaoyv.librdp.R;
-import com.xiaoyv.librdp.view.FreeScrollView;
-import com.xiaoyv.librdp.view.SessionView;
-import com.xiaoyv.librdp.view.TouchPointerView;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -260,22 +260,16 @@ public class SessionActivity extends AppCompatActivity
 
         zoomControls = (ZoomControls) findViewById(R.id.zoomControls);
         zoomControls.hide();
-        zoomControls.setOnZoomInClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resetZoomControlsAutoHideTimeout();
-                zoomControls.setIsZoomInEnabled(sessionView.zoomIn(ZOOMING_STEP));
-                zoomControls.setIsZoomOutEnabled(true);
-            }
-        });
-        zoomControls.setOnZoomOutClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                resetZoomControlsAutoHideTimeout();
-                zoomControls.setIsZoomOutEnabled(sessionView.zoomOut(ZOOMING_STEP));
-                zoomControls.setIsZoomInEnabled(true);
-            }
-        });
+        zoomControls.setOnZoomInClickListener(v -> {
+			resetZoomControlsAutoHideTimeout();
+			zoomControls.setIsZoomInEnabled(sessionView.zoomIn(ZOOMING_STEP));
+			zoomControls.setIsZoomOutEnabled(true);
+		});
+        zoomControls.setOnZoomOutClickListener(v -> {
+			resetZoomControlsAutoHideTimeout();
+			zoomControls.setIsZoomOutEnabled(sessionView.zoomOut(ZOOMING_STEP));
+			zoomControls.setIsZoomInEnabled(true);
+		});
 
         toggleMouseButtons = false;
 
@@ -344,7 +338,7 @@ public class SessionActivity extends AppCompatActivity
         unregisterReceiver(libFreeRDPBroadcastReceiver);
 
         // remove clipboard listener
-        mClipboardManager.removeClipboardChangedListener(this);
+        mClipboardManager.removeClipboardboardChangedListener(this);
 
         // free session
         GlobalApp.freeSession(session.getInstance());
@@ -467,7 +461,8 @@ public class SessionActivity extends AppCompatActivity
         thread.start();
     }
 
-    //通过将当前会话与// sessionView连接起来并相应地更新所有内部对象，从而将当前会话绑定到活动
+    // binds the current session to the activity by wiring it up with the
+    // sessionView and updating all internal objects accordingly
     private void bindSession() {
         Log.v(TAG, "bindSession called");
         session.setUIEventListener(this);
@@ -540,9 +535,8 @@ public class SessionActivity extends AppCompatActivity
         // check if any key is in the keycodes list
 
         List<Keyboard.Key> keys = modifiersKeyboard.getKeys();
-        for (Iterator<Keyboard.Key> it = keys.iterator(); it.hasNext(); ) {
+        for (Keyboard.Key curKey : keys) {
             // if the key is a sticky key - just set it to off
-            Keyboard.Key curKey = it.next();
             if (curKey.sticky) {
                 switch (keyboardMapper.getModifierState(curKey.codes[0])) {
                     case KeyboardMapper.KEYSTATE_ON:
@@ -870,8 +864,8 @@ public class SessionActivity extends AppCompatActivity
     }
 
     @Override
-    public int OnVerifyCertificate(String commonName, String subject, String issuer,
-                                   String fingerprint, boolean mismatch) {
+    public int OnVerifiyCertificate(String commonName, String subject, String issuer,
+                                    String fingerprint, boolean mismatch) {
         // see if global settings says accept all
         if (ApplicationSettingsActivity.getAcceptAllCertificates(this))
             return 0;

@@ -1,13 +1,3 @@
-/*
-   Helper class to access bookmark database
-
-   Copyright 2013 Thincast Technologies GmbH, Author: Martin Fleisz
-
-   This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-   If a copy of the MPL was not distributed with this file, You can obtain one at
-   http://mozilla.org/MPL/2.0/.
-*/
-
 package com.freerdp.freerdpcore.services;
 
 import android.content.ContentValues;
@@ -24,7 +14,7 @@ import java.util.ArrayList;
 
 public abstract class BookmarkBaseGateway {
     private final static String TAG = "BookmarkBaseGateway";
-    private SQLiteOpenHelper bookmarkDB;
+    private final SQLiteOpenHelper bookmarkDB;
 
     private static final String JOIN_PREFIX = "join_";
     private static final String KEY_BOOKMARK_ID = "bookmarkId";
@@ -91,11 +81,11 @@ public abstract class BookmarkBaseGateway {
 
         // advanced settings
         values.put(BookmarkDB.DB_KEY_BOOKMARK_3G_ENABLE,
-                bookmark.getAdvancedSettings().getEnable3GSettings());
+                bookmark.getAdvancedSettings().getEnable345GSettings());
         // insert 3G screen and 3G performance settings
-        rowid = insertScreenSettings(db, bookmark.getAdvancedSettings().getScreen3G());
+        rowid = insertScreenSettings(db, bookmark.getAdvancedSettings().getScreen345G());
         values.put(BookmarkDB.DB_KEY_SCREEN_SETTINGS_3G, rowid);
-        rowid = insertPerformanceFlags(db, bookmark.getAdvancedSettings().getPerformance3G());
+        rowid = insertPerformanceFlags(db, bookmark.getAdvancedSettings().getPerformance345G());
         values.put(BookmarkDB.DB_KEY_PERFORMANCE_FLAGS_3G, rowid);
         values.put(BookmarkDB.DB_KEY_BOOKMARK_REDIRECT_SDCARD,
                 bookmark.getAdvancedSettings().getRedirectSDCard());
@@ -147,7 +137,7 @@ public abstract class BookmarkBaseGateway {
 
         // advanced settings
         values.put(BookmarkDB.DB_KEY_BOOKMARK_3G_ENABLE,
-                bookmark.getAdvancedSettings().getEnable3GSettings());
+                bookmark.getAdvancedSettings().getEnable345GSettings());
         // update 3G screen and 3G performance settings settings
         updateScreenSettings3G(db, bookmark);
         updatePerformanceFlags3G(db, bookmark);
@@ -225,7 +215,7 @@ public abstract class BookmarkBaseGateway {
         Cursor cursor =
                 queryBookmarks(BookmarkDB.DB_KEY_BOOKMARK_LABEL + " LIKE '%" + pattern + "%'",
                         BookmarkDB.DB_KEY_BOOKMARK_LABEL);
-        ArrayList<BookmarkBase> bookmarks = new ArrayList<BookmarkBase>(cursor.getCount());
+        ArrayList<BookmarkBase> bookmarks = new ArrayList<>(cursor.getCount());
 
         if (cursor.moveToFirst() && (cursor.getCount() > 0)) {
             do {
@@ -399,7 +389,7 @@ public abstract class BookmarkBaseGateway {
         readPerformanceFlags(bookmark, cursor);
 
         // advanced settings
-        bookmark.getAdvancedSettings().setEnable3GSettings(
+        bookmark.getAdvancedSettings().setEnable345GSettings(
                 cursor.getInt(cursor.getColumnIndex(BookmarkDB.DB_KEY_BOOKMARK_3G_ENABLE)) != 0);
         readScreenSettings3G(bookmark, cursor);
         readPerformanceFlags3G(bookmark, cursor);
@@ -448,7 +438,7 @@ public abstract class BookmarkBaseGateway {
         perfFlags.setH264(cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_H264)) != 0);
         perfFlags.setWallpaper(cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_WALLPAPER)) !=
                 0);
-        perfFlags.setTheming(cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_THEME)) != 0);
+        perfFlags.setTheme(cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_THEME)) != 0);
         perfFlags.setFullWindowDrag(cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_DRAG)) !=
                 0);
         perfFlags.setMenuAnimations(
@@ -460,7 +450,7 @@ public abstract class BookmarkBaseGateway {
     }
 
     private void readScreenSettings3G(BookmarkBase bookmark, Cursor cursor) {
-        BookmarkBase.ScreenSettings screenSettings = bookmark.getAdvancedSettings().getScreen3G();
+        BookmarkBase.ScreenSettings screenSettings = bookmark.getAdvancedSettings().getScreen345G();
         screenSettings.setColors(cursor.getInt(cursor.getColumnIndex(KEY_SCREEN_COLORS_3G)));
         screenSettings.setResolution(
                 cursor.getInt(cursor.getColumnIndex(KEY_SCREEN_RESOLUTION_3G)));
@@ -469,13 +459,13 @@ public abstract class BookmarkBaseGateway {
     }
 
     private void readPerformanceFlags3G(BookmarkBase bookmark, Cursor cursor) {
-        BookmarkBase.PerformanceFlags perfFlags = bookmark.getAdvancedSettings().getPerformance3G();
+        BookmarkBase.PerformanceFlags perfFlags = bookmark.getAdvancedSettings().getPerformance345G();
         perfFlags.setRemoteFX(cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_RFX_3G)) != 0);
         perfFlags.setGfx(cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_GFX_3G)) != 0);
         perfFlags.setH264(cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_H264_3G)) != 0);
         perfFlags.setWallpaper(cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_WALLPAPER_3G)) !=
                 0);
-        perfFlags.setTheming(cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_THEME_3G)) != 0);
+        perfFlags.setTheme(cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_THEME_3G)) != 0);
         perfFlags.setFullWindowDrag(cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_DRAG_3G)) !=
                 0);
         perfFlags.setMenuAnimations(
@@ -500,7 +490,7 @@ public abstract class BookmarkBaseGateway {
         values.put(BookmarkDB.DB_KEY_PERFORMANCE_GFX, perfFlags.getGfx());
         values.put(BookmarkDB.DB_KEY_PERFORMANCE_H264, perfFlags.getH264());
         values.put(BookmarkDB.DB_KEY_PERFORMANCE_WALLPAPER, perfFlags.getWallpaper());
-        values.put(BookmarkDB.DB_KEY_PERFORMANCE_THEME, perfFlags.getTheming());
+        values.put(BookmarkDB.DB_KEY_PERFORMANCE_THEME, perfFlags.getTheme());
         values.put(BookmarkDB.DB_KEY_PERFORMANCE_DRAG, perfFlags.getFullWindowDrag());
         values.put(BookmarkDB.DB_KEY_PERFORMANCE_MENU_ANIMATIONS, perfFlags.getMenuAnimations());
         values.put(BookmarkDB.DB_KEY_PERFORMANCE_FONTS, perfFlags.getFontSmoothing());
@@ -525,7 +515,7 @@ public abstract class BookmarkBaseGateway {
 
     private boolean updateScreenSettings3G(SQLiteDatabase db, BookmarkBase bookmark) {
         ContentValues values = new ContentValues();
-        fillScreenSettingsContentValues(bookmark.getAdvancedSettings().getScreen3G(), values);
+        fillScreenSettingsContentValues(bookmark.getAdvancedSettings().getScreen345G(), values);
         String whereClause = BookmarkDB.ID + " IN "
                 + "(SELECT " + BookmarkDB.DB_KEY_SCREEN_SETTINGS_3G + " FROM " +
                 getBookmarkTableName() + " WHERE " + BookmarkDB.ID + " =  " +
@@ -551,7 +541,7 @@ public abstract class BookmarkBaseGateway {
 
     private boolean updatePerformanceFlags3G(SQLiteDatabase db, BookmarkBase bookmark) {
         ContentValues values = new ContentValues();
-        fillPerformanceFlagsContentValues(bookmark.getAdvancedSettings().getPerformance3G(),
+        fillPerformanceFlagsContentValues(bookmark.getAdvancedSettings().getPerformance345G(),
                 values);
         String whereClause = BookmarkDB.ID + " IN "
                 + "(SELECT " + BookmarkDB.DB_KEY_PERFORMANCE_FLAGS_3G + " FROM " +

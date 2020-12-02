@@ -1,4 +1,4 @@
-package com.xiaoyv.librdp.view;
+package com.freerdp.freerdpcore.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -40,7 +40,7 @@ public class SessionView extends View {
     private int touchPointerPaddingWidth = 0;
     private int touchPointerPaddingHeight = 0;
     private SessionViewListener sessionViewListener = null;
-    // helpers for scaling gesture handling
+    // 扩展手势处理的助手
     private float scaleFactor = 1.0f;
     private Matrix scaleMatrix;
     private Matrix invScaleMatrix;
@@ -48,7 +48,6 @@ public class SessionView extends View {
     private GestureDetector gestureDetector;
     private SessionState currentSession;
 
-    // private static final String TAG = "FreeRDP.SessionView";
     private DoubleGestureDetector doubleGestureDetector;
 
     public SessionView(Context context) {

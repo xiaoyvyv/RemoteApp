@@ -8,40 +8,23 @@ import android.content.Context;
 public abstract class ClipboardManagerProxy {
 
     public static ClipboardManagerProxy getClipboardManager(Context ctx) {
-        return new HCClipboardManager(ctx);
+		return new HCClipboardManager(ctx);
     }
 
     public abstract void setClipboardData(String data);
 
     public abstract void addClipboardChangedListener(OnClipboardChangedListener listener);
 
-    public abstract void removeClipboardChangedListener(OnClipboardChangedListener listener);
+    public abstract void removeClipboardboardChangedListener(OnClipboardChangedListener listener);
 
     public interface OnClipboardChangedListener {
         void onClipboardChanged(String data);
     }
 
-    private static class PreHCClipboardManager extends ClipboardManagerProxy {
-
-        public PreHCClipboardManager(Context ctx) {
-        }
-
-        @Override
-        public void setClipboardData(String data) {
-        }
-
-        @Override
-        public void addClipboardChangedListener(OnClipboardChangedListener listener) {
-        }
-
-        @Override
-        public void removeClipboardChangedListener(OnClipboardChangedListener listener) {
-        }
-    }
-
     @TargetApi(11)
-    private static class HCClipboardManager extends ClipboardManagerProxy implements ClipboardManager.OnPrimaryClipChangedListener {
-        private ClipboardManager mClipboardManager;
+    private static class HCClipboardManager
+            extends ClipboardManagerProxy implements ClipboardManager.OnPrimaryClipChangedListener {
+        private final ClipboardManager mClipboardManager;
         private OnClipboardChangedListener mListener;
 
         public HCClipboardManager(Context ctx) {
@@ -50,7 +33,8 @@ public abstract class ClipboardManagerProxy {
 
         @Override
         public void setClipboardData(String data) {
-            mClipboardManager.setPrimaryClip(ClipData.newPlainText("rdp-clipboard", data == null ? "" : data));
+            mClipboardManager.setPrimaryClip(
+                    ClipData.newPlainText("rdp-clipboard", data == null ? "" : data));
         }
 
         @Override
@@ -75,7 +59,7 @@ public abstract class ClipboardManagerProxy {
         }
 
         @Override
-        public void removeClipboardChangedListener(OnClipboardChangedListener listener) {
+        public void removeClipboardboardChangedListener(OnClipboardChangedListener listener) {
             mListener = null;
             mClipboardManager.removePrimaryClipChangedListener(this);
         }

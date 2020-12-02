@@ -1,13 +1,3 @@
-/*
-   2 finger gesture detector
-
-   Copyright 2013 Thincast Technologies GmbH, Author: Martin Fleisz
-
-   This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-   If a copy of the MPL was not distributed with this file, You can obtain one at
-   http://mozilla.org/MPL/2.0/.
-*/
-
 package com.freerdp.freerdpcore.utils;
 
 import android.content.Context;
@@ -17,294 +7,279 @@ import android.view.ScaleGestureDetector;
 
 import com.freerdp.freerdpcore.utils.GestureDetector.OnGestureListener;
 
-public class DoubleGestureDetector
-{
-	// timeout during that the second finger has to touch the screen before the double finger
-	// detection is cancelled
-	private static final long DOUBLE_TOUCH_TIMEOUT = 100;
-	// timeout during that an UP event will trigger a single double touch event
-	private static final long SINGLE_DOUBLE_TOUCH_TIMEOUT = 1000;
-	// constants for Message.what used by GestureHandler below
-	private static final int TAP = 1;
-	// different detection modes
-	private static final int MODE_UNKNOWN = 0;
-	private static final int MODE_PINCH_ZOOM = 1;
-	private static final int MODE_SCROLL = 2;
-	private static final int SCROLL_SCORE_TO_REACH = 20;
-	private final OnDoubleGestureListener mListener;
-	private int mPointerDistanceSquare;
-	private int mCurrentMode;
-	private int mScrollDetectionScore;
-	private ScaleGestureDetector scaleGestureDetector;
-	private boolean mCancelDetection;
-	private boolean mDoubleInProgress;
-	private GestureHandler mHandler;
-	private MotionEvent mCurrentDownEvent;
-	private MotionEvent mCurrentDoubleDownEvent;
-	private MotionEvent mPreviousUpEvent;
-	private MotionEvent mPreviousPointerUpEvent;
-	/**
-	 * Creates a GestureDetector with the supplied listener.
-	 * You may only use this constructor from a UI thread (this is the usual situation).
-	 *
-	 * @param context  the application's context
-	 * @param listener the listener invoked for all the callbacks, this must
-	 *                 not be null.
-	 * @throws NullPointerException if {@code listener} is null.
-	 * @see android.os.Handler#Handler()
-	 */
-	public DoubleGestureDetector(Context context, Handler handler, OnDoubleGestureListener listener)
-	{
-		mListener = listener;
-		init(context, handler);
-	}
+public class DoubleGestureDetector {
+    // timeout during that the second finger has to touch the screen before the double finger
+    // detection is cancelled
+    private static final long DOUBLE_TOUCH_TIMEOUT = 100;
+    // timeout during that an UP event will trigger a single double touch event
+    private static final long SINGLE_DOUBLE_TOUCH_TIMEOUT = 1000;
+    // constants for Message.what used by GestureHandler below
+    private static final int TAP = 1;
+    // different detection modes
+    private static final int MODE_UNKNOWN = 0;
+    private static final int MODE_PINCH_ZOOM = 1;
+    private static final int MODE_SCROLL = 2;
+    private static final int SCROLL_SCORE_TO_REACH = 20;
+    private final OnDoubleGestureListener mListener;
+    private int mPointerDistanceSquare;
+    private int mCurrentMode;
+    private int mScrollDetectionScore;
+    private ScaleGestureDetector scaleGestureDetector;
+    private boolean mCancelDetection;
+    private boolean mDoubleInProgress;
+    private GestureHandler mHandler;
+    private MotionEvent mCurrentDownEvent;
+    private MotionEvent mCurrentDoubleDownEvent;
+    private MotionEvent mPreviousUpEvent;
+    private MotionEvent mPreviousPointerUpEvent;
 
-	private void init(Context context, Handler handler)
-	{
-		if (mListener == null)
-		{
-			throw new NullPointerException("OnGestureListener must not be null");
-		}
+    /**
+     * Creates a GestureDetector with the supplied listener.
+     * You may only use this constructor from a UI thread (this is the usual situation).
+     *
+     * @param context  the application's context
+     * @param listener the listener invoked for all the callbacks, this must
+     *                 not be null.
+     * @throws NullPointerException if {@code listener} is null.
+     * @see android.os.Handler#Handler()
+     */
+    public DoubleGestureDetector(Context context, Handler handler, OnDoubleGestureListener listener) {
+        mListener = listener;
+        init(context, handler);
+    }
 
-		if (handler != null)
-			mHandler = new GestureHandler(handler);
-		else
-			mHandler = new GestureHandler();
+    private void init(Context context, Handler handler) {
+        if (mListener == null) {
+            throw new NullPointerException("OnGestureListener must not be null");
+        }
 
-		// we use 1cm distance to decide between scroll and pinch zoom
-		//  - first convert cm to inches
-		//  - then multiply inches by dots per inch
-		float distInches = 0.5f / 2.54f;
-		float distPixelsX = distInches * context.getResources().getDisplayMetrics().xdpi;
-		float distPixelsY = distInches * context.getResources().getDisplayMetrics().ydpi;
+        if (handler != null)
+            mHandler = new GestureHandler(handler);
+        else
+            mHandler = new GestureHandler();
 
-		mPointerDistanceSquare = (int)(distPixelsX * distPixelsX + distPixelsY * distPixelsY);
-	}
+        // we use 1cm distance to decide between scroll and pinch zoom
+        //  - first convert cm to inches
+        //  - then multiply inches by dots per inch
+        float distInches = 0.5f / 2.54f;
+        float distPixelsX = distInches * context.getResources().getDisplayMetrics().xdpi;
+        float distPixelsY = distInches * context.getResources().getDisplayMetrics().ydpi;
 
-	/**
-	 * Set scale gesture detector
-	 *
-	 * @param scaleGestureDetector
-	 */
-	public void setScaleGestureDetector(ScaleGestureDetector scaleGestureDetector)
-	{
-		this.scaleGestureDetector = scaleGestureDetector;
-	}
+        mPointerDistanceSquare = (int) (distPixelsX * distPixelsX + distPixelsY * distPixelsY);
+    }
 
-	/**
-	 * Analyzes the given motion event and if applicable triggers the
-	 * appropriate callbacks on the {@link OnGestureListener} supplied.
-	 *
-	 * @param ev The current motion event.
-	 * @return true if the {@link OnGestureListener} consumed the event,
-	 * else false.
-	 */
-	public boolean onTouchEvent(MotionEvent ev)
-	{
-		boolean handled = false;
-		final int action = ev.getAction();
-		// dumpEvent(ev);
+    /**
+     * Set scale gesture detector
+     *
+     * @param scaleGestureDetector
+     */
+    public void setScaleGestureDetector(ScaleGestureDetector scaleGestureDetector) {
+        this.scaleGestureDetector = scaleGestureDetector;
+    }
 
-		switch (action & MotionEvent.ACTION_MASK)
-		{
-			case MotionEvent.ACTION_DOWN:
-				if (mCurrentDownEvent != null)
-					mCurrentDownEvent.recycle();
+    /**
+     * Analyzes the given motion event and if applicable triggers the
+     * appropriate callbacks on the {@link OnGestureListener} supplied.
+     *
+     * @param ev The current motion event.
+     * @return true if the {@link OnGestureListener} consumed the event,
+     * else false.
+     */
+    public boolean onTouchEvent(MotionEvent ev) {
+        boolean handled = false;
+        final int action = ev.getAction();
+        // dumpEvent(ev);
 
-				mCurrentMode = MODE_UNKNOWN;
-				mCurrentDownEvent = MotionEvent.obtain(ev);
-				mCancelDetection = false;
-				mDoubleInProgress = false;
-				mScrollDetectionScore = 0;
-				handled = true;
-				break;
+        switch (action & MotionEvent.ACTION_MASK) {
+            case MotionEvent.ACTION_DOWN:
+                if (mCurrentDownEvent != null)
+                    mCurrentDownEvent.recycle();
 
-			case MotionEvent.ACTION_POINTER_UP:
-				if (mPreviousPointerUpEvent != null)
-					mPreviousPointerUpEvent.recycle();
-				mPreviousPointerUpEvent = MotionEvent.obtain(ev);
-				break;
+                mCurrentMode = MODE_UNKNOWN;
+                mCurrentDownEvent = MotionEvent.obtain(ev);
+                mCancelDetection = false;
+                mDoubleInProgress = false;
+                mScrollDetectionScore = 0;
+                handled = true;
+                break;
 
-			case MotionEvent.ACTION_POINTER_DOWN:
-				// more than 2 fingers down? cancel
-				// 2nd finger touched too late? cancel
-				if (ev.getPointerCount() > 2 ||
-				    (ev.getEventTime() - mCurrentDownEvent.getEventTime()) > DOUBLE_TOUCH_TIMEOUT)
-				{
-					cancel();
-					break;
-				}
+            case MotionEvent.ACTION_POINTER_UP:
+                if (mPreviousPointerUpEvent != null)
+                    mPreviousPointerUpEvent.recycle();
+                mPreviousPointerUpEvent = MotionEvent.obtain(ev);
+                break;
 
-				// detection cancelled?
-				if (mCancelDetection)
-					break;
+            case MotionEvent.ACTION_POINTER_DOWN:
+                // more than 2 fingers down? cancel
+                // 2nd finger touched too late? cancel
+                if (ev.getPointerCount() > 2 ||
+                        (ev.getEventTime() - mCurrentDownEvent.getEventTime()) > DOUBLE_TOUCH_TIMEOUT) {
+                    cancel();
+                    break;
+                }
 
-				// double touch gesture in progress
-				mDoubleInProgress = true;
-				if (mCurrentDoubleDownEvent != null)
-					mCurrentDoubleDownEvent.recycle();
-				mCurrentDoubleDownEvent = MotionEvent.obtain(ev);
+                // detection cancelled?
+                if (mCancelDetection)
+                    break;
 
-				// set detection mode to unkown and send a TOUCH timeout event to detect single taps
-				mCurrentMode = MODE_UNKNOWN;
-				mHandler.sendEmptyMessageDelayed(TAP, SINGLE_DOUBLE_TOUCH_TIMEOUT);
+                // double touch gesture in progress
+                mDoubleInProgress = true;
+                if (mCurrentDoubleDownEvent != null)
+                    mCurrentDoubleDownEvent.recycle();
+                mCurrentDoubleDownEvent = MotionEvent.obtain(ev);
 
-				handled |= mListener.onDoubleTouchDown(ev);
-				break;
+                // set detection mode to unkown and send a TOUCH timeout event to detect single taps
+                mCurrentMode = MODE_UNKNOWN;
+                mHandler.sendEmptyMessageDelayed(TAP, SINGLE_DOUBLE_TOUCH_TIMEOUT);
 
-			case MotionEvent.ACTION_MOVE:
+                handled |= mListener.onDoubleTouchDown(ev);
+                break;
 
-				// detection cancelled or not active?
-				if (mCancelDetection || !mDoubleInProgress || ev.getPointerCount() != 2)
-					break;
+            case MotionEvent.ACTION_MOVE:
 
-				// determine mode
-				if (mCurrentMode == MODE_UNKNOWN)
-				{
-					// did the pointer distance change?
-					if (pointerDistanceChanged(mCurrentDoubleDownEvent, ev))
-					{
-						handled |= scaleGestureDetector.onTouchEvent(mCurrentDownEvent);
-						MotionEvent e = MotionEvent.obtain(ev);
-						e.setAction(mCurrentDoubleDownEvent.getAction());
-						handled |= scaleGestureDetector.onTouchEvent(e);
-						mCurrentMode = MODE_PINCH_ZOOM;
-						break;
-					}
-					else
-					{
-						mScrollDetectionScore++;
-						if (mScrollDetectionScore >= SCROLL_SCORE_TO_REACH)
-							mCurrentMode = MODE_SCROLL;
-					}
-				}
+                // detection cancelled or not active?
+                if (mCancelDetection || !mDoubleInProgress || ev.getPointerCount() != 2)
+                    break;
 
-				switch (mCurrentMode)
-				{
-					case MODE_PINCH_ZOOM:
-						if (scaleGestureDetector != null)
-							handled |= scaleGestureDetector.onTouchEvent(ev);
-						break;
+                // determine mode
+                if (mCurrentMode == MODE_UNKNOWN) {
+                    // did the pointer distance change?
+                    if (pointerDistanceChanged(mCurrentDoubleDownEvent, ev)) {
+                        handled |= scaleGestureDetector.onTouchEvent(mCurrentDownEvent);
+                        MotionEvent e = MotionEvent.obtain(ev);
+                        e.setAction(mCurrentDoubleDownEvent.getAction());
+                        handled |= scaleGestureDetector.onTouchEvent(e);
+                        mCurrentMode = MODE_PINCH_ZOOM;
+                        break;
+                    } else {
+                        mScrollDetectionScore++;
+                        if (mScrollDetectionScore >= SCROLL_SCORE_TO_REACH)
+                            mCurrentMode = MODE_SCROLL;
+                    }
+                }
 
-					case MODE_SCROLL:
-						handled = mListener.onDoubleTouchScroll(mCurrentDownEvent, ev);
-						break;
+                switch (mCurrentMode) {
+                    case MODE_PINCH_ZOOM:
+                        if (scaleGestureDetector != null)
+                            handled |= scaleGestureDetector.onTouchEvent(ev);
+                        break;
 
-					default:
-						handled = true;
-						break;
-				}
+                    case MODE_SCROLL:
+                        handled = mListener.onDoubleTouchScroll(mCurrentDownEvent, ev);
+                        break;
 
-				break;
+                    default:
+                        handled = true;
+                        break;
+                }
 
-			case MotionEvent.ACTION_UP:
-				// fingers were not removed equally? cancel
-				if (mPreviousPointerUpEvent != null &&
-				    (ev.getEventTime() - mPreviousPointerUpEvent.getEventTime()) >
-				        DOUBLE_TOUCH_TIMEOUT)
-				{
-					mPreviousPointerUpEvent.recycle();
-					mPreviousPointerUpEvent = null;
-					cancel();
-					break;
-				}
+                break;
 
-				// detection cancelled or not active?
-				if (mCancelDetection || !mDoubleInProgress)
-					break;
+            case MotionEvent.ACTION_UP:
+                // fingers were not removed equally? cancel
+                if (mPreviousPointerUpEvent != null &&
+                        (ev.getEventTime() - mPreviousPointerUpEvent.getEventTime()) >
+                                DOUBLE_TOUCH_TIMEOUT) {
+                    mPreviousPointerUpEvent.recycle();
+                    mPreviousPointerUpEvent = null;
+                    cancel();
+                    break;
+                }
 
-				boolean hasTapEvent = mHandler.hasMessages(TAP);
-				MotionEvent currentUpEvent = MotionEvent.obtain(ev);
-				if (mCurrentMode == MODE_UNKNOWN && hasTapEvent)
-					handled = mListener.onDoubleTouchSingleTap(mCurrentDoubleDownEvent);
-				else if (mCurrentMode == MODE_PINCH_ZOOM)
-					handled = scaleGestureDetector.onTouchEvent(ev);
+                // detection cancelled or not active?
+                if (mCancelDetection || !mDoubleInProgress)
+                    break;
 
-				if (mPreviousUpEvent != null)
-					mPreviousUpEvent.recycle();
+                boolean hasTapEvent = mHandler.hasMessages(TAP);
+                MotionEvent currentUpEvent = MotionEvent.obtain(ev);
+                if (mCurrentMode == MODE_UNKNOWN && hasTapEvent)
+                    handled = mListener.onDoubleTouchSingleTap(mCurrentDoubleDownEvent);
+                else if (mCurrentMode == MODE_PINCH_ZOOM)
+                    handled = scaleGestureDetector.onTouchEvent(ev);
 
-				// Hold the event we obtained above - listeners may have changed the original.
-				mPreviousUpEvent = currentUpEvent;
-				handled |= mListener.onDoubleTouchUp(ev);
-				break;
+                if (mPreviousUpEvent != null)
+                    mPreviousUpEvent.recycle();
 
-			case MotionEvent.ACTION_CANCEL:
-				cancel();
-				break;
-		}
+                // Hold the event we obtained above - listeners may have changed the original.
+                mPreviousUpEvent = currentUpEvent;
+                handled |= mListener.onDoubleTouchUp(ev);
+                break;
 
-		if ((action == MotionEvent.ACTION_MOVE) && handled == false)
-			handled = true;
+            case MotionEvent.ACTION_CANCEL:
+                cancel();
+                break;
+        }
 
-		return handled;
-	}
+        if ((action == MotionEvent.ACTION_MOVE) && handled == false)
+            handled = true;
 
-	private void cancel()
-	{
-		mHandler.removeMessages(TAP);
-		mCurrentMode = MODE_UNKNOWN;
-		mCancelDetection = true;
-		mDoubleInProgress = false;
-	}
+        return handled;
+    }
 
-	// returns true of the distance between the two pointers changed
-	private boolean pointerDistanceChanged(MotionEvent oldEvent, MotionEvent newEvent)
-	{
-		int deltaX1 = Math.abs((int)oldEvent.getX(0) - (int)oldEvent.getX(1));
-		int deltaX2 = Math.abs((int)newEvent.getX(0) - (int)newEvent.getX(1));
-		int distXSquare = (deltaX2 - deltaX1) * (deltaX2 - deltaX1);
+    private void cancel() {
+        mHandler.removeMessages(TAP);
+        mCurrentMode = MODE_UNKNOWN;
+        mCancelDetection = true;
+        mDoubleInProgress = false;
+    }
 
-		int deltaY1 = Math.abs((int)oldEvent.getY(0) - (int)oldEvent.getY(1));
-		int deltaY2 = Math.abs((int)newEvent.getY(0) - (int)newEvent.getY(1));
-		int distYSquare = (deltaY2 - deltaY1) * (deltaY2 - deltaY1);
+    // returns true of the distance between the two pointers changed
+    private boolean pointerDistanceChanged(MotionEvent oldEvent, MotionEvent newEvent) {
+        int deltaX1 = Math.abs((int) oldEvent.getX(0) - (int) oldEvent.getX(1));
+        int deltaX2 = Math.abs((int) newEvent.getX(0) - (int) newEvent.getX(1));
+        int distXSquare = (deltaX2 - deltaX1) * (deltaX2 - deltaX1);
 
-		return (distXSquare + distYSquare) > mPointerDistanceSquare;
-	}
+        int deltaY1 = Math.abs((int) oldEvent.getY(0) - (int) oldEvent.getY(1));
+        int deltaY2 = Math.abs((int) newEvent.getY(0) - (int) newEvent.getY(1));
+        int distYSquare = (deltaY2 - deltaY1) * (deltaY2 - deltaY1);
 
-	/**
-	 * The listener that is used to notify when gestures occur.
-	 * If you want to listen for all the different gestures then implement
-	 * this interface. If you only want to listen for a subset it might
-	 * be easier to extend {@link SimpleOnGestureListener}.
-	 */
-	public interface OnDoubleGestureListener {
+        return (distXSquare + distYSquare) > mPointerDistanceSquare;
+    }
 
-		/**
-		 * Notified when a multi tap event starts
-		 */
-		boolean onDoubleTouchDown(MotionEvent e);
+    /**
+     * The listener that is used to notify when gestures occur.
+     * If you want to listen for all the different gestures then implement
+     * this interface. If you only want to listen for a subset it might
+     * be easier to extend {@link SimpleOnGestureListener}.
+     */
+    public interface OnDoubleGestureListener {
 
-		/**
-		 * Notified when a multi tap event ends
-		 */
-		boolean onDoubleTouchUp(MotionEvent e);
+        /**
+         * Notified when a multi tap event starts
+         */
+        boolean onDoubleTouchDown(MotionEvent e);
 
-		/**
-		 * Notified when a tap occurs with the up {@link MotionEvent}
-		 * that triggered it.
-		 *
-		 * @param e The up motion event that completed the first tap
-		 * @return true if the event is consumed, else false
-		 */
-		boolean onDoubleTouchSingleTap(MotionEvent e);
+        /**
+         * Notified when a multi tap event ends
+         */
+        boolean onDoubleTouchUp(MotionEvent e);
 
-		/**
-		 * Notified when a scroll occurs with the initial on down {@link MotionEvent} and the
-		 * current move {@link MotionEvent}. The distance in x and y is also supplied for
-		 * convenience.
-		 *
-		 * @param e1        The first down motion event that started the scrolling.
-		 * @param e2        The move motion event that triggered the current onScroll.
-		 * @param distanceX The distance along the X axis that has been scrolled since the last
-		 *                  call to onScroll. This is NOT the distance between {@code e1}
-		 *                  and {@code e2}.
-		 * @param distanceY The distance along the Y axis that has been scrolled since the last
-		 *                  call to onScroll. This is NOT the distance between {@code e1}
-		 *                  and {@code e2}.
-		 * @return true if the event is consumed, else false
-		 */
-		boolean onDoubleTouchScroll(MotionEvent e1, MotionEvent e2);
-	}
+        /**
+         * Notified when a tap occurs with the up {@link MotionEvent}
+         * that triggered it.
+         *
+         * @param e The up motion event that completed the first tap
+         * @return true if the event is consumed, else false
+         */
+        boolean onDoubleTouchSingleTap(MotionEvent e);
+
+        /**
+         * Notified when a scroll occurs with the initial on down {@link MotionEvent} and the
+         * current move {@link MotionEvent}. The distance in x and y is also supplied for
+         * convenience.
+         *
+         * @param e1        The first down motion event that started the scrolling.
+         * @param e2        The move motion event that triggered the current onScroll.
+         * @param distanceX The distance along the X axis that has been scrolled since the last
+         *                  call to onScroll. This is NOT the distance between {@code e1}
+         *                  and {@code e2}.
+         * @param distanceY The distance along the Y axis that has been scrolled since the last
+         *                  call to onScroll. This is NOT the distance between {@code e1}
+         *                  and {@code e2}.
+         * @return true if the event is consumed, else false
+         */
+        boolean onDoubleTouchScroll(MotionEvent e1, MotionEvent e2);
+    }
 
 	/*
 	private void dumpEvent(MotionEvent event) {
@@ -334,16 +309,13 @@ public class DoubleGestureDetector
 	    }
 	*/
 
-	private class GestureHandler extends Handler
-	{
-		GestureHandler()
-		{
-			super();
-		}
+    private class GestureHandler extends Handler {
+        GestureHandler() {
+            super();
+        }
 
-		GestureHandler(Handler handler)
-		{
-			super(handler.getLooper());
-		}
-	}
+        GestureHandler(Handler handler) {
+            super(handler.getLooper());
+        }
+    }
 }

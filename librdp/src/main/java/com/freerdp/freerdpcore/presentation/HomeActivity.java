@@ -19,21 +19,18 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnCreateContextMenuListener;
-import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.freerdp.freerdpcore.application.GlobalApp;
@@ -50,7 +47,6 @@ import java.util.ArrayList;
 public class HomeActivity extends AppCompatActivity {
     private final static String ADD_BOOKMARK_PLACEHOLDER = "add_bookmark";
     private static final String TAG = "HomeActivity";
-    private static final String PARAM_SUPERBAR_TEXT = "superbar_text";
     private ListView listViewBookmarks;
     private Button clearTextButton;
     private EditText superBarEditText;
@@ -58,7 +54,6 @@ public class HomeActivity extends AppCompatActivity {
     private SeparatedListAdapter separatedListAdapter;
     private PlaceholderBookmark addBookmarkPlaceholder;
     private String sectionLabelBookmarks;
-
     View mDecor;
 
     @Override
@@ -106,50 +101,43 @@ public class HomeActivity extends AppCompatActivity {
         listViewBookmarks = (ListView) findViewById(R.id.listViewBookmarks);
 
         // set listeners for the list view
-        listViewBookmarks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String curSection = separatedListAdapter.getSectionForPosition(position);
-                Log.v(TAG, "Clicked on item id " + separatedListAdapter.getItemId(position) +
-                        " in section " + curSection);
-                if (curSection.equals(sectionLabelBookmarks)) {
-                    String refStr = view.getTag().toString();
-                    if (ConnectionReference.isManualBookmarkReference(refStr) ||
-                            ConnectionReference.isHostnameReference(refStr)) {
-                        Bundle bundle = new Bundle();
-                        bundle.putString(SessionActivity.PARAM_CONNECTION_REFERENCE, refStr);
+        listViewBookmarks.setOnItemClickListener((parent, view, position, id) -> {
+            String curSection = separatedListAdapter.getSectionForPosition(position);
+            Log.v(TAG, "Clicked on item id " + separatedListAdapter.getItemId(position) +
+                    " in section " + curSection);
+            if (curSection.equals(sectionLabelBookmarks)) {
+                String refStr = view.getTag().toString();
+                if (ConnectionReference.isManualBookmarkReference(refStr) ||
+                        ConnectionReference.isHostnameReference(refStr)) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString(SessionActivity.PARAM_CONNECTION_REFERENCE, refStr);
 
-                        Intent sessionIntent = new Intent(view.getContext(), SessionActivity.class);
-                        sessionIntent.putExtras(bundle);
-                        startActivity(sessionIntent);
+                    Intent sessionIntent = new Intent(view.getContext(), SessionActivity.class);
+                    sessionIntent.putExtras(bundle);
+                    startActivity(sessionIntent);
 
-                        // clear any search text
-                        superBarEditText.setText("");
-                        superBarEditText.clearFocus();
-                    } else if (ConnectionReference.isPlaceholderReference(refStr)) {
-                        // is this the add bookmark placeholder?
-                        if (ConnectionReference.getPlaceholder(refStr).equals(
-                                ADD_BOOKMARK_PLACEHOLDER)) {
-                            Intent bookmarkIntent =
-                                    new Intent(view.getContext(), BookmarkActivity.class);
-                            startActivity(bookmarkIntent);
-                        }
+                    // clear any search text
+                    superBarEditText.setText("");
+                    superBarEditText.clearFocus();
+                } else if (ConnectionReference.isPlaceholderReference(refStr)) {
+                    // is this the add bookmark placeholder?
+                    if (ConnectionReference.getPlaceholder(refStr).equals(
+                            ADD_BOOKMARK_PLACEHOLDER)) {
+                        Intent bookmarkIntent =
+                                new Intent(view.getContext(), BookmarkActivity.class);
+                        startActivity(bookmarkIntent);
                     }
                 }
             }
         });
 
-        listViewBookmarks.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
-            @Override
-            public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
-                // if the selected item is not a session item (tag == null) and not a quick connect
-                // entry (not a hostname connection reference) inflate the context menu
-                View itemView = ((AdapterContextMenuInfo) menuInfo).targetView;
-                String refStr = itemView.getTag() != null ? itemView.getTag().toString() : null;
-                if (refStr != null && !ConnectionReference.isHostnameReference(refStr) &&
-                        !ConnectionReference.isPlaceholderReference(refStr)) {
-                    getMenuInflater().inflate(R.menu.bookmark_context_menu, menu);
-                    menu.setHeaderTitle(getResources().getString(R.string.menu_title_bookmark));
-                }
+        listViewBookmarks.setOnCreateContextMenuListener((menu, v, menuInfo) -> {
+            View itemView = ((AdapterContextMenuInfo) menuInfo).targetView;
+            String refStr = itemView.getTag() != null ? itemView.getTag().toString() : null;
+            if (refStr != null && !ConnectionReference.isHostnameReference(refStr) &&
+                    !ConnectionReference.isPlaceholderReference(refStr)) {
+                getMenuInflater().inflate(R.menu.bookmark_context_menu, menu);
+                menu.setHeaderTitle(getResources().getString(R.string.menu_title_bookmark));
             }
         });
 
@@ -164,7 +152,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         // ignore orientation/keyboard change
         super.onConfigurationChanged(newConfig);
         mDecor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
@@ -179,7 +167,6 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public boolean onContextItemSelected(MenuItem aItem) {
-
         // get connection reference
         AdapterContextMenuInfo menuInfo = (AdapterContextMenuInfo) aItem.getMenuInfo();
         String refStr = menuInfo.targetView.getTag().toString();
@@ -225,11 +212,8 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        Log.v(TAG, "HomeActivity.onResume");
-
-        // create bookmark cursor adapter
-        manualBookmarkAdapter = new BookmarkArrayAdapter(
-                this, R.layout.bookmark_list_item, GlobalApp.getManualBookmarkGateway().findAll());
+        // 创建书签光标适配器
+        manualBookmarkAdapter = new BookmarkArrayAdapter(this, R.layout.bookmark_list_item, GlobalApp.getManualBookmarkGateway().findAll());
 
         // add add bookmark item to manual adapter
         manualBookmarkAdapter.insert(addBookmarkPlaceholder, 0);
@@ -288,18 +272,6 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString(PARAM_SUPERBAR_TEXT, superBarEditText.getText().toString());
-    }
-
-    @Override
-    protected void onRestoreInstanceState(Bundle inState) {
-        super.onRestoreInstanceState(inState);
-        superBarEditText.setText(inState.getString(PARAM_SUPERBAR_TEXT));
-    }
-
-    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.home_menu, menu);
@@ -322,8 +294,7 @@ public class HomeActivity extends AppCompatActivity {
             Intent helpIntent = new Intent(this, HelpActivity.class);
             startActivity(helpIntent);
         } else if (itemId == R.id.about) {
-            Intent aboutIntent = new Intent(this, AboutActivity.class);
-            startActivity(aboutIntent);
+
         }
 
         return true;

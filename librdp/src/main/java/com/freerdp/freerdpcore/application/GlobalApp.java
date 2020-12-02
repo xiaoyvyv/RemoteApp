@@ -1,13 +1,3 @@
-/*
-   Android Main Application
-
-   Copyright 2013 Thincast Technologies GmbH, Author: Martin Fleisz
-
-   This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-   If a copy of the MPL was not distributed with this file, You can obtain one at
-   http://mozilla.org/MPL/2.0/.
-*/
-
 package com.freerdp.freerdpcore.application;
 
 import android.app.Application;
@@ -17,11 +7,12 @@ import android.content.IntentFilter;
 import android.net.Uri;
 import android.util.Log;
 
+import com.blankj.utilcode.util.NetworkUtils;
 import com.freerdp.freerdpcore.domain.BookmarkBase;
 import com.freerdp.freerdpcore.presentation.ApplicationSettingsActivity;
 import com.freerdp.freerdpcore.services.BookmarkDB;
 import com.freerdp.freerdpcore.services.HistoryDB;
-import com.xiaoyv.librdp.jni.LibFreeRDP;
+import com.freerdp.freerdpcore.services.LibFreeRDP;
 import com.freerdp.freerdpcore.services.ManualBookmarkGateway;
 import com.freerdp.freerdpcore.services.QuickConnectHistoryGateway;
 
@@ -33,27 +24,42 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class GlobalApp extends Application implements LibFreeRDP.EventListener {
+public class GlobalApp implements LibFreeRDP.EventListener {
+    private static volatile GlobalApp globalApp;
+    private static final String TAG = "GlobalApp";
     // 事件通知定义
     public static final String EVENT_TYPE = "EVENT_TYPE";
     public static final String EVENT_PARAM = "EVENT_PARAM";
-    public static final String EVENT_STATUS = "EVENT_STATUS";
-    public static final String EVENT_ERROR = "EVENT_ERROR";
     public static final String ACTION_EVENT_FREERDP = "com.freerdp.freerdp.event.freerdp";
     public static final int FREERDP_EVENT_CONNECTION_SUCCESS = 1;
     public static final int FREERDP_EVENT_CONNECTION_FAILURE = 2;
     public static final int FREERDP_EVENT_DISCONNECTED = 3;
-    public static final String TAG = "GlobalApp";
-    public static boolean ConnectedTo3G = false;
-    private static Map<Long, SessionState> sessionMap;
-    private static BookmarkDB bookmarkDB;
-    private static ManualBookmarkGateway manualBookmarkGateway;
+    public static boolean ConnectedToMobileWork = false;
+    public static Map<Long, SessionState> sessionMap;
+    public static BookmarkDB bookmarkDB;
+    public static ManualBookmarkGateway manualBookmarkGateway;
 
-    private static HistoryDB historyDB;
-    private static QuickConnectHistoryGateway quickConnectHistoryGateway;
+    public static HistoryDB historyDB;
+    public static QuickConnectHistoryGateway quickConnectHistoryGateway;
 
-    // timer for disconnecting sessions after the screen was turned off
-    private static Timer disconnectTimer = null;
+    // 屏幕关闭后用于断开会话的计时器
+    public static Timer disconnectTimer = null;
+    public static Application application;
+
+    private GlobalApp() {
+
+    }
+
+    public static void init(Application application) {
+        GlobalApp.application = application;
+        if (globalApp == null) {
+            synchronized (GlobalApp.class) {
+                if (globalApp == null) {
+                    globalApp = new GlobalApp();
+                }
+            }
+        }
+    }
 
     public static ManualBookmarkGateway getManualBookmarkGateway() {
         return manualBookmarkGateway;
@@ -63,11 +69,11 @@ public class GlobalApp extends Application implements LibFreeRDP.EventListener {
         return quickConnectHistoryGateway;
     }
 
-    // Disconnect handling for Screen on/off events
-    public void startDisconnectTimer() {
-        final int timeoutMinutes = ApplicationSettingsActivity.getDisconnectTimeout(this);
+    // 断开屏幕开/关事件的处理
+    public static void startDisconnectTimer() {
+        final int timeoutMinutes = ApplicationSettingsActivity.getDisconnectTimeout(application);
         if (timeoutMinutes > 0) {
-            // start disconnect timeout...
+            // 开始断开连接超时...
             disconnectTimer = new Timer();
             disconnectTimer.schedule(new DisconnectTask(), timeoutMinutes * 60 * 1000);
         }
@@ -100,8 +106,8 @@ public class GlobalApp extends Application implements LibFreeRDP.EventListener {
     }
 
     static public Collection<SessionState> getSessions() {
-        // return a copy of the session items
-        return new ArrayList<SessionState>(sessionMap.values());
+        // 返回会话项的副本
+        return new ArrayList<>(sessionMap.values());
     }
 
     static public void freeSession(long instance) {
@@ -111,40 +117,37 @@ public class GlobalApp extends Application implements LibFreeRDP.EventListener {
         }
     }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
+    public void onCreate(Application application) {
 
-        /* Initialize preferences. */
-        ApplicationSettingsActivity.get(this);
 
-        sessionMap = Collections.synchronizedMap(new HashMap<Long, SessionState>());
+        /* 初始化首选项。 */
+        ApplicationSettingsActivity.get(application);
+
+        sessionMap = Collections.synchronizedMap(new HashMap<>());
 
         LibFreeRDP.setEventListener(this);
 
-        bookmarkDB = new BookmarkDB(this);
+        bookmarkDB = new BookmarkDB(application);
 
         manualBookmarkGateway = new ManualBookmarkGateway(bookmarkDB);
 
-        historyDB = new HistoryDB(this);
+        historyDB = new HistoryDB(application);
         quickConnectHistoryGateway = new QuickConnectHistoryGateway(historyDB);
 
-        ConnectedTo3G = NetworkStateReceiver.isConnectedTo3G(this);
+        ConnectedToMobileWork = NetworkUtils.is5G() || NetworkUtils.is4G();
 
-        // init screen receiver here (this can't be declared in AndroidManifest - refer to:
-        // http://thinkandroid.wordpress.com/2010/01/24/handling-screen-off-and-screen-on-intents/
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
         filter.addAction(Intent.ACTION_SCREEN_OFF);
-        registerReceiver(new ScreenReceiver(), filter);
+        application.registerReceiver(new ScreenReceiver(), filter);
     }
 
-    // helper to send FreeRDP notifications
+    // 发送FreeRDP通知的助手
     private void sendRDPNotification(int type, long param) {
-        // send broadcast
+        // 发送广播
         Intent intent = new Intent(ACTION_EVENT_FREERDP);
         intent.putExtra(EVENT_TYPE, type);
         intent.putExtra(EVENT_PARAM, param);
-        sendBroadcast(intent);
+        application.sendBroadcast(intent);
     }
 
     @Override
@@ -162,7 +165,7 @@ public class GlobalApp extends Application implements LibFreeRDP.EventListener {
     public void OnConnectionFailure(long instance) {
         Log.v(TAG, "OnConnectionFailure");
 
-        // send notification to session activity
+        // 向会话活动发送通知
         sendRDPNotification(FREERDP_EVENT_CONNECTION_FAILURE, instance);
     }
 
@@ -175,7 +178,7 @@ public class GlobalApp extends Application implements LibFreeRDP.EventListener {
         sendRDPNotification(FREERDP_EVENT_DISCONNECTED, instance);
     }
 
-    // TimerTask for disconnecting sessions after screen was turned off
+    // TimerTask用于在屏幕关闭后断开会话
     private static class DisconnectTask extends TimerTask {
         @Override
         public void run() {

@@ -3,8 +3,8 @@ package com.xiaoyv.desktop;
 import android.app.Application;
 
 import com.blankj.utilcode.util.Utils;
+import com.freerdp.freerdpcore.application.GlobalApp;
 import com.xiaoyv.busines.BaseApp;
-import com.xiaoyv.librdp.RdpEngineApp;
 
 /**
  * DeskApp
@@ -18,6 +18,6 @@ public class DeskApp extends Application {
         super.onCreate();
         Utils.init(this);
         BaseApp.init(this);
-        RdpEngineApp.init(this);
+        GlobalApp.init(this);
     }
 }

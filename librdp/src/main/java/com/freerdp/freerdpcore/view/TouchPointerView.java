@@ -1,4 +1,4 @@
-package com.xiaoyv.librdp.view;
+package com.freerdp.freerdpcore.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

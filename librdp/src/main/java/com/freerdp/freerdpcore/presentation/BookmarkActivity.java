@@ -1,13 +1,3 @@
-/*
-   Bookmark editing activity
-
-   Copyright 2013 Thincast Technologies GmbH, Author: Martin Fleisz
-
-   This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-   If a copy of the MPL was not distributed with this file, You can obtain one at
-   http://mozilla.org/MPL/2.0/.
- */
-
 package com.freerdp.freerdpcore.presentation;
 
 import android.app.AlertDialog;
@@ -18,7 +8,6 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
-import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
@@ -28,15 +17,16 @@ import com.freerdp.freerdpcore.domain.BookmarkBase;
 import com.freerdp.freerdpcore.domain.ConnectionReference;
 import com.freerdp.freerdpcore.domain.ManualBookmark;
 import com.freerdp.freerdpcore.services.BookmarkBaseGateway;
-import com.xiaoyv.librdp.jni.LibFreeRDP;
-import com.xiaoyv.librdp.utils.RdpFileParser;
+import com.freerdp.freerdpcore.services.LibFreeRDP;
+import com.freerdp.freerdpcore.utils.AppCompatPreferenceActivity;
+import com.freerdp.freerdpcore.utils.RdpFileParser;
 import com.xiaoyv.librdp.R;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class BookmarkActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener {
+public class BookmarkActivity extends AppCompatPreferenceActivity implements OnSharedPreferenceChangeListener {
     public static final String PARAM_CONNECTION_REFERENCE = "conRef";
 
     private static final String TAG = "BookmarkActivity";
@@ -64,7 +54,7 @@ public class BookmarkActivity extends PreferenceActivity implements OnSharedPref
         super.onCreate(savedInstanceState);
 
         PreferenceManager mgr = getPreferenceManager();
-        // init shared preferences for activity
+        // 初始化活动的共享首选项
         mgr.setSharedPreferencesName("TEMP");
         mgr.setSharedPreferencesMode(MODE_PRIVATE);
 
@@ -174,7 +164,7 @@ public class BookmarkActivity extends PreferenceActivity implements OnSharedPref
 
     private void updateH264Preferences() {
         if (!LibFreeRDP.hasH264Support()) {
-            final int preferenceIdList[] = {R.string.preference_key_h264,
+            final int[] preferenceIdList = {R.string.preference_key_h264,
                     R.string.preference_key_h264_3g};
 
             PreferenceManager mgr = getPreferenceManager();
@@ -614,12 +604,7 @@ public class BookmarkActivity extends PreferenceActivity implements OnSharedPref
                                     }
                                 })
                         .setNegativeButton(R.string.no,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        finishAndResetBookmark();
-                                    }
-                                })
+                                (dialog, which) -> finishAndResetBookmark())
                         .show();
             } else {
                 finishAndResetBookmark();

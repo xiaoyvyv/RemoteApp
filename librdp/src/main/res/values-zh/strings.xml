@@ -137,8 +137,7 @@
     <!-- Activity titles -->
     <string name="title_bookmark_settings">连接设置</string>
     <string name="title_application_settings">设置</string>
-    <string name="title_home">aFreeRDP - FreeRDP for Android</string>
-    <string name="title_create_shortcut">RDP Connections</string>
+    <string name="title_create_shortcut">Rdp 收藏</string>
     <string name="title_help">帮助</string>
     <string name="title_about">关于</string>
     <!-- Error message strings -->
@@ -167,9 +166,12 @@
     <string name="dlg_msg_exit">是否退出？</string>
     <string name="dlg_title_clear_cert_cache">清除证书缓存？</string>
     <string name="dlg_msg_clear_cert_cache">是否清除所有的证书缓存？</string>
-    <string name="debug_level">Debug Level</string>
-    <string name="settings_debug">Debug Settings</string>
     <string name="preference_title_client">客户机</string>
     <string name="settings_cat_client">客户机</string>
     <string name="preference_title_client_name">Client Name</string>
+    <string name="settings_perf_gfx" translatable="false">GFX</string>
+    <string name="settings_perf_gfx_h264" translatable="false">H264</string>
+    <string name="debug_level">调试等级</string>
+    <string name="settings_debug">调试设置</string>
+    <string name="title_home">Android 远程终端桌面</string>
 </resources>

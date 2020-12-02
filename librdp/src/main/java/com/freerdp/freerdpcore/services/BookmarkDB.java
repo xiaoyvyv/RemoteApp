@@ -1,13 +1,3 @@
-/*
-   Android Bookmark Database
-
-   Copyright 2013 Thincast Technologies GmbH, Author: Martin Fleisz
-
-   This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-   If a copy of the MPL was not distributed with this file, You can obtain one at
-   http://mozilla.org/MPL/2.0/.
-*/
-
 package com.freerdp.freerdpcore.services;
 
 import android.content.ContentValues;
@@ -86,28 +76,24 @@ public class BookmarkDB extends SQLiteOpenHelper {
 
     private static List<String> GetColumns(SQLiteDatabase db, String tableName) {
         List<String> ar = null;
-        Cursor c = null;
-        try {
-            c = db.rawQuery("SELECT * FROM " + tableName + " LIMIT 1", null);
-            if (c != null) {
-                ar = new ArrayList<>(Arrays.asList(c.getColumnNames()));
-            }
-        } catch (Exception e) {
-            Log.v(tableName, e.getMessage(), e);
-            e.printStackTrace();
-        } finally {
-            if (c != null)
-                c.close();
-        }
+		try (Cursor c = db.rawQuery("SELECT * FROM " + tableName + " LIMIT 1", null)) {
+			if (c != null) {
+				ar = new ArrayList<>(Arrays.asList(c.getColumnNames()));
+			}
+		} catch (Exception e) {
+			Log.v(tableName, e.getMessage(), e);
+			e.printStackTrace();
+		}
         return ar;
     }
 
-    private static String joinStrings(List<String> list, String delim) {
+    @SuppressWarnings("SameParameterValue")
+	private static String joinStrings(List<String> list, String denim) {
         StringBuilder buf = new StringBuilder();
         int num = list.size();
         for (int i = 0; i < num; i++) {
             if (i != 0)
-                buf.append(delim);
+                buf.append(denim);
             buf.append((String) list.get(i));
         }
         return buf.toString();

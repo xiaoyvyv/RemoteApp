@@ -1,13 +1,3 @@
-/*
-   Suggestion Provider for RDP bookmarks
-
-   Copyright 2013 Thincast Technologies GmbH, Author: Martin Fleisz
-
-   This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-   If a copy of the MPL was not distributed with this file, You can obtain one at
-   http://mozilla.org/MPL/2.0/.
-*/
-
 package com.freerdp.freerdpcore.services;
 
 import android.app.SearchManager;
@@ -28,11 +18,10 @@ import java.util.ArrayList;
 public class FreeRDPSuggestionProvider extends ContentProvider {
 
     public static final Uri CONTENT_URI =
-            Uri.parse("content://com.freerdp.afreerdp.services.freerdpsuggestionprovider");
+            Uri.parse("content://com.xiaoyv.rdp.services.provider");
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        // TODO Auto-generated method stub
         return 0;
     }
 
@@ -43,7 +32,6 @@ public class FreeRDPSuggestionProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -81,7 +69,7 @@ public class FreeRDPSuggestionProvider extends ContentProvider {
     private void addBookmarksToCursor(ArrayList<BookmarkBase> bookmarks, MatrixCursor resultCursor) {
         Object[] row = new Object[5];
         for (BookmarkBase bookmark : bookmarks) {
-            row[0] = new Long(bookmark.getId());
+            row[0] = bookmark.getId();
             row[1] = bookmark.getLabel();
             row[2] = bookmark.<ManualBookmark>get().getHostname();
             row[3] = ConnectionReference.getManualBookmarkReference(bookmark.getId());
@@ -94,7 +82,7 @@ public class FreeRDPSuggestionProvider extends ContentProvider {
     private void addHistoryToCursor(ArrayList<BookmarkBase> history, MatrixCursor resultCursor) {
         Object[] row = new Object[5];
         for (BookmarkBase bookmark : history) {
-            row[0] = new Integer(1);
+            row[0] = 1;
             row[1] = bookmark.getLabel();
             row[2] = bookmark.getLabel();
             row[3] = ConnectionReference.getHostnameReference(bookmark.getLabel());

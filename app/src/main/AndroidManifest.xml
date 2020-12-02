@@ -14,6 +14,12 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
 
+
+        <!--屏幕密度-->
+        <meta-data
+            android:name="com.samsung.android.keepalive.density"
+            android:value="true" />
+
         <activity android:name="com.xiaoyv.main.splash.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,6 +29,29 @@
         </activity>
 
 
+        <!--会话请求处理程序活动-用于搜索并在内部启动会话-->
+        <!--实际上应在FreeRDPCore lib中定义，但Android清单合并将-->
+        <!--将libs清单附加到应用程式清单，因此无法使用别名-->
+        <activity
+            android:name="com.freerdp.freerdpcore.services.SessionRequestHandlerActivity"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.NoDisplay">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
+        </activity>
+
+        <activity-alias
+            android:name=".services.SessionRequestHandlerActivity"
+            android:targetActivity="com.freerdp.freerdpcore.services.SessionRequestHandlerActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+            <meta-data
+                android:name="android.app.searchable"
+                android:resource="@xml/searchable" />
+        </activity-alias>
     </application>
 
 </manifest>

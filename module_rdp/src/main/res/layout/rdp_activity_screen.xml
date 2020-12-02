@@ -1,62 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/cl_root"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.inputmethodservice.KeyboardView
-        android:id="@+id/kv_keyboard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent" />
-
-    <com.xiaoyv.librdp.view.FreeScrollView
-        android:id="@+id/fsv_scroll"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:drawingCacheQuality="low"
-        android:fillViewport="true"
-        android:isScrollContainer="true"
-        android:scrollbars="horizontal|vertical"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <com.xiaoyv.librdp.view.SessionView
-            android:id="@+id/sv_session"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawingCacheQuality="low"
-            android:focusable="true"
-            android:focusableInTouchMode="true" />
-    </com.xiaoyv.librdp.view.FreeScrollView>
-
-    <com.xiaoyv.librdp.view.TouchPointerView
-        android:id="@+id/tpv_pointer"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:src="@drawable/touch_pointer_default"
-        android:visibility="invisible" />
-
-    <android.widget.ZoomControls
-        android:id="@+id/zc_controls"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/fsv_scroll" />
-
-    <android.inputmethodservice.KeyboardView
-        android:id="@+id/kv_keyboard_header"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:visibility="gone"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

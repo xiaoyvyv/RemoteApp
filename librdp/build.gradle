@@ -28,5 +28,7 @@ android {
 }
 
 dependencies {
+    // 常用工具类
+    implementation 'com.blankj:utilcodex:' + rootProject.ext.utilCodeXVersion
     implementation 'androidx.appcompat:appcompat:' + rootProject.ext.appcompatVersion
 }

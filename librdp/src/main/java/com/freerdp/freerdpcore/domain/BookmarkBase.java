@@ -1,13 +1,3 @@
-/*
-   Defines base attributes of a bookmark object
-
-   Copyright 2013 Thincast Technologies GmbH, Author: Martin Fleisz
-
-   This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-   If a copy of the MPL was not distributed with this file, You can obtain one at
-   http://mozilla.org/MPL/2.0/.
-*/
-
 package com.freerdp.freerdpcore.domain;
 
 import android.content.SharedPreferences;
@@ -18,27 +8,23 @@ import com.freerdp.freerdpcore.application.GlobalApp;
 
 import java.util.Locale;
 
-/**
- * 定义连接对象的基本属性
- *
- * @author why
- * @since 2020/11/20
- */
 public class BookmarkBase implements Parcelable, Cloneable {
     public static final int TYPE_INVALID = -1;
     public static final int TYPE_MANUAL = 1;
-    public static final int TYPE_QUICKCONNECT = 2;
+    public static final int TYPE_QUICK_CONNECT = 2;
     public static final int TYPE_PLACEHOLDER = 3;
-    public static final Parcelable.Creator<BookmarkBase> CREATOR = new Parcelable.Creator<BookmarkBase>() {
-        public BookmarkBase createFromParcel(Parcel in) {
-            return new BookmarkBase(in);
-        }
+    public static final int TYPE_CUSTOM_BASE = 1000;
+    public static final Parcelable.Creator<BookmarkBase> CREATOR =
+            new Parcelable.Creator<BookmarkBase>() {
+                public BookmarkBase createFromParcel(Parcel in) {
+                    return new BookmarkBase(in);
+                }
 
-        @Override
-        public BookmarkBase[] newArray(int size) {
-            return new BookmarkBase[size];
-        }
-    };
+                @Override
+                public BookmarkBase[] newArray(int size) {
+                    return new BookmarkBase[size];
+                }
+            };
     protected int type;
     private long id;
     private String label;
@@ -65,10 +51,6 @@ public class BookmarkBase implements Parcelable, Cloneable {
     }
 
     public BookmarkBase() {
-        init();
-    }
-
-    private void init() {
         type = TYPE_INVALID;
         id = -1;
         label = "";
@@ -164,14 +146,14 @@ public class BookmarkBase implements Parcelable, Cloneable {
     }
 
     public ScreenSettings getActiveScreenSettings() {
-        return (GlobalApp.ConnectedTo3G && advancedSettings.getEnable3GSettings())
-                ? advancedSettings.getScreen3G()
+        return (GlobalApp.ConnectedToMobileWork && advancedSettings.getEnable345GSettings())
+                ? advancedSettings.getScreen345G()
                 : screenSettings;
     }
 
     public PerformanceFlags getActivePerformanceFlags() {
-        return (GlobalApp.ConnectedTo3G && advancedSettings.getEnable3GSettings())
-                ? advancedSettings.getPerformance3G()
+        return (GlobalApp.ConnectedToMobileWork && advancedSettings.getEnable345GSettings())
+                ? advancedSettings.getPerformance345G()
                 : performanceFlags;
     }
 
@@ -195,7 +177,7 @@ public class BookmarkBase implements Parcelable, Cloneable {
         out.writeParcelable(debugSettings, flags);
     }
 
-    // write to shared preferences
+    // 写共享首选项
     public void writeToSharedPreferences(SharedPreferences sharedPrefs) {
 
         Locale locale = Locale.ENGLISH;
@@ -222,33 +204,33 @@ public class BookmarkBase implements Parcelable, Cloneable {
                 performanceFlags.getDesktopComposition());
         editor.putBoolean("bookmark.perf_window_dragging", performanceFlags.getFullWindowDrag());
         editor.putBoolean("bookmark.perf_menu_animation", performanceFlags.getMenuAnimations());
-        editor.putBoolean("bookmark.perf_themes", performanceFlags.getTheming());
+        editor.putBoolean("bookmark.perf_themes", performanceFlags.getTheme());
 
-        editor.putBoolean("bookmark.enable_3g_settings", advancedSettings.getEnable3GSettings());
+        editor.putBoolean("bookmark.enable_3g_settings", advancedSettings.getEnable345GSettings());
 
-        editor.putInt("bookmark.colors_3g", advancedSettings.getScreen3G().getColors());
+        editor.putInt("bookmark.colors_3g", advancedSettings.getScreen345G().getColors());
         editor.putString("bookmark.resolution_3g",
-                advancedSettings.getScreen3G().getResolutionString().toLowerCase(locale));
-        editor.putInt("bookmark.width_3g", advancedSettings.getScreen3G().getWidth());
-        editor.putInt("bookmark.height_3g", advancedSettings.getScreen3G().getHeight());
+                advancedSettings.getScreen345G().getResolutionString().toLowerCase(locale));
+        editor.putInt("bookmark.width_3g", advancedSettings.getScreen345G().getWidth());
+        editor.putInt("bookmark.height_3g", advancedSettings.getScreen345G().getHeight());
 
         editor.putBoolean("bookmark.perf_remotefx_3g",
-                advancedSettings.getPerformance3G().getRemoteFX());
-        editor.putBoolean("bookmark.perf_gfx_3g", advancedSettings.getPerformance3G().getGfx());
+                advancedSettings.getPerformance345G().getRemoteFX());
+        editor.putBoolean("bookmark.perf_gfx_3g", advancedSettings.getPerformance345G().getGfx());
         editor.putBoolean("bookmark.perf_gfx_h264_3g",
-                advancedSettings.getPerformance3G().getH264());
+                advancedSettings.getPerformance345G().getH264());
         editor.putBoolean("bookmark.perf_wallpaper_3g",
-                advancedSettings.getPerformance3G().getWallpaper());
+                advancedSettings.getPerformance345G().getWallpaper());
         editor.putBoolean("bookmark.perf_font_smoothing_3g",
-                advancedSettings.getPerformance3G().getFontSmoothing());
+                advancedSettings.getPerformance345G().getFontSmoothing());
         editor.putBoolean("bookmark.perf_desktop_composition_3g",
-                advancedSettings.getPerformance3G().getDesktopComposition());
+                advancedSettings.getPerformance345G().getDesktopComposition());
         editor.putBoolean("bookmark.perf_window_dragging_3g",
-                advancedSettings.getPerformance3G().getFullWindowDrag());
+                advancedSettings.getPerformance345G().getFullWindowDrag());
         editor.putBoolean("bookmark.perf_menu_animation_3g",
-                advancedSettings.getPerformance3G().getMenuAnimations());
+                advancedSettings.getPerformance345G().getMenuAnimations());
         editor.putBoolean("bookmark.perf_themes_3g",
-                advancedSettings.getPerformance3G().getTheming());
+                advancedSettings.getPerformance345G().getTheme());
 
         editor.putBoolean("bookmark.redirect_sdcard", advancedSettings.getRedirectSDCard());
         editor.putInt("bookmark.redirect_sound", advancedSettings.getRedirectSound());
@@ -266,7 +248,7 @@ public class BookmarkBase implements Parcelable, Cloneable {
         editor.apply();
     }
 
-    // read from shared preferences
+    // 从共享的偏好中读取
     public void readFromSharedPreferences(SharedPreferences sharedPrefs) {
         label = sharedPrefs.getString("bookmark.label", "");
         username = sharedPrefs.getString("bookmark.username", "");
@@ -290,34 +272,34 @@ public class BookmarkBase implements Parcelable, Cloneable {
                 sharedPrefs.getBoolean("bookmark.perf_window_dragging", false));
         performanceFlags.setMenuAnimations(
                 sharedPrefs.getBoolean("bookmark.perf_menu_animation", false));
-        performanceFlags.setTheming(sharedPrefs.getBoolean("bookmark.perf_themes", false));
+        performanceFlags.setTheme(sharedPrefs.getBoolean("bookmark.perf_themes", false));
 
-        advancedSettings.setEnable3GSettings(
+        advancedSettings.setEnable345GSettings(
                 sharedPrefs.getBoolean("bookmark.enable_3g_settings", false));
 
-        advancedSettings.getScreen3G().setColors(sharedPrefs.getInt("bookmark.colors_3g", 16));
-        advancedSettings.getScreen3G().setResolution(
+        advancedSettings.getScreen345G().setColors(sharedPrefs.getInt("bookmark.colors_3g", 16));
+        advancedSettings.getScreen345G().setResolution(
                 sharedPrefs.getString("bookmark.resolution_3g", "automatic"),
                 sharedPrefs.getInt("bookmark.width_3g", 800),
                 sharedPrefs.getInt("bookmark.height_3g", 600));
 
-        advancedSettings.getPerformance3G().setRemoteFX(
+        advancedSettings.getPerformance345G().setRemoteFX(
                 sharedPrefs.getBoolean("bookmark.perf_remotefx_3g", false));
-        advancedSettings.getPerformance3G().setGfx(
+        advancedSettings.getPerformance345G().setGfx(
                 sharedPrefs.getBoolean("bookmark.perf_gfx_3g", false));
-        advancedSettings.getPerformance3G().setH264(
+        advancedSettings.getPerformance345G().setH264(
                 sharedPrefs.getBoolean("bookmark.perf_gfx_h264_3g", false));
-        advancedSettings.getPerformance3G().setWallpaper(
+        advancedSettings.getPerformance345G().setWallpaper(
                 sharedPrefs.getBoolean("bookmark.perf_wallpaper_3g", false));
-        advancedSettings.getPerformance3G().setFontSmoothing(
+        advancedSettings.getPerformance345G().setFontSmoothing(
                 sharedPrefs.getBoolean("bookmark.perf_font_smoothing_3g", false));
-        advancedSettings.getPerformance3G().setDesktopComposition(
+        advancedSettings.getPerformance345G().setDesktopComposition(
                 sharedPrefs.getBoolean("bookmark.perf_desktop_composition_3g", false));
-        advancedSettings.getPerformance3G().setFullWindowDrag(
+        advancedSettings.getPerformance345G().setFullWindowDrag(
                 sharedPrefs.getBoolean("bookmark.perf_window_dragging_3g", false));
-        advancedSettings.getPerformance3G().setMenuAnimations(
+        advancedSettings.getPerformance345G().setMenuAnimations(
                 sharedPrefs.getBoolean("bookmark.perf_menu_animation_3g", false));
-        advancedSettings.getPerformance3G().setTheming(
+        advancedSettings.getPerformance345G().setTheme(
                 sharedPrefs.getBoolean("bookmark.perf_themes_3g", false));
 
         advancedSettings.setRedirectSDCard(
@@ -337,15 +319,16 @@ public class BookmarkBase implements Parcelable, Cloneable {
     }
 
     // Cloneable
+    @SuppressWarnings("NullableProblems")
     public Object clone() {
         try {
             return super.clone();
-        } catch (CloneNotSupportedException e) {
+        } catch (Exception e) {
             return null;
         }
     }
 
-    // performance flags
+    // 性能设置
     public static class PerformanceFlags implements Parcelable {
         public static final Parcelable.Creator<PerformanceFlags> CREATOR =
                 new Parcelable.Creator<PerformanceFlags>() {
@@ -358,22 +341,22 @@ public class BookmarkBase implements Parcelable, Cloneable {
                         return new PerformanceFlags[size];
                     }
                 };
-        private boolean remotefx;
+        private boolean remoteFx;
         private boolean gfx;
         private boolean h264;
         private boolean wallpaper;
-        private boolean theming;
+        private boolean theme;
         private boolean fullWindowDrag;
         private boolean menuAnimations;
         private boolean fontSmoothing;
         private boolean desktopComposition;
 
         public PerformanceFlags() {
-            remotefx = false;
+            remoteFx = false;
             gfx = false;
             h264 = false;
             wallpaper = false;
-            theming = false;
+            theme = false;
             fullWindowDrag = false;
             menuAnimations = false;
             fontSmoothing = false;
@@ -381,11 +364,11 @@ public class BookmarkBase implements Parcelable, Cloneable {
         }
 
         public PerformanceFlags(Parcel parcel) {
-            remotefx = parcel.readInt() == 1;
+            remoteFx = parcel.readInt() == 1;
             gfx = parcel.readInt() == 1;
             h264 = parcel.readInt() == 1;
             wallpaper = parcel.readInt() == 1;
-            theming = parcel.readInt() == 1;
+            theme = parcel.readInt() == 1;
             fullWindowDrag = (parcel.readInt() == 1);
             menuAnimations = parcel.readInt() == 1;
             fontSmoothing = parcel.readInt() == 1;
@@ -393,11 +376,11 @@ public class BookmarkBase implements Parcelable, Cloneable {
         }
 
         public boolean getRemoteFX() {
-            return remotefx;
+            return remoteFx;
         }
 
         public void setRemoteFX(boolean remotefx) {
-            this.remotefx = remotefx;
+            this.remoteFx = remotefx;
         }
 
         public boolean getGfx() {
@@ -424,12 +407,12 @@ public class BookmarkBase implements Parcelable, Cloneable {
             this.wallpaper = wallpaper;
         }
 
-        public boolean getTheming() {
-            return theming;
+        public boolean getTheme() {
+            return theme;
         }
 
-        public void setTheming(boolean theming) {
-            this.theming = theming;
+        public void setTheme(boolean theme) {
+            this.theme = theme;
         }
 
         public boolean getFullWindowDrag() {
@@ -471,11 +454,11 @@ public class BookmarkBase implements Parcelable, Cloneable {
 
         @Override
         public void writeToParcel(Parcel out, int flags) {
-            out.writeInt(remotefx ? 1 : 0);
+            out.writeInt(remoteFx ? 1 : 0);
             out.writeInt(gfx ? 1 : 0);
             out.writeInt(h264 ? 1 : 0);
             out.writeInt(wallpaper ? 1 : 0);
-            out.writeInt(theming ? 1 : 0);
+            out.writeInt(theme ? 1 : 0);
             out.writeInt(fullWindowDrag ? 1 : 0);
             out.writeInt(menuAnimations ? 1 : 0);
             out.writeInt(fontSmoothing ? 1 : 0);
@@ -769,9 +752,9 @@ public class BookmarkBase implements Parcelable, Cloneable {
                         return new AdvancedSettings[size];
                     }
                 };
-        private boolean enable3GSettings;
-        private ScreenSettings screen3G;
-        private PerformanceFlags performance3G;
+        private boolean enable345GSettings;
+        private ScreenSettings screen345G;
+        private PerformanceFlags performance345G;
         private boolean redirectSDCard;
         private int redirectSound;
         private boolean redirectMicrophone;
@@ -785,9 +768,9 @@ public class BookmarkBase implements Parcelable, Cloneable {
         }
 
         public AdvancedSettings(Parcel parcel) {
-            enable3GSettings = parcel.readInt() == 1;
-            screen3G = parcel.readParcelable(ScreenSettings.class.getClassLoader());
-            performance3G = parcel.readParcelable(PerformanceFlags.class.getClassLoader());
+            enable345GSettings = parcel.readInt() == 1;
+            screen345G = parcel.readParcelable(ScreenSettings.class.getClassLoader());
+            performance345G = parcel.readParcelable(PerformanceFlags.class.getClassLoader());
             redirectSDCard = parcel.readInt() == 1;
             redirectSound = parcel.readInt();
             redirectMicrophone = parcel.readInt() == 1;
@@ -798,9 +781,9 @@ public class BookmarkBase implements Parcelable, Cloneable {
         }
 
         private void init() {
-            enable3GSettings = false;
-            screen3G = new ScreenSettings();
-            performance3G = new PerformanceFlags();
+            enable345GSettings = false;
+            screen345G = new ScreenSettings();
+            performance345G = new PerformanceFlags();
             redirectSDCard = false;
             redirectSound = 0;
             redirectMicrophone = false;
@@ -833,28 +816,28 @@ public class BookmarkBase implements Parcelable, Cloneable {
             }
         }
 
-        public boolean getEnable3GSettings() {
-            return enable3GSettings;
+        public boolean getEnable345GSettings() {
+            return enable345GSettings;
         }
 
-        public void setEnable3GSettings(boolean enable3GSettings) {
-            this.enable3GSettings = enable3GSettings;
+        public void setEnable345GSettings(boolean enable345GSettings) {
+            this.enable345GSettings = enable345GSettings;
         }
 
-        public ScreenSettings getScreen3G() {
-            return screen3G;
+        public ScreenSettings getScreen345G() {
+            return screen345G;
         }
 
-        public void setScreen3G(ScreenSettings screen3G) {
-            this.screen3G = screen3G;
+        public void setScreen345G(ScreenSettings screen345G) {
+            this.screen345G = screen345G;
         }
 
-        public PerformanceFlags getPerformance3G() {
-            return performance3G;
+        public PerformanceFlags getPerformance345G() {
+            return performance345G;
         }
 
-        public void setPerformance3G(PerformanceFlags performance3G) {
-            this.performance3G = performance3G;
+        public void setPerformance345G(PerformanceFlags performance345G) {
+            this.performance345G = performance345G;
         }
 
         public boolean getRedirectSDCard() {
@@ -922,9 +905,9 @@ public class BookmarkBase implements Parcelable, Cloneable {
 
         @Override
         public void writeToParcel(Parcel out, int flags) {
-            out.writeInt(enable3GSettings ? 1 : 0);
-            out.writeParcelable(screen3G, flags);
-            out.writeParcelable(performance3G, flags);
+            out.writeInt(enable345GSettings ? 1 : 0);
+            out.writeParcelable(screen345G, flags);
+            out.writeParcelable(performance345G, flags);
             out.writeInt(redirectSDCard ? 1 : 0);
             out.writeInt(redirectSound);
             out.writeInt(redirectMicrophone ? 1 : 0);

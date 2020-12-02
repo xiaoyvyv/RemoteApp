@@ -20,12 +20,13 @@ public class SessionRequestHandlerActivity extends AppCompatActivity {
 
     @Override
     protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        setIntent(intent);
-        handleIntent(intent);
-    }
+		super.onNewIntent(intent);
+		setIntent(intent);
+		handleIntent(intent);
+	}
 
     private void startSessionWithConnectionReference(String refStr) {
+
         Bundle bundle = new Bundle();
         bundle.putString(SessionActivity.PARAM_CONNECTION_REFERENCE, refStr);
         Intent sessionIntent = new Intent(this, SessionActivity.class);

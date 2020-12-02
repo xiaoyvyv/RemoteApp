@@ -1,13 +1,3 @@
-/*
-   Session State class
-
-   Copyright 2013 Thincast Technologies GmbH, Author: Martin Fleisz
-
-   This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-   If a copy of the MPL was not distributed with this file, You can obtain one at
-   http://mozilla.org/MPL/2.0/.
-*/
-
 package com.freerdp.freerdpcore.application;
 
 import android.content.Context;
@@ -18,7 +8,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.freerdp.freerdpcore.domain.BookmarkBase;
-import com.xiaoyv.librdp.jni.LibFreeRDP;
+import com.freerdp.freerdpcore.services.LibFreeRDP;
 
 public class SessionState implements Parcelable {
     public static final Parcelable.Creator<SessionState> CREATOR =
@@ -32,18 +22,18 @@ public class SessionState implements Parcelable {
                     return new SessionState[size];
                 }
             };
-    private long instance;
-    private BookmarkBase bookmark;
-    private Uri openUri;
+    private final long instance;
+    private final BookmarkBase bookmark;
+    private final Uri openUri;
     private BitmapDrawable surface;
     private LibFreeRDP.UIEventListener uiEventListener;
 
     public SessionState(Parcel parcel) {
         instance = parcel.readLong();
-        bookmark = parcel.readParcelable(null);
-        openUri = parcel.readParcelable(null);
+        bookmark = parcel.readParcelable(getClass().getClassLoader());
+        openUri = parcel.readParcelable(getClass().getClassLoader());
 
-        Bitmap bitmap = parcel.readParcelable(null);
+        Bitmap bitmap = parcel.readParcelable(getClass().getClassLoader());
         surface = new BitmapDrawable(bitmap);
     }
 

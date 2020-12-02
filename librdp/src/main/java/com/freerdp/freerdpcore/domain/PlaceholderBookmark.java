@@ -1,13 +1,3 @@
-/*
-   Placeholder for bookmark items with a special purpose (i.e. just displaying some text)
-
-   Copyright 2013 Thincast Technologies GmbH, Author: Martin Fleisz
-
-   This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-   If a copy of the MPL was not distributed with this file, You can obtain one at
-   http://mozilla.org/MPL/2.0/.
-*/
-
 package com.freerdp.freerdpcore.domain;
 
 import android.content.SharedPreferences;
@@ -68,10 +58,5 @@ public class PlaceholderBookmark extends BookmarkBase {
     @Override
     public void readFromSharedPreferences(SharedPreferences sharedPrefs) {
         super.readFromSharedPreferences(sharedPrefs);
-    }
-
-    // Cloneable
-    public Object clone() {
-        return super.clone();
     }
 }

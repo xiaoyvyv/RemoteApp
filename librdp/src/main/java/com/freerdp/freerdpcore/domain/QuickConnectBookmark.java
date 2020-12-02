@@ -4,9 +4,6 @@ import android.content.SharedPreferences;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-/**
- * 快速连接书签（用于仅使用主机名进行快速连接）
- */
 public class QuickConnectBookmark extends ManualBookmark {
 
     public static final Parcelable.Creator<QuickConnectBookmark> CREATOR =
@@ -23,12 +20,12 @@ public class QuickConnectBookmark extends ManualBookmark {
 
     public QuickConnectBookmark(Parcel parcel) {
         super(parcel);
-        type = TYPE_QUICKCONNECT;
+        type = TYPE_QUICK_CONNECT;
     }
 
     public QuickConnectBookmark() {
         super();
-        type = TYPE_QUICKCONNECT;
+        type = TYPE_QUICK_CONNECT;
     }
 
     @Override
@@ -49,10 +46,5 @@ public class QuickConnectBookmark extends ManualBookmark {
     @Override
     public void readFromSharedPreferences(SharedPreferences sharedPrefs) {
         super.readFromSharedPreferences(sharedPrefs);
-    }
-
-    // Cloneable
-    public Object clone() {
-        return super.clone();
     }
 }
