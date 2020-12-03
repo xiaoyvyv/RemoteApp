@@ -7,10 +7,10 @@ import android.util.Log;
 
 import androidx.collection.LongSparseArray;
 
-import com.freerdp.freerdpcore.application.GlobalApp;
-import com.freerdp.freerdpcore.application.SessionState;
-import com.freerdp.freerdpcore.domain.BookmarkBase;
-import com.freerdp.freerdpcore.domain.ManualBookmark;
+import com.freerdp.freerdpcore.application.RdpApp;
+import com.freerdp.freerdpcore.application.RdpSessionState;
+import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
+import com.freerdp.freerdpcore.domain.RdpBookmark;
 import com.freerdp.freerdpcore.presentation.ApplicationSettingsActivity;
 
 import java.util.ArrayList;
@@ -145,10 +145,10 @@ public class LibFreeRDP {
         return "-" + name;
     }
 
-    public static boolean setConnectionInfo(Context context, long inst, BookmarkBase bookmark) {
-        BookmarkBase.ScreenSettings screenSettings = bookmark.getActiveScreenSettings();
-        BookmarkBase.AdvancedSettings advanced = bookmark.getAdvancedSettings();
-        BookmarkBase.DebugSettings debug = bookmark.getDebugSettings();
+    public static boolean setConnectionInfo(Context context, long inst, BaseRdpBookmark bookmark) {
+        BaseRdpBookmark.ScreenSettings screenSettings = bookmark.getActiveScreenSettings();
+        BaseRdpBookmark.AdvancedSettings advanced = bookmark.getAdvancedSettings();
+        BaseRdpBookmark.DebugSettings debug = bookmark.getDebugSettings();
 
         String arg;
         ArrayList<String> args = new ArrayList<String>();
@@ -161,12 +161,12 @@ public class LibFreeRDP {
             args.add("/client-hostname:" + clientName);
         }
         String certName = "";
-        if (bookmark.getType() != BookmarkBase.TYPE_MANUAL) {
+        if (bookmark.getType() != BaseRdpBookmark.TYPE_MANUAL) {
             return false;
         }
 
-        int port = bookmark.<ManualBookmark>get().getPort();
-        String hostname = bookmark.<ManualBookmark>get().getHostname();
+        int port = bookmark.<RdpBookmark>get().getPort();
+        String hostname = bookmark.<RdpBookmark>get().getHostname();
 
         args.add("/v:" + hostname);
         args.add("/port:" + String.valueOf(port));
@@ -209,7 +209,7 @@ public class LibFreeRDP {
             args.add("/cert-name:" + certName);
         }
 
-        BookmarkBase.PerformanceFlags flags = bookmark.getActivePerformanceFlags();
+        BaseRdpBookmark.PerformanceFlags flags = bookmark.getActivePerformanceFlags();
         if (flags.getRemoteFX()) {
             args.add("/rfx");
         }
@@ -250,10 +250,10 @@ public class LibFreeRDP {
         args.add("/clipboard");
 
         // Gateway enabled?
-        if (bookmark.getType() == BookmarkBase.TYPE_MANUAL &&
-                bookmark.<ManualBookmark>get().getEnableGatewaySettings()) {
-            ManualBookmark.GatewaySettings gateway =
-                    bookmark.<ManualBookmark>get().getGatewaySettings();
+        if (bookmark.getType() == BaseRdpBookmark.TYPE_MANUAL &&
+                bookmark.<RdpBookmark>get().getEnableGatewaySettings()) {
+            RdpBookmark.GatewaySettings gateway =
+                    bookmark.<RdpBookmark>get().getGatewaySettings();
 
             args.add(String.format("/g:%s:%d", gateway.getHostname(), gateway.getPort()));
 
@@ -404,7 +404,7 @@ public class LibFreeRDP {
     }
 
     private static void OnSettingsChanged(long inst, int width, int height, int bpp) {
-        SessionState s = GlobalApp.getSession(inst);
+        RdpSessionState s = RdpApp.getSession(inst);
         if (s == null)
             return;
         UIEventListener uiEventListener = s.getUIEventListener();
@@ -414,7 +414,7 @@ public class LibFreeRDP {
 
     private static boolean OnAuthenticate(long inst, StringBuilder username, StringBuilder domain,
                                           StringBuilder password) {
-        SessionState s = GlobalApp.getSession(inst);
+        RdpSessionState s = RdpApp.getSession(inst);
         if (s == null)
             return false;
         UIEventListener uiEventListener = s.getUIEventListener();
@@ -425,7 +425,7 @@ public class LibFreeRDP {
 
     private static boolean OnGatewayAuthenticate(long inst, StringBuilder username,
                                                  StringBuilder domain, StringBuilder password) {
-        SessionState s = GlobalApp.getSession(inst);
+        RdpSessionState s = RdpApp.getSession(inst);
         if (s == null)
             return false;
         UIEventListener uiEventListener = s.getUIEventListener();
@@ -436,7 +436,7 @@ public class LibFreeRDP {
 
     private static int OnVerifyCertificate(long inst, String commonName, String subject,
                                            String issuer, String fingerprint, boolean hostMismatch) {
-        SessionState s = GlobalApp.getSession(inst);
+        RdpSessionState s = RdpApp.getSession(inst);
         if (s == null)
             return 0;
         UIEventListener uiEventListener = s.getUIEventListener();
@@ -450,7 +450,7 @@ public class LibFreeRDP {
                                                   String issuer, String fingerprint,
                                                   String oldSubject, String oldIssuer,
                                                   String oldFingerprint) {
-        SessionState s = GlobalApp.getSession(inst);
+        RdpSessionState s = RdpApp.getSession(inst);
         if (s == null)
             return 0;
         UIEventListener uiEventListener = s.getUIEventListener();
@@ -461,7 +461,7 @@ public class LibFreeRDP {
     }
 
     private static void OnGraphicsUpdate(long inst, int x, int y, int width, int height) {
-        SessionState s = GlobalApp.getSession(inst);
+        RdpSessionState s = RdpApp.getSession(inst);
         if (s == null)
             return;
         UIEventListener uiEventListener = s.getUIEventListener();
@@ -470,7 +470,7 @@ public class LibFreeRDP {
     }
 
     private static void OnGraphicsResize(long inst, int width, int height, int bpp) {
-        SessionState s = GlobalApp.getSession(inst);
+        RdpSessionState s = RdpApp.getSession(inst);
         if (s == null)
             return;
         UIEventListener uiEventListener = s.getUIEventListener();
@@ -479,7 +479,7 @@ public class LibFreeRDP {
     }
 
     private static void OnRemoteClipboardChanged(long inst, String data) {
-        SessionState s = GlobalApp.getSession(inst);
+        RdpSessionState s = RdpApp.getSession(inst);
         if (s == null)
             return;
         UIEventListener uiEventListener = s.getUIEventListener();

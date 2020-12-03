@@ -7,28 +7,28 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.freerdp.freerdpcore.domain.BookmarkBase;
+import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
 import com.freerdp.freerdpcore.services.LibFreeRDP;
 
-public class SessionState implements Parcelable {
-    public static final Parcelable.Creator<SessionState> CREATOR =
-            new Parcelable.Creator<SessionState>() {
-                public SessionState createFromParcel(Parcel in) {
-                    return new SessionState(in);
+public class RdpSessionState implements Parcelable {
+    public static final Parcelable.Creator<RdpSessionState> CREATOR =
+            new Parcelable.Creator<RdpSessionState>() {
+                public RdpSessionState createFromParcel(Parcel in) {
+                    return new RdpSessionState(in);
                 }
 
                 @Override
-                public SessionState[] newArray(int size) {
-                    return new SessionState[size];
+                public RdpSessionState[] newArray(int size) {
+                    return new RdpSessionState[size];
                 }
             };
     private final long instance;
-    private final BookmarkBase bookmark;
+    private final BaseRdpBookmark bookmark;
     private final Uri openUri;
     private BitmapDrawable surface;
     private LibFreeRDP.UIEventListener uiEventListener;
 
-    public SessionState(Parcel parcel) {
+    public RdpSessionState(Parcel parcel) {
         instance = parcel.readLong();
         bookmark = parcel.readParcelable(getClass().getClassLoader());
         openUri = parcel.readParcelable(getClass().getClassLoader());
@@ -37,14 +37,14 @@ public class SessionState implements Parcelable {
         surface = new BitmapDrawable(bitmap);
     }
 
-    public SessionState(long instance, BookmarkBase bookmark) {
+    public RdpSessionState(long instance, BaseRdpBookmark bookmark) {
         this.instance = instance;
         this.bookmark = bookmark;
         this.openUri = null;
         this.uiEventListener = null;
     }
 
-    public SessionState(long instance, Uri openUri) {
+    public RdpSessionState(long instance, Uri openUri) {
         this.instance = instance;
         this.bookmark = null;
         this.openUri = openUri;
@@ -64,7 +64,7 @@ public class SessionState implements Parcelable {
         return instance;
     }
 
-    public BookmarkBase getBookmark() {
+    public BaseRdpBookmark getBookmark() {
         return bookmark;
     }
 

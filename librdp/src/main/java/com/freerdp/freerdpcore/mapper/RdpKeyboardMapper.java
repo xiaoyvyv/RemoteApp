@@ -8,7 +8,7 @@ import com.xiaoyv.librdp.R;
 /**
  * 键盘映射器
  */
-public class KeyboardMapper {
+public class RdpKeyboardMapper {
 	public static final int KEYBOARD_TYPE_FUNCTIONKEYS = 1;
 	public static final int KEYBOARD_TYPE_NUMPAD = 2;
 	public static final int KEYBOARD_TYPE_CURSOR = 3;

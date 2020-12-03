@@ -17,7 +17,7 @@ import android.view.View;
 import android.view.WindowInsets;
 import android.view.WindowInsetsController;
 
-import com.freerdp.freerdpcore.application.SessionState;
+import com.freerdp.freerdpcore.application.RdpSessionState;
 import com.freerdp.freerdpcore.presentation.SessionActivity;
 import com.freerdp.freerdpcore.utils.DoubleGestureDetector;
 import com.freerdp.freerdpcore.utils.GestureDetector;
@@ -27,7 +27,7 @@ import java.util.Stack;
 /**
  * 远程连接自定义视图
  */
-public class SessionView extends View {
+public class RdpSessionView extends View {
     public static final float MAX_SCALE_FACTOR = 3.0f;
     public static final float MIN_SCALE_FACTOR = 1.0f;
     private static final String TAG = "SessionView";
@@ -46,21 +46,21 @@ public class SessionView extends View {
     private Matrix invScaleMatrix;
     private RectF invalidRegionF;
     private GestureDetector gestureDetector;
-    private SessionState currentSession;
+    private RdpSessionState currentSession;
 
     private DoubleGestureDetector doubleGestureDetector;
 
-    public SessionView(Context context) {
+    public RdpSessionView(Context context) {
         super(context);
         initSessionView(context);
     }
 
-    public SessionView(Context context, AttributeSet attrs) {
+    public RdpSessionView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initSessionView(context);
     }
 
-    public SessionView(Context context, AttributeSet attrs, int defStyle) {
+    public RdpSessionView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initSessionView(context);
     }
@@ -77,11 +77,6 @@ public class SessionView extends View {
         invalidRegionF = new RectF();
 
 
-        WindowInsetsController controller = getWindowInsetsController();
-        if (controller != null) {
-            controller.hide(WindowInsets.Type.statusBars() | WindowInsets.Type.navigationBars());
-            controller.setSystemBarsBehavior(WindowInsetsController.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE);
-        }
     }
 
     public void setScaleGestureDetector(ScaleGestureDetector scaleGestureDetector) {
@@ -105,7 +100,7 @@ public class SessionView extends View {
         invalidate(invalidRegions.pop());
     }
 
-    public void onSurfaceChange(SessionState session) {
+    public void onSurfaceChange(RdpSessionState session) {
         surface = session.getSurface();
         Bitmap bitmap = surface.getBitmap();
         width = bitmap.getWidth();

@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.util.Log;
 
-import com.freerdp.freerdpcore.domain.BookmarkBase;
+import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
 
 import java.util.ArrayList;
 
@@ -51,18 +51,18 @@ public abstract class BookmarkBaseGateway {
         this.bookmarkDB = bookmarkDB;
     }
 
-    protected abstract BookmarkBase createBookmark();
+    protected abstract BaseRdpBookmark createBookmark();
 
     protected abstract String getBookmarkTableName();
 
     protected abstract void addBookmarkSpecificColumns(ArrayList<String> columns);
 
-    protected abstract void addBookmarkSpecificColumns(BookmarkBase bookmark,
+    protected abstract void addBookmarkSpecificColumns(BaseRdpBookmark bookmark,
                                                        ContentValues columns);
 
-    protected abstract void readBookmarkSpecificColumns(BookmarkBase bookmark, Cursor cursor);
+    protected abstract void readBookmarkSpecificColumns(BaseRdpBookmark bookmark, Cursor cursor);
 
-    public void insert(BookmarkBase bookmark) {
+    public void insert(BaseRdpBookmark bookmark) {
         // begin transaction
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
@@ -120,7 +120,7 @@ public abstract class BookmarkBaseGateway {
         db.endTransaction();
     }
 
-    public boolean update(BookmarkBase bookmark) {
+    public boolean update(BaseRdpBookmark bookmark) {
         // start a transaction
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction();
@@ -183,7 +183,7 @@ public abstract class BookmarkBaseGateway {
         db.delete(getBookmarkTableName(), BookmarkDB.ID + " = " + id, null);
     }
 
-    public BookmarkBase findById(long id) {
+    public BaseRdpBookmark findById(long id) {
         Cursor cursor =
                 queryBookmarks(getBookmarkTableName() + "." + BookmarkDB.ID + " = " + id, null);
         if (cursor.getCount() == 0) {
@@ -192,18 +192,18 @@ public abstract class BookmarkBaseGateway {
         }
 
         cursor.moveToFirst();
-        BookmarkBase bookmark = getBookmarkFromCursor(cursor);
+        BaseRdpBookmark bookmark = getBookmarkFromCursor(cursor);
         cursor.close();
         return bookmark;
     }
 
-    public BookmarkBase findByLabel(String label) {
+    public BaseRdpBookmark findByLabel(String label) {
         Cursor cursor = queryBookmarks(BookmarkDB.DB_KEY_BOOKMARK_LABEL + " = '" + label + "'",
                 BookmarkDB.DB_KEY_BOOKMARK_LABEL);
         if (cursor.getCount() > 1)
             Log.e(TAG, "More than one bookmark with the same label found!");
 
-        BookmarkBase bookmark = null;
+        BaseRdpBookmark bookmark = null;
         if (cursor.moveToFirst() && (cursor.getCount() > 0))
             bookmark = getBookmarkFromCursor(cursor);
 
@@ -211,11 +211,11 @@ public abstract class BookmarkBaseGateway {
         return bookmark;
     }
 
-    public ArrayList<BookmarkBase> findByLabelLike(String pattern) {
+    public ArrayList<BaseRdpBookmark> findByLabelLike(String pattern) {
         Cursor cursor =
                 queryBookmarks(BookmarkDB.DB_KEY_BOOKMARK_LABEL + " LIKE '%" + pattern + "%'",
                         BookmarkDB.DB_KEY_BOOKMARK_LABEL);
-        ArrayList<BookmarkBase> bookmarks = new ArrayList<>(cursor.getCount());
+        ArrayList<BaseRdpBookmark> bookmarks = new ArrayList<>(cursor.getCount());
 
         if (cursor.moveToFirst() && (cursor.getCount() > 0)) {
             do {
@@ -227,10 +227,10 @@ public abstract class BookmarkBaseGateway {
         return bookmarks;
     }
 
-    public ArrayList<BookmarkBase> findAll() {
+    public ArrayList<BaseRdpBookmark> findAll() {
         Cursor cursor = queryBookmarks(null, BookmarkDB.DB_KEY_BOOKMARK_LABEL);
         final int count = cursor.getCount();
-        ArrayList<BookmarkBase> bookmarks = new ArrayList<>(count);
+        ArrayList<BaseRdpBookmark> bookmarks = new ArrayList<>(count);
 
         if (cursor.moveToFirst() && (count > 0)) {
             do {
@@ -374,8 +374,8 @@ public abstract class BookmarkBaseGateway {
                 KEY_PERFORMANCE_COMPOSITION_3G);
     }
 
-    protected BookmarkBase getBookmarkFromCursor(Cursor cursor) {
-        BookmarkBase bookmark = createBookmark();
+    protected BaseRdpBookmark getBookmarkFromCursor(Cursor cursor) {
+        BaseRdpBookmark bookmark = createBookmark();
         bookmark.setId(cursor.getLong(cursor.getColumnIndex(KEY_BOOKMARK_ID)));
         bookmark.setLabel(
                 cursor.getString(cursor.getColumnIndex(BookmarkDB.DB_KEY_BOOKMARK_LABEL)));
@@ -423,16 +423,16 @@ public abstract class BookmarkBaseGateway {
         return bookmark;
     }
 
-    private void readScreenSettings(BookmarkBase bookmark, Cursor cursor) {
-        BookmarkBase.ScreenSettings screenSettings = bookmark.getScreenSettings();
+    private void readScreenSettings(BaseRdpBookmark bookmark, Cursor cursor) {
+        BaseRdpBookmark.ScreenSettings screenSettings = bookmark.getScreenSettings();
         screenSettings.setColors(cursor.getInt(cursor.getColumnIndex(KEY_SCREEN_COLORS)));
         screenSettings.setResolution(cursor.getInt(cursor.getColumnIndex(KEY_SCREEN_RESOLUTION)));
         screenSettings.setWidth(cursor.getInt(cursor.getColumnIndex(KEY_SCREEN_WIDTH)));
         screenSettings.setHeight(cursor.getInt(cursor.getColumnIndex(KEY_SCREEN_HEIGHT)));
     }
 
-    private void readPerformanceFlags(BookmarkBase bookmark, Cursor cursor) {
-        BookmarkBase.PerformanceFlags perfFlags = bookmark.getPerformanceFlags();
+    private void readPerformanceFlags(BaseRdpBookmark bookmark, Cursor cursor) {
+        BaseRdpBookmark.PerformanceFlags perfFlags = bookmark.getPerformanceFlags();
         perfFlags.setRemoteFX(cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_RFX)) != 0);
         perfFlags.setGfx(cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_GFX)) != 0);
         perfFlags.setH264(cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_H264)) != 0);
@@ -449,8 +449,8 @@ public abstract class BookmarkBaseGateway {
                 cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_COMPOSITION)) != 0);
     }
 
-    private void readScreenSettings3G(BookmarkBase bookmark, Cursor cursor) {
-        BookmarkBase.ScreenSettings screenSettings = bookmark.getAdvancedSettings().getScreen345G();
+    private void readScreenSettings3G(BaseRdpBookmark bookmark, Cursor cursor) {
+        BaseRdpBookmark.ScreenSettings screenSettings = bookmark.getAdvancedSettings().getScreen345G();
         screenSettings.setColors(cursor.getInt(cursor.getColumnIndex(KEY_SCREEN_COLORS_3G)));
         screenSettings.setResolution(
                 cursor.getInt(cursor.getColumnIndex(KEY_SCREEN_RESOLUTION_3G)));
@@ -458,8 +458,8 @@ public abstract class BookmarkBaseGateway {
         screenSettings.setHeight(cursor.getInt(cursor.getColumnIndex(KEY_SCREEN_HEIGHT_3G)));
     }
 
-    private void readPerformanceFlags3G(BookmarkBase bookmark, Cursor cursor) {
-        BookmarkBase.PerformanceFlags perfFlags = bookmark.getAdvancedSettings().getPerformance345G();
+    private void readPerformanceFlags3G(BaseRdpBookmark bookmark, Cursor cursor) {
+        BaseRdpBookmark.PerformanceFlags perfFlags = bookmark.getAdvancedSettings().getPerformance345G();
         perfFlags.setRemoteFX(cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_RFX_3G)) != 0);
         perfFlags.setGfx(cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_GFX_3G)) != 0);
         perfFlags.setH264(cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_H264_3G)) != 0);
@@ -476,7 +476,7 @@ public abstract class BookmarkBaseGateway {
                 cursor.getInt(cursor.getColumnIndex(KEY_PERFORMANCE_COMPOSITION_3G)) != 0);
     }
 
-    private void fillScreenSettingsContentValues(BookmarkBase.ScreenSettings settings,
+    private void fillScreenSettingsContentValues(BaseRdpBookmark.ScreenSettings settings,
                                                  ContentValues values) {
         values.put(BookmarkDB.DB_KEY_SCREEN_COLORS, settings.getColors());
         values.put(BookmarkDB.DB_KEY_SCREEN_RESOLUTION, settings.getResolution());
@@ -484,7 +484,7 @@ public abstract class BookmarkBaseGateway {
         values.put(BookmarkDB.DB_KEY_SCREEN_HEIGHT, settings.getHeight());
     }
 
-    private void fillPerformanceFlagsContentValues(BookmarkBase.PerformanceFlags perfFlags,
+    private void fillPerformanceFlagsContentValues(BaseRdpBookmark.PerformanceFlags perfFlags,
                                                    ContentValues values) {
         values.put(BookmarkDB.DB_KEY_PERFORMANCE_RFX, perfFlags.getRemoteFX());
         values.put(BookmarkDB.DB_KEY_PERFORMANCE_GFX, perfFlags.getGfx());
@@ -497,13 +497,13 @@ public abstract class BookmarkBaseGateway {
         values.put(BookmarkDB.DB_KEY_PERFORMANCE_COMPOSITION, perfFlags.getDesktopComposition());
     }
 
-    private long insertScreenSettings(SQLiteDatabase db, BookmarkBase.ScreenSettings settings) {
+    private long insertScreenSettings(SQLiteDatabase db, BaseRdpBookmark.ScreenSettings settings) {
         ContentValues values = new ContentValues();
         fillScreenSettingsContentValues(settings, values);
         return db.insertOrThrow(BookmarkDB.DB_TABLE_SCREEN, null, values);
     }
 
-    private boolean updateScreenSettings(SQLiteDatabase db, BookmarkBase bookmark) {
+    private boolean updateScreenSettings(SQLiteDatabase db, BaseRdpBookmark bookmark) {
         ContentValues values = new ContentValues();
         fillScreenSettingsContentValues(bookmark.getScreenSettings(), values);
         String whereClause = BookmarkDB.ID + " IN "
@@ -513,7 +513,7 @@ public abstract class BookmarkBaseGateway {
         return (db.update(BookmarkDB.DB_TABLE_SCREEN, values, whereClause, null) == 1);
     }
 
-    private boolean updateScreenSettings3G(SQLiteDatabase db, BookmarkBase bookmark) {
+    private boolean updateScreenSettings3G(SQLiteDatabase db, BaseRdpBookmark bookmark) {
         ContentValues values = new ContentValues();
         fillScreenSettingsContentValues(bookmark.getAdvancedSettings().getScreen345G(), values);
         String whereClause = BookmarkDB.ID + " IN "
@@ -523,13 +523,13 @@ public abstract class BookmarkBaseGateway {
         return (db.update(BookmarkDB.DB_TABLE_SCREEN, values, whereClause, null) == 1);
     }
 
-    private long insertPerformanceFlags(SQLiteDatabase db, BookmarkBase.PerformanceFlags perfFlags) {
+    private long insertPerformanceFlags(SQLiteDatabase db, BaseRdpBookmark.PerformanceFlags perfFlags) {
         ContentValues values = new ContentValues();
         fillPerformanceFlagsContentValues(perfFlags, values);
         return db.insertOrThrow(BookmarkDB.DB_TABLE_PERFORMANCE, null, values);
     }
 
-    private boolean updatePerformanceFlags(SQLiteDatabase db, BookmarkBase bookmark) {
+    private boolean updatePerformanceFlags(SQLiteDatabase db, BaseRdpBookmark bookmark) {
         ContentValues values = new ContentValues();
         fillPerformanceFlagsContentValues(bookmark.getPerformanceFlags(), values);
         String whereClause = BookmarkDB.ID + " IN "
@@ -539,7 +539,7 @@ public abstract class BookmarkBaseGateway {
         return (db.update(BookmarkDB.DB_TABLE_PERFORMANCE, values, whereClause, null) == 1);
     }
 
-    private boolean updatePerformanceFlags3G(SQLiteDatabase db, BookmarkBase bookmark) {
+    private boolean updatePerformanceFlags3G(SQLiteDatabase db, BaseRdpBookmark bookmark) {
         ContentValues values = new ContentValues();
         fillPerformanceFlagsContentValues(bookmark.getAdvancedSettings().getPerformance345G(),
                 values);

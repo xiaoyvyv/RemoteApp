@@ -7,21 +7,19 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.blankj.utilcode.util.LogUtils;
-import com.freerdp.freerdpcore.domain.BookmarkBase;
-import com.freerdp.freerdpcore.domain.QuickConnectBookmark;
+import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
+import com.freerdp.freerdpcore.domain.RdpQuickBookmark;
 
 import java.util.ArrayList;
 
 public class QuickConnectHistoryGateway {
-    private final static String TAG = "QuickConnectHistoryGateway";
     private final SQLiteOpenHelper historyDB;
 
     public QuickConnectHistoryGateway(SQLiteOpenHelper historyDB) {
         this.historyDB = historyDB;
     }
 
-    public ArrayList<BookmarkBase> findHistory(String filter) {
+    public ArrayList<BaseRdpBookmark> findHistory(String filter) {
         String[] column = {HistoryDB.QUICK_CONNECT_TABLE_COL_ITEM};
 
         SQLiteDatabase db = getReadableDatabase();
@@ -32,12 +30,12 @@ public class QuickConnectHistoryGateway {
         Cursor cursor = db.query(HistoryDB.QUICK_CONNECT_TABLE_NAME, column, selection, null, null,
                 null, HistoryDB.QUICK_CONNECT_TABLE_COL_TIMESTAMP);
 
-        ArrayList<BookmarkBase> result = new ArrayList<BookmarkBase>(cursor.getCount());
+        ArrayList<BaseRdpBookmark> result = new ArrayList<>(cursor.getCount());
         if (cursor.moveToFirst()) {
             do {
                 String hostname =
                         cursor.getString(cursor.getColumnIndex(HistoryDB.QUICK_CONNECT_TABLE_COL_ITEM));
-                QuickConnectBookmark bookmark = new QuickConnectBookmark();
+                RdpQuickBookmark bookmark = new RdpQuickBookmark();
                 bookmark.setLabel(hostname);
                 bookmark.setHostname(hostname);
                 result.add(bookmark);

@@ -4,16 +4,19 @@ import android.content.SharedPreferences;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class ManualBookmark extends BookmarkBase {
-    public static final Parcelable.Creator<ManualBookmark> CREATOR =
-            new Parcelable.Creator<ManualBookmark>() {
-                public ManualBookmark createFromParcel(Parcel in) {
-                    return new ManualBookmark(in);
+/**
+ * Rdp配置标签模型
+ */
+public class RdpBookmark extends BaseRdpBookmark {
+    public static final Parcelable.Creator<RdpBookmark> CREATOR =
+            new Parcelable.Creator<RdpBookmark>() {
+                public RdpBookmark createFromParcel(Parcel in) {
+                    return new RdpBookmark(in);
                 }
 
                 @Override
-                public ManualBookmark[] newArray(int size) {
-                    return new ManualBookmark[size];
+                public RdpBookmark[] newArray(int size) {
+                    return new RdpBookmark[size];
                 }
             };
     private String hostname;
@@ -21,7 +24,7 @@ public class ManualBookmark extends BookmarkBase {
     private boolean enableGatewaySettings;
     private GatewaySettings gatewaySettings;
 
-    public ManualBookmark(Parcel parcel) {
+    public RdpBookmark(Parcel parcel) {
         super(parcel);
         type = TYPE_MANUAL;
         hostname = parcel.readString();
@@ -31,7 +34,7 @@ public class ManualBookmark extends BookmarkBase {
         gatewaySettings = parcel.readParcelable(GatewaySettings.class.getClassLoader());
     }
 
-    public ManualBookmark() {
+    public RdpBookmark() {
         super();
         init();
     }

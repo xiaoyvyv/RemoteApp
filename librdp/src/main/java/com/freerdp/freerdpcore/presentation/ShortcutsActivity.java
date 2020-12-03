@@ -13,8 +13,8 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.freerdp.freerdpcore.application.GlobalApp;
-import com.freerdp.freerdpcore.domain.BookmarkBase;
+import com.freerdp.freerdpcore.application.RdpApp;
+import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
 import com.freerdp.freerdpcore.services.SessionRequestHandlerActivity;
 import com.freerdp.freerdpcore.utils.BookmarkArrayAdapter;
 import com.xiaoyv.librdp.R;
@@ -51,7 +51,7 @@ public class ShortcutsActivity extends ListActivity {
     public void onResume() {
         super.onResume();
         // create bookmark cursor adapter
-        ArrayList<BookmarkBase> bookmarks = GlobalApp.getManualBookmarkGateway().findAll();
+        ArrayList<BaseRdpBookmark> bookmarks = RdpApp.getManualBookmarkGateway().findAll();
         BookmarkArrayAdapter bookmarkAdapter =
                 new BookmarkArrayAdapter(this, android.R.layout.simple_list_item_2, bookmarks);
         getListView().setAdapter(bookmarkAdapter);

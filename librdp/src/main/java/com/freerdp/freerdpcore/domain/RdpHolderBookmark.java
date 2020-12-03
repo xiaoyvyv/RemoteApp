@@ -4,28 +4,31 @@ import android.content.SharedPreferences;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class PlaceholderBookmark extends BookmarkBase {
+/**
+ * 占位标签
+ */
+public class RdpHolderBookmark extends BaseRdpBookmark {
 
-    public static final Parcelable.Creator<PlaceholderBookmark> CREATOR =
-            new Parcelable.Creator<PlaceholderBookmark>() {
-                public PlaceholderBookmark createFromParcel(Parcel in) {
-                    return new PlaceholderBookmark(in);
+    public static final Parcelable.Creator<RdpHolderBookmark> CREATOR =
+            new Parcelable.Creator<RdpHolderBookmark>() {
+                public RdpHolderBookmark createFromParcel(Parcel in) {
+                    return new RdpHolderBookmark(in);
                 }
 
                 @Override
-                public PlaceholderBookmark[] newArray(int size) {
-                    return new PlaceholderBookmark[size];
+                public RdpHolderBookmark[] newArray(int size) {
+                    return new RdpHolderBookmark[size];
                 }
             };
     private String name;
 
-    public PlaceholderBookmark(Parcel parcel) {
+    public RdpHolderBookmark(Parcel parcel) {
         super(parcel);
         type = TYPE_PLACEHOLDER;
         name = parcel.readString();
     }
 
-    public PlaceholderBookmark() {
+    public RdpHolderBookmark() {
         super();
         type = TYPE_PLACEHOLDER;
         name = "";

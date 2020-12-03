@@ -1,13 +1,3 @@
-/*
-   ArrayAdapter for bookmark lists
-
-   Copyright 2013 Thincast Technologies GmbH, Author: Martin Fleisz
-
-   This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-   If a copy of the MPL was not distributed with this file, You can obtain one at
-   http://mozilla.org/MPL/2.0/.
-*/
-
 package com.freerdp.freerdpcore.utils;
 
 import android.content.Context;
@@ -21,18 +11,18 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.freerdp.freerdpcore.domain.BookmarkBase;
+import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
 import com.freerdp.freerdpcore.domain.ConnectionReference;
-import com.freerdp.freerdpcore.domain.ManualBookmark;
-import com.freerdp.freerdpcore.domain.PlaceholderBookmark;
+import com.freerdp.freerdpcore.domain.RdpBookmark;
+import com.freerdp.freerdpcore.domain.RdpHolderBookmark;
 import com.freerdp.freerdpcore.presentation.BookmarkActivity;
 import com.xiaoyv.librdp.R;
 
 import java.util.List;
 
-public class BookmarkArrayAdapter extends ArrayAdapter<BookmarkBase> {
+public class BookmarkArrayAdapter extends ArrayAdapter<BaseRdpBookmark> {
 
-    public BookmarkArrayAdapter(Context context, int textViewResourceId, List<BookmarkBase> objects) {
+    public BookmarkArrayAdapter(Context context, int textViewResourceId, List<BaseRdpBookmark> objects) {
         super(context, textViewResourceId, objects);
     }
 
@@ -45,7 +35,7 @@ public class BookmarkArrayAdapter extends ArrayAdapter<BookmarkBase> {
             curView = vi.inflate(R.layout.bookmark_list_item, null);
         }
 
-        BookmarkBase bookmark = getItem(position);
+        BaseRdpBookmark bookmark = getItem(position);
         TextView label = (TextView) curView.findViewById(R.id.bookmark_text1);
         TextView hostname = (TextView) curView.findViewById(R.id.bookmark_text2);
         ImageView star_icon = (ImageView) curView.findViewById(R.id.bookmark_icon2);
@@ -56,20 +46,20 @@ public class BookmarkArrayAdapter extends ArrayAdapter<BookmarkBase> {
         star_icon.setVisibility(View.VISIBLE);
 
         String refStr;
-        if (bookmark.getType() == BookmarkBase.TYPE_MANUAL) {
-            hostname.setText(bookmark.<ManualBookmark>get().getHostname());
+        if (bookmark.getType() == BaseRdpBookmark.TYPE_MANUAL) {
+            hostname.setText(bookmark.<RdpBookmark>get().getHostname());
             refStr = ConnectionReference.getManualBookmarkReference(bookmark.getId());
             star_icon.setImageResource(R.drawable.icon_star_on);
-        } else if (bookmark.getType() == BookmarkBase.TYPE_QUICK_CONNECT) {
+        } else if (bookmark.getType() == BaseRdpBookmark.TYPE_QUICK_CONNECT) {
             // just set an empty hostname (with a blank) - the hostname is already displayed in the
             // label and in case we just set it to "" the textview will shrunk
             hostname.setText(" ");
             refStr = ConnectionReference.getHostnameReference(bookmark.getLabel());
             star_icon.setImageResource(R.drawable.icon_star_off);
-        } else if (bookmark.getType() == BookmarkBase.TYPE_PLACEHOLDER) {
+        } else if (bookmark.getType() == BaseRdpBookmark.TYPE_PLACEHOLDER) {
             hostname.setText(" ");
             refStr = ConnectionReference.getPlaceholderReference(
-                    bookmark.<PlaceholderBookmark>get().getName());
+                    bookmark.<RdpHolderBookmark>get().getName());
             star_icon.setVisibility(View.GONE);
         } else {
             // unknown bookmark type...
@@ -97,20 +87,20 @@ public class BookmarkArrayAdapter extends ArrayAdapter<BookmarkBase> {
         return curView;
     }
 
-    public void addItems(List<BookmarkBase> newItems) {
-        for (BookmarkBase item : newItems)
+    public void addItems(List<BaseRdpBookmark> newItems) {
+        for (BaseRdpBookmark item : newItems)
             add(item);
     }
 
-    public void replaceItems(List<BookmarkBase> newItems) {
+    public void replaceItems(List<BaseRdpBookmark> newItems) {
         clear();
-        for (BookmarkBase item : newItems)
+        for (BaseRdpBookmark item : newItems)
             add(item);
     }
 
     public void remove(long bookmarkId) {
         for (int i = 0; i < getCount(); i++) {
-            BookmarkBase bm = getItem(i);
+            BaseRdpBookmark bm = getItem(i);
             if (bm.getId() == bookmarkId) {
                 remove(bm);
                 return;

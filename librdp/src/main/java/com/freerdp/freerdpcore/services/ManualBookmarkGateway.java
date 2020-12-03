@@ -4,8 +4,8 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.freerdp.freerdpcore.domain.BookmarkBase;
-import com.freerdp.freerdpcore.domain.ManualBookmark;
+import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
+import com.freerdp.freerdpcore.domain.RdpBookmark;
 
 import java.util.ArrayList;
 
@@ -16,8 +16,8 @@ public class ManualBookmarkGateway extends BookmarkBaseGateway {
     }
 
     @Override
-    protected BookmarkBase createBookmark() {
-        return new ManualBookmark();
+    protected BaseRdpBookmark createBookmark() {
+        return new RdpBookmark();
     }
 
     @Override
@@ -26,8 +26,8 @@ public class ManualBookmarkGateway extends BookmarkBaseGateway {
     }
 
     @Override
-    protected void addBookmarkSpecificColumns(BookmarkBase bookmark, ContentValues columns) {
-        ManualBookmark bm = (ManualBookmark) bookmark;
+    protected void addBookmarkSpecificColumns(BaseRdpBookmark bookmark, ContentValues columns) {
+        RdpBookmark bm = (RdpBookmark) bookmark;
         columns.put(BookmarkDB.DB_KEY_BOOKMARK_HOSTNAME, bm.getHostname());
         columns.put(BookmarkDB.DB_KEY_BOOKMARK_PORT, bm.getPort());
 
@@ -53,8 +53,8 @@ public class ManualBookmarkGateway extends BookmarkBaseGateway {
     }
 
     @Override
-    protected void readBookmarkSpecificColumns(BookmarkBase bookmark, Cursor cursor) {
-        ManualBookmark bm = (ManualBookmark) bookmark;
+    protected void readBookmarkSpecificColumns(BaseRdpBookmark bookmark, Cursor cursor) {
+        RdpBookmark bm = (RdpBookmark) bookmark;
         bm.setHostname(
                 cursor.getString(cursor.getColumnIndex(BookmarkDB.DB_KEY_BOOKMARK_HOSTNAME)));
         bm.setPort(cursor.getInt(cursor.getColumnIndex(BookmarkDB.DB_KEY_BOOKMARK_PORT)));
@@ -64,7 +64,7 @@ public class ManualBookmarkGateway extends BookmarkBaseGateway {
         readGatewaySettings(bm, cursor);
     }
 
-    public BookmarkBase findByLabelOrHostname(String pattern) {
+    public BaseRdpBookmark findByLabelOrHostname(String pattern) {
         if (pattern.length() == 0)
             return null;
 
@@ -72,7 +72,7 @@ public class ManualBookmarkGateway extends BookmarkBaseGateway {
                 queryBookmarks(BookmarkDB.DB_KEY_BOOKMARK_LABEL + " = '" + pattern + "' OR " +
                                 BookmarkDB.DB_KEY_BOOKMARK_HOSTNAME + " = '" + pattern + "'",
                         BookmarkDB.DB_KEY_BOOKMARK_LABEL);
-        BookmarkBase bookmark = null;
+        BaseRdpBookmark bookmark = null;
         if (cursor.moveToFirst() && (cursor.getCount() > 0))
             bookmark = getBookmarkFromCursor(cursor);
 
@@ -80,12 +80,12 @@ public class ManualBookmarkGateway extends BookmarkBaseGateway {
         return bookmark;
     }
 
-    public ArrayList<BookmarkBase> findByLabelOrHostnameLike(String pattern) {
+    public ArrayList<BaseRdpBookmark> findByLabelOrHostnameLike(String pattern) {
         Cursor cursor =
                 queryBookmarks(BookmarkDB.DB_KEY_BOOKMARK_LABEL + " LIKE '%" + pattern + "%' OR " +
                                 BookmarkDB.DB_KEY_BOOKMARK_HOSTNAME + " LIKE '%" + pattern + "%'",
                         BookmarkDB.DB_KEY_BOOKMARK_LABEL);
-        ArrayList<BookmarkBase> bookmarks = new ArrayList<BookmarkBase>(cursor.getCount());
+        ArrayList<BaseRdpBookmark> bookmarks = new ArrayList<BaseRdpBookmark>(cursor.getCount());
 
         if (cursor.moveToFirst() && (cursor.getCount() > 0)) {
             do {
@@ -97,8 +97,8 @@ public class ManualBookmarkGateway extends BookmarkBaseGateway {
         return bookmarks;
     }
 
-    private void readGatewaySettings(ManualBookmark bookmark, Cursor cursor) {
-        ManualBookmark.GatewaySettings gatewaySettings = bookmark.getGatewaySettings();
+    private void readGatewaySettings(RdpBookmark bookmark, Cursor cursor) {
+        RdpBookmark.GatewaySettings gatewaySettings = bookmark.getGatewaySettings();
         gatewaySettings.setHostname(
                 cursor.getString(cursor.getColumnIndex(BookmarkDB.DB_KEY_BOOKMARK_GW_HOSTNAME)));
         gatewaySettings.setPort(

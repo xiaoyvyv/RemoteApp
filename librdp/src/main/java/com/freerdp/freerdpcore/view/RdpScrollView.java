@@ -34,7 +34,7 @@ import java.util.List;
  * using the two together is possible to achieve the effect of a text view
  * within a larger container.
  */
-public class FreeScrollView extends FrameLayout {
+public class RdpScrollView extends FrameLayout {
 
     static final int ANIMATED_SCROLL_GAP = 250;
     static final float MAX_SCROLL_FACTOR = 0.5f;
@@ -82,17 +82,17 @@ public class FreeScrollView extends FrameLayout {
     private int mMinimumVelocity;
     private int mMaximumVelocity;
 
-    public FreeScrollView(Context context) {
+    public RdpScrollView(Context context) {
         super(context);
         initTwoDScrollView();
     }
 
-    public FreeScrollView(Context context, AttributeSet attrs) {
+    public RdpScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initTwoDScrollView();
     }
 
-    public FreeScrollView(Context context, AttributeSet attrs, int defStyle) {
+    public RdpScrollView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initTwoDScrollView();
     }
@@ -1159,6 +1159,6 @@ public class FreeScrollView extends FrameLayout {
 
     // interface to receive notifications when the view is scrolled
     public interface ScrollView2DListener {
-        void onScrollChanged(FreeScrollView scrollView, int x, int y, int oldx, int oldy);
+        void onScrollChanged(RdpScrollView scrollView, int x, int y, int oldx, int oldy);
     }
 }

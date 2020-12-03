@@ -38,28 +38,27 @@ import android.widget.ZoomControls;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.freerdp.freerdpcore.application.GlobalApp;
-import com.freerdp.freerdpcore.application.SessionState;
-import com.freerdp.freerdpcore.domain.BookmarkBase;
+import com.freerdp.freerdpcore.application.RdpApp;
+import com.freerdp.freerdpcore.application.RdpSessionState;
+import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
 import com.freerdp.freerdpcore.domain.ConnectionReference;
-import com.freerdp.freerdpcore.domain.ManualBookmark;
+import com.freerdp.freerdpcore.domain.RdpBookmark;
 import com.freerdp.freerdpcore.services.LibFreeRDP;
 import com.freerdp.freerdpcore.utils.ClipboardManagerProxy;
-import com.freerdp.freerdpcore.mapper.KeyboardMapper;
-import com.freerdp.freerdpcore.mapper.MouseMapper;
-import com.freerdp.freerdpcore.view.FreeScrollView;
-import com.freerdp.freerdpcore.view.SessionView;
-import com.freerdp.freerdpcore.view.TouchPointerView;
+import com.freerdp.freerdpcore.mapper.RdpKeyboardMapper;
+import com.freerdp.freerdpcore.mapper.RdpMouseMapper;
+import com.freerdp.freerdpcore.view.RdpScrollView;
+import com.freerdp.freerdpcore.view.RdpSessionView;
+import com.freerdp.freerdpcore.view.RdpPointerView;
 import com.xiaoyv.librdp.R;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 
 public class SessionActivity extends AppCompatActivity
         implements LibFreeRDP.UIEventListener, KeyboardView.OnKeyboardActionListener,
-        FreeScrollView.ScrollView2DListener, KeyboardMapper.KeyProcessingListener,
-        SessionView.SessionViewListener, TouchPointerView.TouchPointerListener,
+        RdpScrollView.ScrollView2DListener, RdpKeyboardMapper.KeyProcessingListener,
+        RdpSessionView.SessionViewListener, RdpPointerView.TouchPointerListener,
         ClipboardManagerProxy.OnClipboardChangedListener {
     public static final String PARAM_CONNECTION_REFERENCE = "conRef";
     public static final String PARAM_INSTANCE = "instance";
@@ -74,14 +73,14 @@ public class SessionActivity extends AppCompatActivity
     private static final int MAX_DISCARDED_MOVE_EVENTS = 3;
     private static final int SEND_MOVE_EVENT_TIMEOUT = 150;
     private Bitmap bitmap;
-    private SessionState session;
-    private SessionView sessionView;
-    private TouchPointerView touchPointerView;
+    private RdpSessionState session;
+    private RdpSessionView rdpSessionView;
+    private RdpPointerView rdpPointerView;
     private ProgressDialog progressDialog;
     private KeyboardView keyboardView;
     private KeyboardView modifiersKeyboardView;
     private ZoomControls zoomControls;
-    private KeyboardMapper keyboardMapper;
+    private RdpKeyboardMapper rdpKeyboardMapper;
 
     private Keyboard specialkeysKeyboard;
     private Keyboard numpadKeyboard;
@@ -102,7 +101,7 @@ public class SessionActivity extends AppCompatActivity
     private boolean toggleMouseButtons = false;
 
     private LibFreeRDPBroadcastReceiver libFreeRDPBroadcastReceiver;
-    private FreeScrollView scrollView;
+    private RdpScrollView scrollView;
     // keyboard visibility flags
     private boolean sysKeyboardVisible = false;
     private boolean extKeyboardVisible = false;
@@ -226,18 +225,18 @@ public class SessionActivity extends AppCompatActivity
                     }
                 });
 
-        sessionView = (SessionView) findViewById(R.id.sessionView);
-        sessionView.setScaleGestureDetector(
+        rdpSessionView = (RdpSessionView) findViewById(R.id.sessionView);
+        rdpSessionView.setScaleGestureDetector(
                 new ScaleGestureDetector(this, new PinchZoomListener()));
-        sessionView.setSessionViewListener(this);
-        sessionView.requestFocus();
+        rdpSessionView.setSessionViewListener(this);
+        rdpSessionView.requestFocus();
 
-        touchPointerView = (TouchPointerView) findViewById(R.id.touchPointerView);
-        touchPointerView.setTouchPointerListener(this);
+        rdpPointerView = (RdpPointerView) findViewById(R.id.touchPointerView);
+        rdpPointerView.setTouchPointerListener(this);
 
-        keyboardMapper = new KeyboardMapper();
-        keyboardMapper.init(this);
-        keyboardMapper.reset(this);
+        rdpKeyboardMapper = new RdpKeyboardMapper();
+        rdpKeyboardMapper.init(this);
+        rdpKeyboardMapper.reset(this);
 
         modifiersKeyboard = new Keyboard(getApplicationContext(), R.xml.modifiers_keyboard);
         specialkeysKeyboard = new Keyboard(getApplicationContext(), R.xml.specialkeys_keyboard);
@@ -253,7 +252,7 @@ public class SessionActivity extends AppCompatActivity
         modifiersKeyboardView.setKeyboard(modifiersKeyboard);
         modifiersKeyboardView.setOnKeyboardActionListener(this);
 
-        scrollView = (FreeScrollView) findViewById(R.id.sessionScrollView);
+        scrollView = (RdpScrollView) findViewById(R.id.sessionScrollView);
         scrollView.setScrollViewListener(this);
         uiHandler = new UIHandler();
         libFreeRDPBroadcastReceiver = new LibFreeRDPBroadcastReceiver();
@@ -262,12 +261,12 @@ public class SessionActivity extends AppCompatActivity
         zoomControls.hide();
         zoomControls.setOnZoomInClickListener(v -> {
 			resetZoomControlsAutoHideTimeout();
-			zoomControls.setIsZoomInEnabled(sessionView.zoomIn(ZOOMING_STEP));
+			zoomControls.setIsZoomInEnabled(rdpSessionView.zoomIn(ZOOMING_STEP));
 			zoomControls.setIsZoomOutEnabled(true);
 		});
         zoomControls.setOnZoomOutClickListener(v -> {
 			resetZoomControlsAutoHideTimeout();
-			zoomControls.setIsZoomOutEnabled(sessionView.zoomOut(ZOOMING_STEP));
+			zoomControls.setIsZoomOutEnabled(rdpSessionView.zoomOut(ZOOMING_STEP));
 			zoomControls.setIsZoomInEnabled(true);
 		});
 
@@ -277,7 +276,7 @@ public class SessionActivity extends AppCompatActivity
 
         // register freerdp events broadcast receiver
         IntentFilter filter = new IntentFilter();
-        filter.addAction(GlobalApp.ACTION_EVENT_FREERDP);
+        filter.addAction(RdpApp.ACTION_EVENT_FREERDP);
         registerReceiver(libFreeRDPBroadcastReceiver, filter);
 
         mClipboardManager = ClipboardManagerProxy.getClipboardManager(this);
@@ -327,11 +326,11 @@ public class SessionActivity extends AppCompatActivity
         Log.v(TAG, "Session.onDestroy");
 
         // Cancel running disconnect timers.
-        GlobalApp.cancelDisconnectTimer();
+        RdpApp.cancelDisconnectTimer();
 
         // Disconnect all remaining sessions.
-        Collection<SessionState> sessions = GlobalApp.getSessions();
-        for (SessionState session : sessions)
+        Collection<RdpSessionState> sessions = RdpApp.getSessions();
+        for (RdpSessionState session : sessions)
             LibFreeRDP.disconnect(session.getInstance());
 
         // unregister freerdp events broadcast receiver
@@ -341,7 +340,7 @@ public class SessionActivity extends AppCompatActivity
         mClipboardManager.removeClipboardboardChangedListener(this);
 
         // free session
-        GlobalApp.freeSession(session.getInstance());
+        RdpApp.freeSession(session.getInstance());
 
         session = null;
     }
@@ -374,18 +373,18 @@ public class SessionActivity extends AppCompatActivity
             connect(openUri);
         } else if (bundle.containsKey(PARAM_INSTANCE)) {
             int inst = bundle.getInt(PARAM_INSTANCE);
-            session = GlobalApp.getSession(inst);
+            session = RdpApp.getSession(inst);
             bitmap = session.getSurface().getBitmap();
             bindSession();
         } else if (bundle.containsKey(PARAM_CONNECTION_REFERENCE)) {
-            BookmarkBase bookmark = null;
+            BaseRdpBookmark bookmark = null;
             String refStr = bundle.getString(PARAM_CONNECTION_REFERENCE);
             if (ConnectionReference.isHostnameReference(refStr)) {
-                bookmark = new ManualBookmark();
-                bookmark.<ManualBookmark>get().setHostname(ConnectionReference.getHostname(refStr));
+                bookmark = new RdpBookmark();
+                bookmark.<RdpBookmark>get().setHostname(ConnectionReference.getHostname(refStr));
             } else if (ConnectionReference.isBookmarkReference(refStr)) {
                 if (ConnectionReference.isManualBookmarkReference(refStr))
-                    bookmark = GlobalApp.getManualBookmarkGateway().findById(
+                    bookmark = RdpApp.getManualBookmarkGateway().findById(
                             ConnectionReference.getManualBookmarkId(refStr));
                 else
                     assert false;
@@ -401,10 +400,10 @@ public class SessionActivity extends AppCompatActivity
         }
     }
 
-    private void connect(BookmarkBase bookmark) {
-        session = GlobalApp.createSession(bookmark, getApplicationContext());
+    private void connect(BaseRdpBookmark bookmark) {
+        session = RdpApp.createSession(bookmark, getApplicationContext());
 
-        BookmarkBase.ScreenSettings screenSettings =
+        BaseRdpBookmark.ScreenSettings screenSettings =
                 session.getBookmark().getActiveScreenSettings();
         Log.v(TAG, "Screen Resolution: " + screenSettings.getResolutionString());
         if (screenSettings.isAutomatic()) {
@@ -431,7 +430,7 @@ public class SessionActivity extends AppCompatActivity
     }
 
     private void connect(Uri openUri) {
-        session = GlobalApp.createSession(openUri, getApplicationContext());
+        session = RdpApp.createSession(openUri, getApplicationContext());
 
         connectWithTitle(openUri.getAuthority());
     }
@@ -466,9 +465,9 @@ public class SessionActivity extends AppCompatActivity
     private void bindSession() {
         Log.v(TAG, "bindSession called");
         session.setUIEventListener(this);
-        sessionView.onSurfaceChange(session);
+        rdpSessionView.onSurfaceChange(session);
         scrollView.requestLayout();
-        keyboardMapper.reset(this);
+        rdpKeyboardMapper.reset(this);
         mDecor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
                 View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
     }
@@ -517,7 +516,7 @@ public class SessionActivity extends AppCompatActivity
             modifiersKeyboardView.setVisibility(View.GONE);
 
             // clear any active key modifiers)
-            keyboardMapper.clearAllModifiers();
+            rdpKeyboardMapper.clearAllModifiers();
         }
 
         sysKeyboardVisible = showSystemKeyboard;
@@ -538,18 +537,18 @@ public class SessionActivity extends AppCompatActivity
         for (Keyboard.Key curKey : keys) {
             // if the key is a sticky key - just set it to off
             if (curKey.sticky) {
-                switch (keyboardMapper.getModifierState(curKey.codes[0])) {
-                    case KeyboardMapper.KEYSTATE_ON:
+                switch (rdpKeyboardMapper.getModifierState(curKey.codes[0])) {
+                    case RdpKeyboardMapper.KEYSTATE_ON:
                         curKey.on = true;
                         curKey.pressed = false;
                         break;
 
-                    case KeyboardMapper.KEYSTATE_OFF:
+                    case RdpKeyboardMapper.KEYSTATE_OFF:
                         curKey.on = false;
                         curKey.pressed = false;
                         break;
 
-                    case KeyboardMapper.KEYSTATE_LOCKED:
+                    case RdpKeyboardMapper.KEYSTATE_LOCKED:
                         curKey.on = true;
                         curKey.pressed = true;
                         break;
@@ -569,7 +568,7 @@ public class SessionActivity extends AppCompatActivity
             discardedMoveEvents = 0;
 
         if (discardedMoveEvents > MAX_DISCARDED_MOVE_EVENTS)
-            LibFreeRDP.sendCursorEvent(session.getInstance(), x, y, MouseMapper.getMoveEvent());
+            LibFreeRDP.sendCursorEvent(session.getInstance(), x, y, RdpMouseMapper.getMoveEvent());
         else
             uiHandler.sendMessageDelayed(Message.obtain(null, UIHandler.SEND_MOVE_EVENT, x, y),
                     SEND_MOVE_EVENT_TIMEOUT);
@@ -593,13 +592,13 @@ public class SessionActivity extends AppCompatActivity
 
         if (itemId == R.id.session_touch_pointer) {
             // toggle touch pointer
-            if (touchPointerView.getVisibility() == View.VISIBLE) {
-                touchPointerView.setVisibility(View.INVISIBLE);
-                sessionView.setTouchPointerPadding(0, 0);
+            if (rdpPointerView.getVisibility() == View.VISIBLE) {
+                rdpPointerView.setVisibility(View.INVISIBLE);
+                rdpSessionView.setTouchPointerPadding(0, 0);
             } else {
-                touchPointerView.setVisibility(View.VISIBLE);
-                sessionView.setTouchPointerPadding(touchPointerView.getPointerWidth(),
-                        touchPointerView.getPointerHeight());
+                rdpPointerView.setVisibility(View.VISIBLE);
+                rdpSessionView.setTouchPointerPadding(rdpPointerView.getPointerWidth(),
+                        rdpPointerView.getPointerHeight());
             }
         } else if (itemId == R.id.session_sys_keyboard) {
             showKeyboard(!sysKeyboardVisible, false);
@@ -619,7 +618,7 @@ public class SessionActivity extends AppCompatActivity
         if (sysKeyboardVisible || extKeyboardVisible)
             showKeyboard(false, false);
         else
-            keyboardMapper.sendAltF4();
+            rdpKeyboardMapper.sendAltF4();
     }
 
     @Override
@@ -639,26 +638,26 @@ public class SessionActivity extends AppCompatActivity
     // combinations (like Win + E to open the explorer).
     @Override
     public boolean onKeyDown(int keycode, KeyEvent event) {
-        return keyboardMapper.processAndroidKeyEvent(event);
+        return rdpKeyboardMapper.processAndroidKeyEvent(event);
     }
 
     @Override
     public boolean onKeyUp(int keycode, KeyEvent event) {
-        return keyboardMapper.processAndroidKeyEvent(event);
+        return rdpKeyboardMapper.processAndroidKeyEvent(event);
     }
 
     // onKeyMultiple is called for input of some special characters like umlauts
     // and some symbol characters
     @Override
     public boolean onKeyMultiple(int keyCode, int repeatCount, KeyEvent event) {
-        return keyboardMapper.processAndroidKeyEvent(event);
+        return rdpKeyboardMapper.processAndroidKeyEvent(event);
     }
 
     // ****************************************************************************
     // KeyboardView.KeyboardActionEventListener
     @Override
     public void onKey(int primaryCode, int[] keyCodes) {
-        keyboardMapper.processCustomKeyEvent(primaryCode);
+        rdpKeyboardMapper.processCustomKeyEvent(primaryCode);
     }
 
     @Override
@@ -705,15 +704,15 @@ public class SessionActivity extends AppCompatActivity
     @Override
     public void switchKeyboard(int keyboardType) {
         switch (keyboardType) {
-            case KeyboardMapper.KEYBOARD_TYPE_FUNCTIONKEYS:
+            case RdpKeyboardMapper.KEYBOARD_TYPE_FUNCTIONKEYS:
                 keyboardView.setKeyboard(specialkeysKeyboard);
                 break;
 
-            case KeyboardMapper.KEYBOARD_TYPE_NUMPAD:
+            case RdpKeyboardMapper.KEYBOARD_TYPE_NUMPAD:
                 keyboardView.setKeyboard(numpadKeyboard);
                 break;
 
-            case KeyboardMapper.KEYBOARD_TYPE_CURSOR:
+            case RdpKeyboardMapper.KEYBOARD_TYPE_CURSOR:
                 keyboardView.setKeyboard(cursorKeyboard);
                 break;
 
@@ -749,7 +748,7 @@ public class SessionActivity extends AppCompatActivity
         // FIXME: the additional check (settings.getWidth() != width + 1) is for
         // the RDVH bug fix to avoid accidental notifications
         // (refer to android_freerdp.c for more info on this problem)
-        BookmarkBase.ScreenSettings settings = session.getBookmark().getActiveScreenSettings();
+        BaseRdpBookmark.ScreenSettings settings = session.getBookmark().getActiveScreenSettings();
         if ((settings.getWidth() != width && settings.getWidth() != width + 1) ||
                 settings.getHeight() != height || settings.getColors() != bpp)
             uiHandler.sendMessage(
@@ -761,7 +760,7 @@ public class SessionActivity extends AppCompatActivity
     public void OnGraphicsUpdate(int x, int y, int width, int height) {
         LibFreeRDP.updateGraphics(session.getInstance(), bitmap, x, y, width, height);
 
-        sessionView.addInvalidRegion(new Rect(x, y, x + width, y + height));
+        rdpSessionView.addInvalidRegion(new Rect(x, y, x + width, y + height));
 
         /*
          * since sessionView can only be modified from the UI thread any
@@ -939,9 +938,9 @@ public class SessionActivity extends AppCompatActivity
     }
 
     @Override
-    public void onScrollChanged(FreeScrollView scrollView, int x, int y, int oldx, int oldy) {
-        zoomControls.setIsZoomInEnabled(!sessionView.isAtMaxZoom());
-        zoomControls.setIsZoomOutEnabled(!sessionView.isAtMinZoom());
+    public void onScrollChanged(RdpScrollView scrollView, int x, int y, int oldx, int oldy) {
+        zoomControls.setIsZoomInEnabled(!rdpSessionView.isAtMaxZoom());
+        zoomControls.setIsZoomOutEnabled(!rdpSessionView.isAtMinZoom());
         if (!ApplicationSettingsActivity.getHideZoomControls(this) &&
                 zoomControls.getVisibility() != View.VISIBLE)
             zoomControls.show();
@@ -966,8 +965,8 @@ public class SessionActivity extends AppCompatActivity
             cancelDelayedMoveEvent();
 
         LibFreeRDP.sendCursorEvent(session.getInstance(), x, y,
-                toggleMouseButtons ? MouseMapper.getRightButtonEvent(this, down)
-                        : MouseMapper.getLeftButtonEvent(this, down));
+                toggleMouseButtons ? RdpMouseMapper.getRightButtonEvent(this, down)
+                        : RdpMouseMapper.getLeftButtonEvent(this, down));
 
         if (!down)
             toggleMouseButtons = false;
@@ -985,20 +984,20 @@ public class SessionActivity extends AppCompatActivity
 
     @Override
     public void onSessionViewScroll(boolean down) {
-        LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0, MouseMapper.getScrollEvent(this, down));
+        LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0, RdpMouseMapper.getScrollEvent(this, down));
     }
 
     // ****************************************************************************
     // TouchPointerView.TouchPointerListener
     @Override
     public void onTouchPointerClose() {
-        touchPointerView.setVisibility(View.INVISIBLE);
-        sessionView.setTouchPointerPadding(0, 0);
+        rdpPointerView.setVisibility(View.INVISIBLE);
+        rdpSessionView.setTouchPointerPadding(0, 0);
     }
 
     private Point mapScreenCoordToSessionCoord(int x, int y) {
-        int mappedX = (int) ((float) (x + scrollView.getScrollX()) / sessionView.getZoom());
-        int mappedY = (int) ((float) (y + scrollView.getScrollY()) / sessionView.getZoom());
+        int mappedX = (int) ((float) (x + scrollView.getScrollX()) / rdpSessionView.getZoom());
+        int mappedY = (int) ((float) (y + scrollView.getScrollY()) / rdpSessionView.getZoom());
         if (mappedX > bitmap.getWidth())
             mappedX = bitmap.getWidth();
         if (mappedY > bitmap.getHeight())
@@ -1010,20 +1009,20 @@ public class SessionActivity extends AppCompatActivity
     public void onTouchPointerLeftClick(int x, int y, boolean down) {
         Point p = mapScreenCoordToSessionCoord(x, y);
         LibFreeRDP.sendCursorEvent(session.getInstance(), p.x, p.y,
-                MouseMapper.getLeftButtonEvent(this, down));
+                RdpMouseMapper.getLeftButtonEvent(this, down));
     }
 
     @Override
     public void onTouchPointerRightClick(int x, int y, boolean down) {
         Point p = mapScreenCoordToSessionCoord(x, y);
         LibFreeRDP.sendCursorEvent(session.getInstance(), p.x, p.y,
-                MouseMapper.getRightButtonEvent(this, down));
+                RdpMouseMapper.getRightButtonEvent(this, down));
     }
 
     @Override
     public void onTouchPointerMove(int x, int y) {
         Point p = mapScreenCoordToSessionCoord(x, y);
-        LibFreeRDP.sendCursorEvent(session.getInstance(), p.x, p.y, MouseMapper.getMoveEvent());
+        LibFreeRDP.sendCursorEvent(session.getInstance(), p.x, p.y, RdpMouseMapper.getMoveEvent());
 
         if (ApplicationSettingsActivity.getAutoScrollTouchPointer(this) &&
                 !uiHandler.hasMessages(UIHandler.SCROLLING_REQUESTED)) {
@@ -1034,7 +1033,7 @@ public class SessionActivity extends AppCompatActivity
 
     @Override
     public void onTouchPointerScroll(boolean down) {
-        LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0, MouseMapper.getScrollEvent(this, down));
+        LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0, RdpMouseMapper.getScrollEvent(this, down));
     }
 
     @Override
@@ -1049,7 +1048,7 @@ public class SessionActivity extends AppCompatActivity
 
     @Override
     public void onTouchPointerResetScrollZoom() {
-        sessionView.setZoom(1.0f);
+        rdpSessionView.setZoom(1.0f);
         scrollView.scrollTo(0, 0);
     }
 
@@ -1061,11 +1060,11 @@ public class SessionActivity extends AppCompatActivity
                 final float vScroll = e.getAxisValue(MotionEvent.AXIS_VSCROLL);
                 if (vScroll < 0) {
                     LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0,
-                            MouseMapper.getScrollEvent(this, false));
+                            RdpMouseMapper.getScrollEvent(this, false));
                 }
                 if (vScroll > 0) {
                     LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0,
-                            MouseMapper.getScrollEvent(this, true));
+                            RdpMouseMapper.getScrollEvent(this, true));
                 }
                 break;
         }
@@ -1098,12 +1097,12 @@ public class SessionActivity extends AppCompatActivity
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case GRAPHICS_CHANGED: {
-                    sessionView.onSurfaceChange(session);
+                    rdpSessionView.onSurfaceChange(session);
                     scrollView.requestLayout();
                     break;
                 }
                 case REFRESH_SESSIONVIEW: {
-                    sessionView.invalidateRegion();
+                    rdpSessionView.invalidateRegion();
                     break;
                 }
                 case DISPLAY_TOAST: {
@@ -1118,7 +1117,7 @@ public class SessionActivity extends AppCompatActivity
                 }
                 case SEND_MOVE_EVENT: {
                     LibFreeRDP.sendCursorEvent(session.getInstance(), msg.arg1, msg.arg2,
-                            MouseMapper.getMoveEvent());
+                            RdpMouseMapper.getMoveEvent());
                     break;
                 }
                 case SHOW_DIALOG: {
@@ -1129,14 +1128,14 @@ public class SessionActivity extends AppCompatActivity
                 case SCROLLING_REQUESTED: {
                     int scrollX = 0;
                     int scrollY = 0;
-                    float[] pointerPos = touchPointerView.getPointerPosition();
+                    float[] pointerPos = rdpPointerView.getPointerPosition();
 
-                    if (pointerPos[0] > (screen_width - touchPointerView.getPointerWidth()))
+                    if (pointerPos[0] > (screen_width - rdpPointerView.getPointerWidth()))
                         scrollX = SCROLLING_DISTANCE;
                     else if (pointerPos[0] < 0)
                         scrollX = -SCROLLING_DISTANCE;
 
-                    if (pointerPos[1] > (screen_height - touchPointerView.getPointerHeight()))
+                    if (pointerPos[1] > (screen_height - rdpPointerView.getPointerHeight()))
                         scrollY = SCROLLING_DISTANCE;
                     else if (pointerPos[1] < 0)
                         scrollY = -SCROLLING_DISTANCE;
@@ -1145,11 +1144,11 @@ public class SessionActivity extends AppCompatActivity
 
                     // see if we reached the min/max scroll positions
                     if (scrollView.getScrollX() == 0 ||
-                            scrollView.getScrollX() == (sessionView.getWidth() - scrollView.getWidth()))
+                            scrollView.getScrollX() == (rdpSessionView.getWidth() - scrollView.getWidth()))
                         scrollX = 0;
                     if (scrollView.getScrollY() == 0 ||
                             scrollView.getScrollY() ==
-                                    (sessionView.getHeight() - scrollView.getHeight()))
+                                    (rdpSessionView.getHeight() - scrollView.getHeight()))
                         scrollY = 0;
 
                     if (scrollX != 0 || scrollY != 0)
@@ -1176,11 +1175,11 @@ public class SessionActivity extends AppCompatActivity
 
             // calc scale factor
             scaleFactor *= detector.getScaleFactor();
-            scaleFactor = Math.max(SessionView.MIN_SCALE_FACTOR,
-                    Math.min(scaleFactor, SessionView.MAX_SCALE_FACTOR));
-            sessionView.setZoom(scaleFactor);
+            scaleFactor = Math.max(RdpSessionView.MIN_SCALE_FACTOR,
+                    Math.min(scaleFactor, RdpSessionView.MAX_SCALE_FACTOR));
+            rdpSessionView.setZoom(scaleFactor);
 
-            if (!sessionView.isAtMinZoom() && !sessionView.isAtMaxZoom()) {
+            if (!rdpSessionView.isAtMinZoom() && !rdpSessionView.isAtMaxZoom()) {
                 // transform scroll origin to the new zoom space
                 float transOriginX = scrollView.getScrollX() * detector.getScaleFactor();
                 float transOriginY = scrollView.getScrollY() * detector.getScaleFactor();
@@ -1215,18 +1214,18 @@ public class SessionActivity extends AppCompatActivity
                 return;
 
             // is this event for the current session?
-            if (session.getInstance() != intent.getExtras().getLong(GlobalApp.EVENT_PARAM, -1))
+            if (session.getInstance() != intent.getExtras().getLong(RdpApp.EVENT_PARAM, -1))
                 return;
 
-            switch (intent.getExtras().getInt(GlobalApp.EVENT_TYPE, -1)) {
-                case GlobalApp.FREERDP_EVENT_CONNECTION_SUCCESS:
+            switch (intent.getExtras().getInt(RdpApp.EVENT_TYPE, -1)) {
+                case RdpApp.FREERDP_EVENT_CONNECTION_SUCCESS:
                     OnConnectionSuccess(context);
                     break;
 
-                case GlobalApp.FREERDP_EVENT_CONNECTION_FAILURE:
+                case RdpApp.FREERDP_EVENT_CONNECTION_FAILURE:
                     OnConnectionFailure(context);
                     break;
-                case GlobalApp.FREERDP_EVENT_DISCONNECTED:
+                case RdpApp.FREERDP_EVENT_DISCONNECTED:
                     OnDisconnected(context);
                     break;
             }
@@ -1253,10 +1252,10 @@ public class SessionActivity extends AppCompatActivity
             if (bundle != null && bundle.containsKey(PARAM_CONNECTION_REFERENCE)) {
                 if (ConnectionReference.isHostnameReference(
                         bundle.getString(PARAM_CONNECTION_REFERENCE))) {
-                    assert session.getBookmark().getType() == BookmarkBase.TYPE_MANUAL;
-                    String item = session.getBookmark().<ManualBookmark>get().getHostname();
-                    if (!GlobalApp.getQuickConnectHistoryGateway().historyItemExists(item))
-                        GlobalApp.getQuickConnectHistoryGateway().addHistoryItem(item);
+                    assert session.getBookmark().getType() == BaseRdpBookmark.TYPE_MANUAL;
+                    String item = session.getBookmark().<RdpBookmark>get().getHostname();
+                    if (!RdpApp.getQuickConnectHistoryGateway().historyItemExists(item))
+                        RdpApp.getQuickConnectHistoryGateway().addHistoryItem(item);
                 }
             }
         }

@@ -27,7 +27,7 @@ public class GestureDetector {
     private int mTouchSlopSquare;
     private int mLargeTouchSlopSquare;
     private int mDoubleTapSlopSquare;
-    private int mLongpressTimeout = 100;
+    private int mLongPressTimeout = 100;
     private OnDoubleTapListener mDoubleTapListener;
     private boolean mStillDown;
     private boolean mInLongPress;
@@ -42,7 +42,7 @@ public class GestureDetector {
     private boolean mIsDoubleTapping;
     private float mLastMotionY;
     private float mLastMotionX;
-    private boolean mIsLongpressEnabled;
+    private boolean mIsLongPressEnabled;
     /**
      * True if we are at a target API level of >= Froyo or the developer can
      * explicitly set it. If true, input events with > 1 pointer will be ignored
@@ -112,7 +112,7 @@ public class GestureDetector {
         if (mListener == null) {
             throw new NullPointerException("OnGestureListener must not be null");
         }
-        mIsLongpressEnabled = true;
+        mIsLongPressEnabled = true;
         mIgnoreMultitouch = ignoreMultitouch;
 
         // Fallback to support pre-donuts releases
@@ -156,18 +156,18 @@ public class GestureDetector {
      * @param isLongpressEnabled whether longpress should be enabled.
      */
     public void setIsLongpressEnabled(boolean isLongpressEnabled) {
-        mIsLongpressEnabled = isLongpressEnabled;
+        mIsLongPressEnabled = isLongpressEnabled;
     }
 
     /**
      * @return true if longpress is enabled, else false.
      */
     public boolean isLongpressEnabled() {
-        return mIsLongpressEnabled;
+        return mIsLongPressEnabled;
     }
 
     public void setLongPressTimeout(int timeout) {
-        mLongpressTimeout = timeout;
+        mLongPressTimeout = timeout;
     }
 
     /**
@@ -236,11 +236,11 @@ public class GestureDetector {
                 mStillDown = true;
                 mInLongPress = false;
 
-                if (mIsLongpressEnabled) {
+                if (mIsLongPressEnabled) {
                     mHandler.removeMessages(LONG_PRESS);
                     mHandler.sendEmptyMessageAtTime(LONG_PRESS, mCurrentDownEvent.getDownTime() +
                             TAP_TIMEOUT +
-                            mLongpressTimeout);
+                            mLongPressTimeout);
                 }
                 mHandler.sendEmptyMessageAtTime(SHOW_PRESS,
                         mCurrentDownEvent.getDownTime() + TAP_TIMEOUT);

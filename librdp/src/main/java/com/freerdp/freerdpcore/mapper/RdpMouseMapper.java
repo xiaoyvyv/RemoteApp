@@ -4,7 +4,7 @@ import android.content.Context;
 
 import com.freerdp.freerdpcore.presentation.ApplicationSettingsActivity;
 
-public class MouseMapper {
+public class RdpMouseMapper {
 
 	private final static int PTR_FLAGS_LEFT_BUTTON = 0x1000;
 	private final static int PTR_FLAGS_RIGHT_BUTTON = 0x2000;

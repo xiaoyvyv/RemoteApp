@@ -18,7 +18,6 @@ public class HistoryDB extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-
         String sqlQuickConnectHistory = "CREATE TABLE " + QUICK_CONNECT_TABLE_NAME + " (" +
                 QUICK_CONNECT_TABLE_COL_ITEM + " TEXT PRIMARY KEY, " +
                 QUICK_CONNECT_TABLE_COL_TIMESTAMP + " INTEGER"

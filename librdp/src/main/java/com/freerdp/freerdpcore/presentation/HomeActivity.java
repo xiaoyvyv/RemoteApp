@@ -23,7 +23,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -33,11 +32,11 @@ import android.widget.ListView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.freerdp.freerdpcore.application.GlobalApp;
-import com.freerdp.freerdpcore.domain.BookmarkBase;
+import com.freerdp.freerdpcore.application.RdpApp;
+import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
 import com.freerdp.freerdpcore.domain.ConnectionReference;
-import com.freerdp.freerdpcore.domain.PlaceholderBookmark;
-import com.freerdp.freerdpcore.domain.QuickConnectBookmark;
+import com.freerdp.freerdpcore.domain.RdpHolderBookmark;
+import com.freerdp.freerdpcore.domain.RdpQuickBookmark;
 import com.freerdp.freerdpcore.utils.BookmarkArrayAdapter;
 import com.freerdp.freerdpcore.utils.SeparatedListAdapter;
 import com.xiaoyv.librdp.R;
@@ -52,7 +51,7 @@ public class HomeActivity extends AppCompatActivity {
     private EditText superBarEditText;
     private BookmarkArrayAdapter manualBookmarkAdapter;
     private SeparatedListAdapter separatedListAdapter;
-    private PlaceholderBookmark addBookmarkPlaceholder;
+    private RdpHolderBookmark addBookmarkPlaceholder;
     private String sectionLabelBookmarks;
     View mDecor;
 
@@ -74,10 +73,9 @@ public class HomeActivity extends AppCompatActivity {
         sectionLabelBookmarks = getResources().getString(R.string.section_bookmarks);
 
         // create add bookmark/quick connect bookmark placeholder
-        addBookmarkPlaceholder = new PlaceholderBookmark();
+        addBookmarkPlaceholder = new RdpHolderBookmark();
         addBookmarkPlaceholder.setName(ADD_BOOKMARK_PLACEHOLDER);
-        addBookmarkPlaceholder.setLabel(
-                getResources().getString(R.string.list_placeholder_add_bookmark));
+        addBookmarkPlaceholder.setLabel(getResources().getString(R.string.list_placeholder_add_bookmark));
 
         // check for passed .rdp file and open it in a new bookmark
         Intent caller = getIntent();
@@ -143,12 +141,7 @@ public class HomeActivity extends AppCompatActivity {
 
         superBarEditText.addTextChangedListener(new SuperBarTextWatcher());
 
-        clearTextButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                superBarEditText.setText("");
-            }
-        });
+        clearTextButton.setOnClickListener(v -> superBarEditText.setText(""));
     }
 
     @Override
@@ -194,7 +187,7 @@ public class HomeActivity extends AppCompatActivity {
         } else if (itemId == R.id.bookmark_delete) {
             if (ConnectionReference.isManualBookmarkReference(refStr)) {
                 long id = ConnectionReference.getManualBookmarkId(refStr);
-                GlobalApp.getManualBookmarkGateway().delete(id);
+                RdpApp.getManualBookmarkGateway().delete(id);
                 manualBookmarkAdapter.remove(id);
                 separatedListAdapter.notifyDataSetChanged();
             } else {
@@ -213,7 +206,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         // 创建书签光标适配器
-        manualBookmarkAdapter = new BookmarkArrayAdapter(this, R.layout.bookmark_list_item, GlobalApp.getManualBookmarkGateway().findAll());
+        manualBookmarkAdapter = new BookmarkArrayAdapter(this, R.layout.bookmark_list_item, RdpApp.getManualBookmarkGateway().findAll());
 
         // add add bookmark item to manual adapter
         manualBookmarkAdapter.insert(addBookmarkPlaceholder, 0);
@@ -306,18 +299,18 @@ public class HomeActivity extends AppCompatActivity {
             if (separatedListAdapter != null) {
                 String text = s.toString();
                 if (text.length() > 0) {
-                    ArrayList<BookmarkBase> computers_list =
-                            GlobalApp.getQuickConnectHistoryGateway().findHistory(text);
+                    ArrayList<BaseRdpBookmark> computers_list =
+                            RdpApp.getQuickConnectHistoryGateway().findHistory(text);
                     computers_list.addAll(
-                            GlobalApp.getManualBookmarkGateway().findByLabelOrHostnameLike(text));
+                            RdpApp.getManualBookmarkGateway().findByLabelOrHostnameLike(text));
                     manualBookmarkAdapter.replaceItems(computers_list);
-                    QuickConnectBookmark qcBm = new QuickConnectBookmark();
+                    RdpQuickBookmark qcBm = new RdpQuickBookmark();
                     qcBm.setLabel(text);
                     qcBm.setHostname(text);
                     manualBookmarkAdapter.insert(qcBm, 0);
                 } else {
                     manualBookmarkAdapter.replaceItems(
-                            GlobalApp.getManualBookmarkGateway().findAll());
+                            RdpApp.getManualBookmarkGateway().findAll());
                     manualBookmarkAdapter.insert(addBookmarkPlaceholder, 0);
                 }
 

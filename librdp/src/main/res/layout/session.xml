@@ -21,7 +21,7 @@
         android:layout_alignParentBottom="true"
         android:visibility="gone" />
 
-    <com.xiaoyv.librdp.view.FreeScrollView
+    <com.freerdp.freerdpcore.view.RdpScrollView
         android:id="@+id/sessionScrollView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -32,7 +32,7 @@
         android:isScrollContainer="true"
         android:scrollbars="horizontal|vertical">
 
-        <com.xiaoyv.librdp.view.SessionView
+        <com.freerdp.freerdpcore.view.RdpSessionView
             android:id="@+id/sessionView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -40,9 +40,9 @@
             android:focusable="true"
             android:focusableInTouchMode="true" />
 
-    </com.xiaoyv.librdp.view.FreeScrollView>
+    </com.freerdp.freerdpcore.view.RdpScrollView>
 
-    <com.xiaoyv.librdp.view.TouchPointerView
+    <com.freerdp.freerdpcore.view.RdpPointerView
         android:id="@+id/touchPointerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -4,25 +4,27 @@ import android.content.SharedPreferences;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.freerdp.freerdpcore.application.GlobalApp;
+import com.freerdp.freerdpcore.application.RdpApp;
 
 import java.util.Locale;
 
-public class BookmarkBase implements Parcelable, Cloneable {
+/**
+ * RDP 基础标签
+ */
+public class BaseRdpBookmark implements Parcelable, Cloneable {
     public static final int TYPE_INVALID = -1;
     public static final int TYPE_MANUAL = 1;
     public static final int TYPE_QUICK_CONNECT = 2;
     public static final int TYPE_PLACEHOLDER = 3;
-    public static final int TYPE_CUSTOM_BASE = 1000;
-    public static final Parcelable.Creator<BookmarkBase> CREATOR =
-            new Parcelable.Creator<BookmarkBase>() {
-                public BookmarkBase createFromParcel(Parcel in) {
-                    return new BookmarkBase(in);
+    public static final Parcelable.Creator<BaseRdpBookmark> CREATOR =
+            new Parcelable.Creator<BaseRdpBookmark>() {
+                public BaseRdpBookmark createFromParcel(Parcel in) {
+                    return new BaseRdpBookmark(in);
                 }
 
                 @Override
-                public BookmarkBase[] newArray(int size) {
-                    return new BookmarkBase[size];
+                public BaseRdpBookmark[] newArray(int size) {
+                    return new BaseRdpBookmark[size];
                 }
             };
     protected int type;
@@ -36,7 +38,7 @@ public class BookmarkBase implements Parcelable, Cloneable {
     private AdvancedSettings advancedSettings;
     private DebugSettings debugSettings;
 
-    public BookmarkBase(Parcel parcel) {
+    public BaseRdpBookmark(Parcel parcel) {
         type = parcel.readInt();
         id = parcel.readLong();
         label = parcel.readString();
@@ -50,7 +52,7 @@ public class BookmarkBase implements Parcelable, Cloneable {
         debugSettings = parcel.readParcelable(DebugSettings.class.getClassLoader());
     }
 
-    public BookmarkBase() {
+    public BaseRdpBookmark() {
         type = TYPE_INVALID;
         id = -1;
         label = "";
@@ -65,7 +67,7 @@ public class BookmarkBase implements Parcelable, Cloneable {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends BookmarkBase> T get() {
+    public <T extends BaseRdpBookmark> T get() {
         return (T) this;
     }
 
@@ -146,13 +148,13 @@ public class BookmarkBase implements Parcelable, Cloneable {
     }
 
     public ScreenSettings getActiveScreenSettings() {
-        return (GlobalApp.ConnectedToMobileWork && advancedSettings.getEnable345GSettings())
+        return (RdpApp.ConnectedToMobileWork && advancedSettings.getEnable345GSettings())
                 ? advancedSettings.getScreen345G()
                 : screenSettings;
     }
 
     public PerformanceFlags getActivePerformanceFlags() {
-        return (GlobalApp.ConnectedToMobileWork && advancedSettings.getEnable345GSettings())
+        return (RdpApp.ConnectedToMobileWork && advancedSettings.getEnable345GSettings())
                 ? advancedSettings.getPerformance345G()
                 : performanceFlags;
     }
@@ -466,7 +468,7 @@ public class BookmarkBase implements Parcelable, Cloneable {
         }
     }
 
-    // Screen Settings class
+    // 屏幕设置类
     public static class ScreenSettings implements Parcelable {
         public static final int FITSCREEN = -2;
         public static final int AUTOMATIC = -1;
@@ -639,6 +641,7 @@ public class BookmarkBase implements Parcelable, Cloneable {
         }
     }
 
+    // 调试设置
     public static class DebugSettings implements Parcelable {
 
         public static final Parcelable.Creator<DebugSettings> CREATOR =
@@ -662,7 +665,7 @@ public class BookmarkBase implements Parcelable, Cloneable {
             init();
         }
 
-        // Session Settings
+        // 会话设置
         public DebugSettings(Parcel parcel) {
             asyncChannel = parcel.readInt() == 1;
             asyncTransport = parcel.readInt() == 1;
@@ -739,7 +742,7 @@ public class BookmarkBase implements Parcelable, Cloneable {
         }
     }
 
-    // Session Settings
+    // 高级设置
     public static class AdvancedSettings implements Parcelable {
         public static final Parcelable.Creator<AdvancedSettings> CREATOR =
                 new Parcelable.Creator<AdvancedSettings>() {

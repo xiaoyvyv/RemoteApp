@@ -12,10 +12,10 @@ import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.util.Log;
 
-import com.freerdp.freerdpcore.application.GlobalApp;
-import com.freerdp.freerdpcore.domain.BookmarkBase;
+import com.freerdp.freerdpcore.application.RdpApp;
+import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
 import com.freerdp.freerdpcore.domain.ConnectionReference;
-import com.freerdp.freerdpcore.domain.ManualBookmark;
+import com.freerdp.freerdpcore.domain.RdpBookmark;
 import com.freerdp.freerdpcore.services.BookmarkBaseGateway;
 import com.freerdp.freerdpcore.services.LibFreeRDP;
 import com.freerdp.freerdpcore.utils.AppCompatPreferenceActivity;
@@ -44,7 +44,7 @@ public class BookmarkActivity extends AppCompatPreferenceActivity implements OnS
     // (we have to do this because Android has a bug where the style for
     // Preferences
     // is only applied to the first PreferenceScreen but not to subsequent ones)
-    private static BookmarkBase bookmark = null;
+    private static BaseRdpBookmark bookmark = null;
     private static boolean settings_changed = false;
     private static boolean new_bookmark = false;
     private int current_preferences;
@@ -66,25 +66,25 @@ public class BookmarkActivity extends AppCompatPreferenceActivity implements OnS
                 if (bundle.containsKey(PARAM_CONNECTION_REFERENCE)) {
                     String refStr = bundle.getString(PARAM_CONNECTION_REFERENCE);
                     if (ConnectionReference.isManualBookmarkReference(refStr)) {
-                        bookmark = GlobalApp.getManualBookmarkGateway().findById(
+                        bookmark = RdpApp.getManualBookmarkGateway().findById(
                                 ConnectionReference.getManualBookmarkId(refStr));
                         new_bookmark = false;
                     } else if (ConnectionReference.isHostnameReference(refStr)) {
-                        bookmark = new ManualBookmark();
-                        bookmark.<ManualBookmark>get().setLabel(
+                        bookmark = new RdpBookmark();
+                        bookmark.<RdpBookmark>get().setLabel(
                                 ConnectionReference.getHostname(refStr));
-                        bookmark.<ManualBookmark>get().setHostname(
+                        bookmark.<RdpBookmark>get().setHostname(
                                 ConnectionReference.getHostname(refStr));
                         new_bookmark = true;
                     } else if (ConnectionReference.isFileReference(refStr)) {
                         String file = ConnectionReference.getFile(refStr);
 
-                        bookmark = new ManualBookmark();
+                        bookmark = new RdpBookmark();
                         bookmark.setLabel(file);
 
                         try {
                             RdpFileParser rdpFile = new RdpFileParser(file);
-                            updateBookmarkFromFile((ManualBookmark) bookmark, rdpFile);
+                            updateBookmarkFromFile((RdpBookmark) bookmark, rdpFile);
 
                             bookmark.setLabel(new File(file).getName());
                             new_bookmark = true;
@@ -97,11 +97,11 @@ public class BookmarkActivity extends AppCompatPreferenceActivity implements OnS
 
             // last chance - ensure we really have a valid bookmark
             if (bookmark == null)
-                bookmark = new ManualBookmark();
+                bookmark = new RdpBookmark();
 
             // hide gateway settings if we edit a non-manual bookmark
             if (current_preferences == PREFERENCES_ADVANCED &&
-                    bookmark.getType() != ManualBookmark.TYPE_MANUAL) {
+                    bookmark.getType() != RdpBookmark.TYPE_MANUAL) {
                 PreferenceScreen screen = getPreferenceScreen();
                 screen.removePreference(findPreference("bookmark.enable_gateway"));
                 screen.removePreference(findPreference("bookmark.gateway"));
@@ -178,7 +178,7 @@ public class BookmarkActivity extends AppCompatPreferenceActivity implements OnS
         }
     }
 
-    private void updateBookmarkFromFile(ManualBookmark bookmark, RdpFileParser rdpFile) {
+    private void updateBookmarkFromFile(RdpBookmark bookmark, RdpFileParser rdpFile) {
         String s;
         Integer i;
 
@@ -582,12 +582,12 @@ public class BookmarkActivity extends AppCompatPreferenceActivity implements OnS
                                                 getPreferenceManager().getSharedPreferences());
 
                                         BookmarkBaseGateway bookmarkGateway;
-                                        if (bookmark.getType() == BookmarkBase.TYPE_MANUAL) {
-                                            bookmarkGateway = GlobalApp.getManualBookmarkGateway();
+                                        if (bookmark.getType() == BaseRdpBookmark.TYPE_MANUAL) {
+                                            bookmarkGateway = RdpApp.getManualBookmarkGateway();
                                             // remove any history entry for this
                                             // bookmark
-                                            GlobalApp.getQuickConnectHistoryGateway().removeHistoryItem(
-                                                    bookmark.<ManualBookmark>get().getHostname());
+                                            RdpApp.getQuickConnectHistoryGateway().removeHistoryItem(
+                                                    bookmark.<RdpBookmark>get().getHostname());
                                         } else {
                                             assert false;
                                             return;

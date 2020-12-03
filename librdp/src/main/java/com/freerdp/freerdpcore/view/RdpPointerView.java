@@ -19,7 +19,7 @@ import com.xiaoyv.librdp.R;
 /**
  * 模拟鼠标自定义视图
  */
-public class TouchPointerView extends AppCompatImageView {
+public class RdpPointerView extends AppCompatImageView {
 
     private static final int POINTER_ACTION_CURSOR = 0;
     private static final int POINTER_ACTION_CLOSE = 3;
@@ -57,17 +57,17 @@ public class TouchPointerView extends AppCompatImageView {
     // 手势检测
     private GestureDetector gestureDetector;
 
-    public TouchPointerView(Context context) {
+    public RdpPointerView(Context context) {
         super(context);
         initTouchPointer(context);
     }
 
-    public TouchPointerView(Context context, AttributeSet attrs) {
+    public RdpPointerView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initTouchPointer(context);
     }
 
-    public TouchPointerView(Context context, AttributeSet attrs, int defStyle) {
+    public RdpPointerView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initTouchPointer(context);
     }

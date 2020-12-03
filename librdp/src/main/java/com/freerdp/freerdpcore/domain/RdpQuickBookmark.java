@@ -4,26 +4,29 @@ import android.content.SharedPreferences;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-public class QuickConnectBookmark extends ManualBookmark {
+/**
+ * 快速连接标签
+ */
+public class RdpQuickBookmark extends RdpBookmark {
 
-    public static final Parcelable.Creator<QuickConnectBookmark> CREATOR =
-            new Parcelable.Creator<QuickConnectBookmark>() {
-                public QuickConnectBookmark createFromParcel(Parcel in) {
-                    return new QuickConnectBookmark(in);
+    public static final Parcelable.Creator<RdpQuickBookmark> CREATOR =
+            new Parcelable.Creator<RdpQuickBookmark>() {
+                public RdpQuickBookmark createFromParcel(Parcel in) {
+                    return new RdpQuickBookmark(in);
                 }
 
                 @Override
-                public QuickConnectBookmark[] newArray(int size) {
-                    return new QuickConnectBookmark[size];
+                public RdpQuickBookmark[] newArray(int size) {
+                    return new RdpQuickBookmark[size];
                 }
             };
 
-    public QuickConnectBookmark(Parcel parcel) {
+    public RdpQuickBookmark(Parcel parcel) {
         super(parcel);
         type = TYPE_QUICK_CONNECT;
     }
 
-    public QuickConnectBookmark() {
+    public RdpQuickBookmark() {
         super();
         type = TYPE_QUICK_CONNECT;
     }

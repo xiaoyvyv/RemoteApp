@@ -7,18 +7,17 @@ import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
 
-import com.freerdp.freerdpcore.application.GlobalApp;
-import com.freerdp.freerdpcore.domain.BookmarkBase;
+import com.freerdp.freerdpcore.application.RdpApp;
+import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
 import com.freerdp.freerdpcore.domain.ConnectionReference;
-import com.freerdp.freerdpcore.domain.ManualBookmark;
+import com.freerdp.freerdpcore.domain.RdpBookmark;
 import com.xiaoyv.librdp.R;
 
 import java.util.ArrayList;
 
 public class FreeRDPSuggestionProvider extends ContentProvider {
 
-    public static final Uri CONTENT_URI =
-            Uri.parse("content://com.xiaoyv.rdp.services.provider");
+    public static final Uri CONTENT_URI = Uri.parse("content://com.xiaoyv.rdp.services.provider");
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
@@ -46,56 +45,53 @@ public class FreeRDPSuggestionProvider extends ContentProvider {
 
         String query = (selectionArgs != null && selectionArgs.length > 0) ? selectionArgs[0] : "";
 
-        // search history
-        ArrayList<BookmarkBase> history =
-                GlobalApp.getQuickConnectHistoryGateway().findHistory(query);
+        // 搜索历史记录
+        ArrayList<BaseRdpBookmark> history =
+                RdpApp.getQuickConnectHistoryGateway().findHistory(query);
 
-        // search bookmarks
-        ArrayList<BookmarkBase> manualBookmarks;
+        // 搜索书签
+        ArrayList<BaseRdpBookmark> manualBookmarks;
         if (query.length() > 0)
-            manualBookmarks = GlobalApp.getManualBookmarkGateway().findByLabelOrHostnameLike(query);
+            manualBookmarks = RdpApp.getManualBookmarkGateway().findByLabelOrHostnameLike(query);
         else
-            manualBookmarks = GlobalApp.getManualBookmarkGateway().findAll();
+            manualBookmarks = RdpApp.getManualBookmarkGateway().findAll();
 
         return createResultCursor(history, manualBookmarks);
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        // TODO Auto-generated method stub
         return 0;
     }
 
-    private void addBookmarksToCursor(ArrayList<BookmarkBase> bookmarks, MatrixCursor resultCursor) {
+    private void addBookmarksToCursor(ArrayList<BaseRdpBookmark> bookmarks, MatrixCursor resultCursor) {
         Object[] row = new Object[5];
-        for (BookmarkBase bookmark : bookmarks) {
+        for (BaseRdpBookmark bookmark : bookmarks) {
             row[0] = bookmark.getId();
             row[1] = bookmark.getLabel();
-            row[2] = bookmark.<ManualBookmark>get().getHostname();
+            row[2] = bookmark.<RdpBookmark>get().getHostname();
             row[3] = ConnectionReference.getManualBookmarkReference(bookmark.getId());
-            row[4] = "android.resource://" + getContext().getPackageName() + "/" +
-                    R.drawable.icon_star_on;
+            row[4] = "android.resource://" + getContext().getPackageName() + "/" + R.drawable.icon_star_on;
             resultCursor.addRow(row);
         }
     }
 
-    private void addHistoryToCursor(ArrayList<BookmarkBase> history, MatrixCursor resultCursor) {
+    private void addHistoryToCursor(ArrayList<BaseRdpBookmark> history, MatrixCursor resultCursor) {
         Object[] row = new Object[5];
-        for (BookmarkBase bookmark : history) {
+        for (BaseRdpBookmark bookmark : history) {
             row[0] = 1;
             row[1] = bookmark.getLabel();
             row[2] = bookmark.getLabel();
             row[3] = ConnectionReference.getHostnameReference(bookmark.getLabel());
-            row[4] = "android.resource://" + getContext().getPackageName() + "/" +
-                    R.drawable.icon_star_off;
+            row[4] = "android.resource://" + getContext().getPackageName() + "/" + R.drawable.icon_star_off;
             resultCursor.addRow(row);
         }
     }
 
-    private Cursor createResultCursor(ArrayList<BookmarkBase> history,
-                                      ArrayList<BookmarkBase> manualBookmarks) {
+    private Cursor createResultCursor(ArrayList<BaseRdpBookmark> history,
+                                      ArrayList<BaseRdpBookmark> manualBookmarks) {
 
-        // create result matrix cursor
+        // 创建结果矩阵游标
         int totalCount = history.size() + manualBookmarks.size();
         String[] columns = {android.provider.BaseColumns._ID, SearchManager.SUGGEST_COLUMN_TEXT_1,
                 SearchManager.SUGGEST_COLUMN_TEXT_2,
@@ -103,7 +99,7 @@ public class FreeRDPSuggestionProvider extends ContentProvider {
                 SearchManager.SUGGEST_COLUMN_ICON_2};
         MatrixCursor matrixCursor = new MatrixCursor(columns, totalCount);
 
-        // populate result matrix
+        // 填充结果矩阵
         if (totalCount > 0) {
             addHistoryToCursor(history, matrixCursor);
             addBookmarksToCursor(manualBookmarks, matrixCursor);
