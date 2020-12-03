@@ -43,13 +43,13 @@ import com.freerdp.freerdpcore.application.RdpSessionState;
 import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
 import com.freerdp.freerdpcore.domain.ConnectionReference;
 import com.freerdp.freerdpcore.domain.RdpBookmark;
-import com.freerdp.freerdpcore.services.LibFreeRDP;
-import com.freerdp.freerdpcore.utils.ClipboardManagerProxy;
 import com.freerdp.freerdpcore.mapper.RdpKeyboardMapper;
 import com.freerdp.freerdpcore.mapper.RdpMouseMapper;
+import com.freerdp.freerdpcore.services.LibFreeRDP;
+import com.freerdp.freerdpcore.utils.ClipboardManagerProxy;
+import com.freerdp.freerdpcore.view.RdpPointerView;
 import com.freerdp.freerdpcore.view.RdpScrollView;
 import com.freerdp.freerdpcore.view.RdpSessionView;
-import com.freerdp.freerdpcore.view.RdpPointerView;
 import com.xiaoyv.librdp.R;
 
 import java.util.Collection;
@@ -260,15 +260,15 @@ public class SessionActivity extends AppCompatActivity
         zoomControls = (ZoomControls) findViewById(R.id.zoomControls);
         zoomControls.hide();
         zoomControls.setOnZoomInClickListener(v -> {
-			resetZoomControlsAutoHideTimeout();
-			zoomControls.setIsZoomInEnabled(rdpSessionView.zoomIn(ZOOMING_STEP));
-			zoomControls.setIsZoomOutEnabled(true);
-		});
+            resetZoomControlsAutoHideTimeout();
+            zoomControls.setIsZoomInEnabled(rdpSessionView.zoomIn(ZOOMING_STEP));
+            zoomControls.setIsZoomOutEnabled(true);
+        });
         zoomControls.setOnZoomOutClickListener(v -> {
-			resetZoomControlsAutoHideTimeout();
-			zoomControls.setIsZoomOutEnabled(rdpSessionView.zoomOut(ZOOMING_STEP));
-			zoomControls.setIsZoomInEnabled(true);
-		});
+            resetZoomControlsAutoHideTimeout();
+            zoomControls.setIsZoomOutEnabled(rdpSessionView.zoomOut(ZOOMING_STEP));
+            zoomControls.setIsZoomInEnabled(true);
+        });
 
         toggleMouseButtons = false;
 
@@ -460,21 +460,20 @@ public class SessionActivity extends AppCompatActivity
         thread.start();
     }
 
-    // binds the current session to the activity by wiring it up with the
-    // sessionView and updating all internal objects accordingly
+    /**
+     * 通过将当前会话与sessionView连接起来并相应地更新所有内部对象，从而将当前会话绑定到活动
+     */
     private void bindSession() {
         Log.v(TAG, "bindSession called");
         session.setUIEventListener(this);
         rdpSessionView.onSurfaceChange(session);
         scrollView.requestLayout();
         rdpKeyboardMapper.reset(this);
-        mDecor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        mDecor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
     }
 
     private void hideSoftInput() {
         InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-
         if (mgr.isActive()) {
             mgr.toggleSoftInput(InputMethodManager.HIDE_NOT_ALWAYS, 0);
         } else {
@@ -482,11 +481,11 @@ public class SessionActivity extends AppCompatActivity
         }
     }
 
-    // displays either the system or the extended keyboard or non of them
+    // 显示系统或扩展键盘或不显示
     private void showKeyboard(final boolean showSystemKeyboard, final boolean showExtendedKeyboard) {
-        // no matter what we are doing ... hide the zoom controls
-        // TODO: this is not working correctly as hiding the keyboard issues a
-        // onScrollChange notification showing the control again ...
+        // 无论我们在做什么...隐藏缩放控件
+        // TODO：这无法正常工作，因为隐藏了键盘问题
+        // 再次显示控件的 onScrollChange 通知...
         uiHandler.removeMessages(UIHandler.HIDE_ZOOMCONTROLS);
         if (zoomControls.getVisibility() == View.VISIBLE)
             zoomControls.hide();
@@ -494,28 +493,28 @@ public class SessionActivity extends AppCompatActivity
         InputMethodManager mgr = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 
         if (showSystemKeyboard) {
-            // hide extended keyboard
+            // 隐藏扩展键盘
             keyboardView.setVisibility(View.GONE);
-            // show system keyboard
+            // 显示系统键盘
             mgr.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0);
 
-            // show modifiers keyboard
+            // 显示修改器键盘
             modifiersKeyboardView.setVisibility(View.VISIBLE);
         } else if (showExtendedKeyboard) {
-            // hide system keyboard
+            // 隐藏系统键盘
             hideSoftInput();
 
-            // show extended keyboard
+            // 显示扩展键盘
             keyboardView.setKeyboard(specialkeysKeyboard);
             keyboardView.setVisibility(View.VISIBLE);
             modifiersKeyboardView.setVisibility(View.VISIBLE);
         } else {
-            // hide both
+            // 隐藏两者
             hideSoftInput();
             keyboardView.setVisibility(View.GONE);
             modifiersKeyboardView.setVisibility(View.GONE);
 
-            // clear any active key modifiers)
+            // 清除所有活动的按键修饰符
             rdpKeyboardMapper.clearAllModifiers();
         }
 
@@ -524,14 +523,14 @@ public class SessionActivity extends AppCompatActivity
     }
 
     private void closeSessionActivity(int resultCode) {
-        // Go back to home activity (and send intent data back to home)
+        // 返回主页（并将意图数据发送回主页）
         setResult(resultCode, getIntent());
         finish();
     }
 
-    // update the state of our modifier keys
+    // 更新我们的修改键的状态
     private void updateModifierKeyStates() {
-        // check if any key is in the keycodes list
+        // 检查键码列表中是否有任何键
 
         List<Keyboard.Key> keys = modifiersKeyboard.getKeys();
         for (Keyboard.Key curKey : keys) {
@@ -567,11 +566,12 @@ public class SessionActivity extends AppCompatActivity
         } else
             discardedMoveEvents = 0;
 
-        if (discardedMoveEvents > MAX_DISCARDED_MOVE_EVENTS)
+        if (discardedMoveEvents > MAX_DISCARDED_MOVE_EVENTS) {
             LibFreeRDP.sendCursorEvent(session.getInstance(), x, y, RdpMouseMapper.getMoveEvent());
-        else
+        } else {
             uiHandler.sendMessageDelayed(Message.obtain(null, UIHandler.SEND_MOVE_EVENT, x, y),
                     SEND_MOVE_EVENT_TIMEOUT);
+        }
     }
 
     private void cancelDelayedMoveEvent() {
@@ -615,10 +615,11 @@ public class SessionActivity extends AppCompatActivity
     @Override
     public void onBackPressed() {
         // hide keyboards (if any visible) or send alt+f4 to the session
-        if (sysKeyboardVisible || extKeyboardVisible)
+        if (sysKeyboardVisible || extKeyboardVisible) {
             showKeyboard(false, false);
-        else
+        } else {
             rdpKeyboardMapper.sendAltF4();
+        }
     }
 
     @Override
@@ -939,8 +940,8 @@ public class SessionActivity extends AppCompatActivity
 
     @Override
     public void onScrollChanged(RdpScrollView scrollView, int x, int y, int oldx, int oldy) {
-        zoomControls.setIsZoomInEnabled(!rdpSessionView.isAtMaxZoom());
-        zoomControls.setIsZoomOutEnabled(!rdpSessionView.isAtMinZoom());
+        zoomControls.setIsZoomInEnabled(rdpSessionView.isNotAtMaxZoom());
+        zoomControls.setIsZoomOutEnabled(rdpSessionView.isNotAtMinZoom());
         if (!ApplicationSettingsActivity.getHideZoomControls(this) &&
                 zoomControls.getVisibility() != View.VISIBLE)
             zoomControls.show();
@@ -1179,7 +1180,7 @@ public class SessionActivity extends AppCompatActivity
                     Math.min(scaleFactor, RdpSessionView.MAX_SCALE_FACTOR));
             rdpSessionView.setZoom(scaleFactor);
 
-            if (!rdpSessionView.isAtMinZoom() && !rdpSessionView.isAtMaxZoom()) {
+            if (rdpSessionView.isNotAtMinZoom() && rdpSessionView.isNotAtMaxZoom()) {
                 // transform scroll origin to the new zoom space
                 float transOriginX = scrollView.getScrollX() * detector.getScaleFactor();
                 float transOriginY = scrollView.getScrollY() * detector.getScaleFactor();

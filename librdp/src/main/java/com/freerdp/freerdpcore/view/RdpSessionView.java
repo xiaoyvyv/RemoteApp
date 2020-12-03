@@ -1,6 +1,7 @@
 package com.freerdp.freerdpcore.view;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -9,16 +10,12 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
-import android.view.WindowInsets;
-import android.view.WindowInsetsController;
 
 import com.freerdp.freerdpcore.application.RdpSessionState;
-import com.freerdp.freerdpcore.presentation.SessionActivity;
 import com.freerdp.freerdpcore.utils.DoubleGestureDetector;
 import com.freerdp.freerdpcore.utils.GestureDetector;
 
@@ -30,7 +27,6 @@ import java.util.Stack;
 public class RdpSessionView extends View {
     public static final float MAX_SCALE_FACTOR = 3.0f;
     public static final float MIN_SCALE_FACTOR = 1.0f;
-    private static final String TAG = "SessionView";
     private static final float SCALE_FACTOR_DELTA = 0.0001f;
     private static final float TOUCH_SCROLL_DELTA = 10.0f;
     private int width;
@@ -66,17 +62,13 @@ public class RdpSessionView extends View {
     }
 
     private void initSessionView(Context context) {
-        invalidRegions = new Stack<Rect>();
+        invalidRegions = new Stack<>();
         gestureDetector = new GestureDetector(context, new SessionGestureListener(), null, true);
-        doubleGestureDetector =
-                new DoubleGestureDetector(context, null, new SessionDoubleGestureListener());
-
+        doubleGestureDetector = new DoubleGestureDetector(context, null, new SessionDoubleGestureListener());
         scaleFactor = 1.0f;
         scaleMatrix = new Matrix();
         invScaleMatrix = new Matrix();
         invalidRegionF = new RectF();
-
-
     }
 
     public void setScaleGestureDetector(ScaleGestureDetector scaleGestureDetector) {
@@ -88,7 +80,7 @@ public class RdpSessionView extends View {
     }
 
     public void addInvalidRegion(Rect invalidRegion) {
-        // correctly transform invalid region depending on current scaling
+        // 根据当前缩放比例正确变换无效区域
         invalidRegionF.set(invalidRegion);
         scaleMatrix.mapRect(invalidRegionF);
         invalidRegionF.roundOut(invalidRegion);
@@ -119,22 +111,21 @@ public class RdpSessionView extends View {
     }
 
     public void setZoom(float factor) {
-        // calc scale matrix and inverse scale matrix (to correctly transform the view and moues
-        // coordinates)
+        // 计算比例尺矩阵和逆比例尺矩阵（以正确地变换视图和Moue坐标）
         scaleFactor = factor;
         scaleMatrix.setScale(scaleFactor, scaleFactor);
         invScaleMatrix.setScale(1.0f / scaleFactor, 1.0f / scaleFactor);
 
-        // update layout
+        // 更新布局
         requestLayout();
     }
 
-    public boolean isAtMaxZoom() {
-        return (scaleFactor > (MAX_SCALE_FACTOR - SCALE_FACTOR_DELTA));
+    public boolean isNotAtMaxZoom() {
+        return (!(scaleFactor > (MAX_SCALE_FACTOR - SCALE_FACTOR_DELTA)));
     }
 
-    public boolean isAtMinZoom() {
-        return (scaleFactor < (MIN_SCALE_FACTOR + SCALE_FACTOR_DELTA));
+    public boolean isNotAtMinZoom() {
+        return (!(scaleFactor < (MIN_SCALE_FACTOR + SCALE_FACTOR_DELTA)));
     }
 
     public boolean zoomIn(float factor) {
@@ -175,9 +166,7 @@ public class RdpSessionView extends View {
 
     @Override
     public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        Log.v(TAG, width + "x" + height);
-        this.setMeasuredDimension((int) (width * scaleFactor) + touchPointerPaddingWidth,
-                (int) (height * scaleFactor) + touchPointerPaddingHeight);
+        this.setMeasuredDimension((int) (width * scaleFactor) + touchPointerPaddingWidth, (int) (height * scaleFactor) + touchPointerPaddingHeight);
     }
 
     @Override
@@ -192,17 +181,15 @@ public class RdpSessionView extends View {
         canvas.restore();
     }
 
-    // dirty hack: we call back to our activity and call onBackPressed as this doesn't reach us when
-    // the soft keyboard is shown ...
     @Override
     public boolean dispatchKeyEventPreIme(KeyEvent event) {
-        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK &&
-                event.getAction() == KeyEvent.ACTION_DOWN)
-            ((SessionActivity) this.getContext()).onBackPressed();
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK && event.getAction() == KeyEvent.ACTION_DOWN) {
+            ((Activity) this.getContext()).onBackPressed();
+        }
         return super.dispatchKeyEventPreIme(event);
     }
 
-    // perform mapping on the touch event's coordinates according to the current scaling
+    // 根据当前缩放比例在触摸事件的坐标上执行映射
     private MotionEvent mapTouchEvent(MotionEvent event) {
         MotionEvent mappedEvent = MotionEvent.obtain(event);
         float[] coordinates = {mappedEvent.getX(), mappedEvent.getY()};
@@ -211,11 +198,10 @@ public class RdpSessionView extends View {
         return mappedEvent;
     }
 
-    // perform mapping on the double touch event's coordinates according to the current scaling
+    // 根据当前缩放比例在两次触摸事件的坐标上执行映射
     private MotionEvent mapDoubleTouchEvent(MotionEvent event) {
         MotionEvent mappedEvent = MotionEvent.obtain(event);
-        float[] coordinates = {(mappedEvent.getX(0) + mappedEvent.getX(1)) / 2,
-                (mappedEvent.getY(0) + mappedEvent.getY(1)) / 2};
+        float[] coordinates = {(mappedEvent.getX(0) + mappedEvent.getX(1)) / 2, (mappedEvent.getY(0) + mappedEvent.getY(1)) / 2};
         invScaleMatrix.mapPoints(coordinates);
         mappedEvent.setLocation(coordinates[0], coordinates[1]);
         return mappedEvent;
@@ -258,15 +244,13 @@ public class RdpSessionView extends View {
         public void onLongPress(MotionEvent e) {
             MotionEvent mappedEvent = mapTouchEvent(e);
             sessionViewListener.onSessionViewBeginTouch();
-            sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(),
-                    (int) mappedEvent.getY(), true);
+            sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(), (int) mappedEvent.getY(), true);
             longPressInProgress = true;
         }
 
         public void onLongPressUp(MotionEvent e) {
             MotionEvent mappedEvent = mapTouchEvent(e);
-            sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(),
-                    (int) mappedEvent.getY(), false);
+            sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(), (int) mappedEvent.getY(), false);
             longPressInProgress = false;
             sessionViewListener.onSessionViewEndTouch();
         }
@@ -274,8 +258,7 @@ public class RdpSessionView extends View {
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             if (longPressInProgress) {
                 MotionEvent mappedEvent = mapTouchEvent(e2);
-                sessionViewListener.onSessionViewMove((int) mappedEvent.getX(),
-                        (int) mappedEvent.getY());
+                sessionViewListener.onSessionViewMove((int) mappedEvent.getX(), (int) mappedEvent.getY());
                 return true;
             }
 
@@ -283,44 +266,26 @@ public class RdpSessionView extends View {
         }
 
         public boolean onDoubleTap(MotionEvent e) {
-            // send 2nd click for double click
+            // 发送双击事件
             MotionEvent mappedEvent = mapTouchEvent(e);
-            sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(),
-                    (int) mappedEvent.getY(), true);
-            sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(),
-                    (int) mappedEvent.getY(), false);
+            sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(), (int) mappedEvent.getY(), true);
+            sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(), (int) mappedEvent.getY(), false);
             return true;
         }
 
+
         public boolean onSingleTapUp(MotionEvent e) {
-            // send single click
+            // 发送单击事件
             MotionEvent mappedEvent = mapTouchEvent(e);
             sessionViewListener.onSessionViewBeginTouch();
-            switch (e.getButtonState()) {
-                case MotionEvent.BUTTON_PRIMARY:
-                    sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(),
-                            (int) mappedEvent.getY(), true);
-                    sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(),
-                            (int) mappedEvent.getY(), false);
-                    break;
-                case MotionEvent.BUTTON_SECONDARY:
-                    sessionViewListener.onSessionViewRightTouch((int) mappedEvent.getX(),
-                            (int) mappedEvent.getY(), true);
-                    sessionViewListener.onSessionViewRightTouch((int) mappedEvent.getX(),
-                            (int) mappedEvent.getY(), false);
-                    sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(),
-                            (int) mappedEvent.getY(), true);
-                    sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(),
-                            (int) mappedEvent.getY(), false);
-                    break;
-            }
+            sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(), (int) mappedEvent.getY(), true);
+            sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(), (int) mappedEvent.getY(), false);
             sessionViewListener.onSessionViewEndTouch();
             return true;
         }
     }
 
-    private class SessionDoubleGestureListener
-            implements DoubleGestureDetector.OnDoubleGestureListener {
+    private class SessionDoubleGestureListener implements DoubleGestureDetector.OnDoubleGestureListener {
         private MotionEvent prevEvent = null;
 
         public boolean onDoubleTouchDown(MotionEvent e) {
@@ -339,7 +304,7 @@ public class RdpSessionView extends View {
         }
 
         public boolean onDoubleTouchScroll(MotionEvent e1, MotionEvent e2) {
-            // calc if user scrolled up or down (or if any scrolling happened at all)
+            // 计算用户向上或向下滚动（或根本没有滚动）
             float deltaY = e2.getY() - prevEvent.getY();
             if (deltaY > TOUCH_SCROLL_DELTA) {
                 sessionViewListener.onSessionViewScroll(true);
@@ -354,12 +319,10 @@ public class RdpSessionView extends View {
         }
 
         public boolean onDoubleTouchSingleTap(MotionEvent e) {
-            // send single click
+            // 发送点击
             MotionEvent mappedEvent = mapDoubleTouchEvent(e);
-            sessionViewListener.onSessionViewRightTouch((int) mappedEvent.getX(),
-                    (int) mappedEvent.getY(), true);
-            sessionViewListener.onSessionViewRightTouch((int) mappedEvent.getX(),
-                    (int) mappedEvent.getY(), false);
+            sessionViewListener.onSessionViewRightTouch((int) mappedEvent.getX(), (int) mappedEvent.getY(), true);
+            sessionViewListener.onSessionViewRightTouch((int) mappedEvent.getX(), (int) mappedEvent.getY(), false);
             return true;
         }
     }

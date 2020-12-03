@@ -1,17 +1,6 @@
-/*
-   Main/Home Activity
-
-   Copyright 2013 Thincast Technologies GmbH, Author: Martin Fleisz
-
-   This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
-   If a copy of the MPL was not distributed with this file, You can obtain one at
-   http://mozilla.org/MPL/2.0/.
-*/
-
 package com.freerdp.freerdpcore.presentation;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -35,7 +24,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.freerdp.freerdpcore.application.RdpApp;
 import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
 import com.freerdp.freerdpcore.domain.ConnectionReference;
-import com.freerdp.freerdpcore.domain.RdpHolderBookmark;
 import com.freerdp.freerdpcore.domain.RdpQuickBookmark;
 import com.freerdp.freerdpcore.utils.BookmarkArrayAdapter;
 import com.freerdp.freerdpcore.utils.SeparatedListAdapter;
@@ -51,9 +39,8 @@ public class HomeActivity extends AppCompatActivity {
     private EditText superBarEditText;
     private BookmarkArrayAdapter manualBookmarkAdapter;
     private SeparatedListAdapter separatedListAdapter;
-    private RdpHolderBookmark addBookmarkPlaceholder;
     private String sectionLabelBookmarks;
-    View mDecor;
+    private View mDecor;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -62,8 +49,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.home);
 
         mDecor = getWindow().getDecorView();
-        mDecor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+        mDecor.setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
         long heapSize = Runtime.getRuntime().maxMemory();
         Log.i(TAG, "Max HeapSize: " + heapSize);
@@ -71,11 +57,6 @@ public class HomeActivity extends AppCompatActivity {
 
         // load strings
         sectionLabelBookmarks = getResources().getString(R.string.section_bookmarks);
-
-        // create add bookmark/quick connect bookmark placeholder
-        addBookmarkPlaceholder = new RdpHolderBookmark();
-        addBookmarkPlaceholder.setName(ADD_BOOKMARK_PLACEHOLDER);
-        addBookmarkPlaceholder.setLabel(getResources().getString(R.string.list_placeholder_add_bookmark));
 
         // check for passed .rdp file and open it in a new bookmark
         Intent caller = getIntent();
@@ -208,9 +189,6 @@ public class HomeActivity extends AppCompatActivity {
         // 创建书签光标适配器
         manualBookmarkAdapter = new BookmarkArrayAdapter(this, R.layout.bookmark_list_item, RdpApp.getManualBookmarkGateway().findAll());
 
-        // add add bookmark item to manual adapter
-        manualBookmarkAdapter.insert(addBookmarkPlaceholder, 0);
-
         // attach all adapters to the separatedListView adapter and assign it to the list view
         separatedListAdapter = new SeparatedListAdapter(this);
         separatedListAdapter.addSection(sectionLabelBookmarks, manualBookmarkAdapter);
@@ -246,17 +224,9 @@ public class HomeActivity extends AppCompatActivity {
                     .setMessage(R.string.dlg_msg_exit)
                     .setView(cb)
                     .setPositiveButton(R.string.yes,
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    finish();
-                                }
-                            })
+                            (dialog, which) -> finish())
                     .setNegativeButton(R.string.no,
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    dialog.dismiss();
-                                }
-                            })
+                            (dialog, which) -> dialog.dismiss())
                     .create()
                     .show();
         } else {
@@ -311,7 +281,6 @@ public class HomeActivity extends AppCompatActivity {
                 } else {
                     manualBookmarkAdapter.replaceItems(
                             RdpApp.getManualBookmarkGateway().findAll());
-                    manualBookmarkAdapter.insert(addBookmarkPlaceholder, 0);
                 }
 
                 separatedListAdapter.notifyDataSetChanged();

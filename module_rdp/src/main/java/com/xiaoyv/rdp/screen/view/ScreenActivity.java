@@ -5,13 +5,18 @@ import android.os.Bundle;
 import android.view.View;
 
 import com.blankj.utilcode.util.ActivityUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.Utils;
+import com.freerdp.freerdpcore.application.RdpApp;
+import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
 import com.freerdp.freerdpcore.presentation.SessionActivity;
 import com.xiaoyv.busines.base.BaseMvpActivity;
 import com.xiaoyv.busines.room.entity.RdpEntity;
 import com.xiaoyv.rdp.databinding.RdpActivityScreenBinding;
 import com.xiaoyv.rdp.screen.contract.ScreenContract;
 import com.xiaoyv.rdp.screen.presenter.ScreenPresenter;
+
+import java.util.ArrayList;
 
 /**
  * ScreenView
@@ -48,6 +53,7 @@ public class ScreenActivity extends BaseMvpActivity<ScreenContract.View, ScreenP
 
     @Override
     protected void initData() {
+
 
     }
 }

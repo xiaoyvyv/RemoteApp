@@ -164,8 +164,7 @@ public class BookmarkActivity extends AppCompatPreferenceActivity implements OnS
 
     private void updateH264Preferences() {
         if (!LibFreeRDP.hasH264Support()) {
-            final int[] preferenceIdList = {R.string.preference_key_h264,
-                    R.string.preference_key_h264_3g};
+            final int[] preferenceIdList = {R.string.preference_key_h264, R.string.preference_key_h264_3g};
 
             PreferenceManager mgr = getPreferenceManager();
             for (int id : preferenceIdList) {
@@ -363,30 +362,42 @@ public class BookmarkActivity extends AppCompatPreferenceActivity implements OnS
     }
 
     private void advancedSettingsChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals("bookmark.enable_gateway_settings")) {
-            boolean enabled = sharedPreferences.getBoolean(key, false);
-            findPreference("bookmark.gateway_settings").setEnabled(enabled);
-        } else if (key.equals("bookmark.enable_3g_settings")) {
-            boolean enabled = sharedPreferences.getBoolean(key, false);
-            findPreference("bookmark.screen_3g").setEnabled(enabled);
-            findPreference("bookmark.performance_3g").setEnabled(enabled);
-        } else if (key.equals("bookmark.security")) {
-            ListPreference listPreference = (ListPreference) findPreference(key);
-            CharSequence security = listPreference.getEntries()[sharedPreferences.getInt(key, 0)];
-            listPreference.setSummary(security);
-        } else if (key.equals("bookmark.resolution_3g") || key.equals("bookmark.colors_3g") ||
-                key.equals("bookmark.width_3g") || key.equals("bookmark.height_3g")) {
-            String resolution = sharedPreferences.getString("bookmark.resolution_3g", "800x600");
-            if (resolution.equals("automatic"))
-                resolution = getResources().getString(R.string.resolution_automatic);
-            else if (resolution.equals("custom"))
-                resolution = getResources().getString(R.string.resolution_custom);
-            resolution += "@" + sharedPreferences.getInt("bookmark.colors_3g", 16);
-            findPreference("bookmark.screen_3g").setSummary(resolution);
-        } else if (key.equals("bookmark.remote_program"))
-            findPreference(key).setSummary(sharedPreferences.getString(key, ""));
-        else if (key.equals("bookmark.work_dir"))
-            findPreference(key).setSummary(sharedPreferences.getString(key, ""));
+        switch (key) {
+            case "bookmark.enable_gateway_settings": {
+                boolean enabled = sharedPreferences.getBoolean(key, false);
+                findPreference("bookmark.gateway_settings").setEnabled(enabled);
+                break;
+            }
+            case "bookmark.enable_3g_settings": {
+                boolean enabled = sharedPreferences.getBoolean(key, false);
+                findPreference("bookmark.screen_3g").setEnabled(enabled);
+                findPreference("bookmark.performance_3g").setEnabled(enabled);
+                break;
+            }
+            case "bookmark.security":
+                ListPreference listPreference = (ListPreference) findPreference(key);
+                CharSequence security = listPreference.getEntries()[sharedPreferences.getInt(key, 0)];
+                listPreference.setSummary(security);
+                break;
+            case "bookmark.resolution_3g":
+            case "bookmark.colors_3g":
+            case "bookmark.width_3g":
+            case "bookmark.height_3g":
+                String resolution = sharedPreferences.getString("bookmark.resolution_3g", "800x600");
+                if (resolution.equals("automatic"))
+                    resolution = getResources().getString(R.string.resolution_automatic);
+                else if (resolution.equals("custom"))
+                    resolution = getResources().getString(R.string.resolution_custom);
+                resolution += "@" + sharedPreferences.getInt("bookmark.colors_3g", 16);
+                findPreference("bookmark.screen_3g").setSummary(resolution);
+                break;
+            case "bookmark.remote_program":
+                findPreference(key).setSummary(sharedPreferences.getString(key, ""));
+                break;
+            case "bookmark.work_dir":
+                findPreference(key).setSummary(sharedPreferences.getString(key, ""));
+                break;
+        }
     }
 
     private void initCredentialsSettings(SharedPreferences sharedPreferences) {
@@ -396,17 +407,20 @@ public class BookmarkActivity extends AppCompatPreferenceActivity implements OnS
     }
 
     private void credentialsSettingsChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals("bookmark.username"))
-            findPreference(key).setSummary(sharedPreferences.getString(key, ""));
-        else if (key.equals("bookmark.password")) {
-            if (sharedPreferences.getString(key, "").length() == 0)
-                findPreference(key).setSummary(
-                        getResources().getString(R.string.settings_password_empty));
-            else
-                findPreference(key).setSummary(
-                        getResources().getString(R.string.settings_password_present));
-        } else if (key.equals("bookmark.domain"))
-            findPreference(key).setSummary(sharedPreferences.getString(key, ""));
+        switch (key) {
+            case "bookmark.username":
+            case "bookmark.domain":
+                findPreference(key).setSummary(sharedPreferences.getString(key, ""));
+                break;
+            case "bookmark.password":
+                if (sharedPreferences.getString(key, "").length() == 0)
+                    findPreference(key).setSummary(
+                            getResources().getString(R.string.settings_password_empty));
+                else
+                    findPreference(key).setSummary(
+                            getResources().getString(R.string.settings_password_present));
+                break;
+        }
     }
 
     private void initScreenSettings(SharedPreferences sharedPreferences) {
@@ -429,26 +443,38 @@ public class BookmarkActivity extends AppCompatPreferenceActivity implements OnS
         if (findPreference(key) == null)
             return;
 
-        if (key.equals("bookmark.colors") || key.equals("bookmark.colors_3g")) {
-            ListPreference listPreference = (ListPreference) findPreference(key);
-            listPreference.setSummary(listPreference.getEntry());
-        } else if (key.equals("bookmark.resolution") || key.equals("bookmark.resolution_3g")) {
-            ListPreference listPreference = (ListPreference) findPreference(key);
-            listPreference.setSummary(listPreference.getEntry());
-
-            String value = listPreference.getValue();
-            boolean enabled = value.equalsIgnoreCase("custom");
-            if (key.equals("bookmark.resolution")) {
-                findPreference("bookmark.width").setEnabled(enabled);
-                findPreference("bookmark.height").setEnabled(enabled);
-            } else {
-                findPreference("bookmark.width_3g").setEnabled(enabled);
-                findPreference("bookmark.height_3g").setEnabled(enabled);
+        switch (key) {
+            case "bookmark.colors":
+            case "bookmark.colors_3g": {
+                ListPreference listPreference = (ListPreference) findPreference(key);
+                listPreference.setSummary(listPreference.getEntry());
+                break;
             }
-        } else if (key.equals("bookmark.width") || key.equals("bookmark.width_3g"))
-            findPreference(key).setSummary(String.valueOf(sharedPreferences.getInt(key, 800)));
-        else if (key.equals("bookmark.height") || key.equals("bookmark.height_3g"))
-            findPreference(key).setSummary(String.valueOf(sharedPreferences.getInt(key, 600)));
+            case "bookmark.resolution":
+            case "bookmark.resolution_3g": {
+                ListPreference listPreference = (ListPreference) findPreference(key);
+                listPreference.setSummary(listPreference.getEntry());
+
+                String value = listPreference.getValue();
+                boolean enabled = value.equalsIgnoreCase("custom");
+                if (key.equals("bookmark.resolution")) {
+                    findPreference("bookmark.width").setEnabled(enabled);
+                    findPreference("bookmark.height").setEnabled(enabled);
+                } else {
+                    findPreference("bookmark.width_3g").setEnabled(enabled);
+                    findPreference("bookmark.height_3g").setEnabled(enabled);
+                }
+                break;
+            }
+            case "bookmark.width":
+            case "bookmark.width_3g":
+                findPreference(key).setSummary(String.valueOf(sharedPreferences.getInt(key, 800)));
+                break;
+            case "bookmark.height":
+            case "bookmark.height_3g":
+                findPreference(key).setSummary(String.valueOf(sharedPreferences.getInt(key, 600)));
+                break;
+        }
     }
 
     private void initDebugSettings(SharedPreferences sharedPreferences) {
@@ -467,41 +493,57 @@ public class BookmarkActivity extends AppCompatPreferenceActivity implements OnS
     }
 
     private void debugSettingsChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals("bookmark.debug_level")) {
-            String level = sharedPreferences.getString(key, "INFO");
-            Preference pref = findPreference("bookmark.debug_level");
-            pref.setDefaultValue(level);
-        } else if (key.equals("bookmark.async_channel")) {
-            boolean enabled = sharedPreferences.getBoolean(key, false);
-            Preference pref = findPreference("bookmark.async_channel");
-            pref.setDefaultValue(enabled);
-        } else if (key.equals("bookmark.async_update")) {
-            boolean enabled = sharedPreferences.getBoolean(key, false);
-            Preference pref = findPreference("bookmark.async_update");
-            pref.setDefaultValue(enabled);
-        } else if (key.equals("bookmark.async_input")) {
-            boolean enabled = sharedPreferences.getBoolean(key, false);
-            Preference pref = findPreference("bookmark.async_input");
-            pref.setDefaultValue(enabled);
+        switch (key) {
+            case "bookmark.debug_level": {
+                String level = sharedPreferences.getString(key, "INFO");
+                Preference pref = findPreference("bookmark.debug_level");
+                pref.setDefaultValue(level);
+                break;
+            }
+            case "bookmark.async_channel": {
+                boolean enabled = sharedPreferences.getBoolean(key, false);
+                Preference pref = findPreference("bookmark.async_channel");
+                pref.setDefaultValue(enabled);
+                break;
+            }
+            case "bookmark.async_update": {
+                boolean enabled = sharedPreferences.getBoolean(key, false);
+                Preference pref = findPreference("bookmark.async_update");
+                pref.setDefaultValue(enabled);
+                break;
+            }
+            case "bookmark.async_input": {
+                boolean enabled = sharedPreferences.getBoolean(key, false);
+                Preference pref = findPreference("bookmark.async_input");
+                pref.setDefaultValue(enabled);
+                break;
+            }
         }
     }
 
     private void gatewaySettingsChanged(SharedPreferences sharedPreferences, String key) {
-        if (key.equals("bookmark.gateway_hostname")) {
-            findPreference(key).setSummary(sharedPreferences.getString(key, ""));
-        } else if (key.equals("bookmark.gateway_port")) {
-            findPreference(key).setSummary(String.valueOf(sharedPreferences.getInt(key, 443)));
-        } else if (key.equals("bookmark.gateway_username")) {
-            findPreference(key).setSummary(sharedPreferences.getString(key, ""));
-        } else if (key.equals("bookmark.gateway_password")) {
-            if (sharedPreferences.getString(key, "").length() == 0)
-                findPreference(key).setSummary(
-                        getResources().getString(R.string.settings_password_empty));
-            else
-                findPreference(key).setSummary(
-                        getResources().getString(R.string.settings_password_present));
-        } else if (key.equals("bookmark.gateway_domain"))
-            findPreference(key).setSummary(sharedPreferences.getString(key, ""));
+        switch (key) {
+            case "bookmark.gateway_hostname":
+                findPreference(key).setSummary(sharedPreferences.getString(key, ""));
+                break;
+            case "bookmark.gateway_port":
+                findPreference(key).setSummary(String.valueOf(sharedPreferences.getInt(key, 443)));
+                break;
+            case "bookmark.gateway_username":
+                findPreference(key).setSummary(sharedPreferences.getString(key, ""));
+                break;
+            case "bookmark.gateway_password":
+                if (sharedPreferences.getString(key, "").length() == 0)
+                    findPreference(key).setSummary(
+                            getResources().getString(R.string.settings_password_empty));
+                else
+                    findPreference(key).setSummary(
+                            getResources().getString(R.string.settings_password_present));
+                break;
+            case "bookmark.gateway_domain":
+                findPreference(key).setSummary(sharedPreferences.getString(key, ""));
+                break;
+        }
     }
 
     private boolean verifySettings(SharedPreferences sharedPreferences) {
@@ -526,8 +568,7 @@ public class BookmarkActivity extends AppCompatPreferenceActivity implements OnS
 
     private void finishAndResetBookmark() {
         bookmark = null;
-        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(
-                this);
+        getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
         finish();
     }
 

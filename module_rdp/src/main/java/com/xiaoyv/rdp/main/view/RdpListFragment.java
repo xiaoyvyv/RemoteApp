@@ -5,12 +5,16 @@ import android.view.View;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.ColorUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ObjectUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 import com.drakeet.multitype.MultiTypeAdapter;
+import com.freerdp.freerdpcore.application.RdpApp;
+import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
+import com.freerdp.freerdpcore.presentation.BookmarkActivity;
 import com.google.android.material.tabs.TabLayout;
 import com.xiaoyv.busines.base.BaseMvpFragment;
 import com.xiaoyv.busines.base.BaseSubscriber;
@@ -29,6 +33,7 @@ import com.xiaoyv.ui.dialog.OptionsDialog;
 import com.xiaoyv.ui.listener.SimpleRefreshListener;
 import com.xiaoyv.ui.listener.SimpleTabSelectListener;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import me.everything.android.ui.overscroll.IOverScrollDecor;
@@ -76,6 +81,7 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
         multiTypeAdapter = new MultiTypeAdapter();
         multiTypeAdapter.register(RdpEntity.class, rdpBinder);
         binding.rvContent.setAdapter(multiTypeAdapter);
+
     }
 
 
@@ -94,7 +100,7 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
             optionsDialog.show();
             optionsDialog.setOnItemChildClickListener(position -> {
                 // 连接
-                if (position == 0 || !longClick) {
+                if (position == 0) {
                     return;
                 }
                 // 编辑

@@ -45,7 +45,6 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseVie
     protected abstract View createContentView();
 
     protected void initIntentData(Intent intent, Bundle bundle) {
-        LogUtils.v("initIntentData: bind intent data!");
     }
 
     protected abstract void initView();

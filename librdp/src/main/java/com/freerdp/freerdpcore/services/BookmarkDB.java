@@ -20,8 +20,7 @@ public class BookmarkDB extends SQLiteOpenHelper {
     static final String DB_TABLE_BOOKMARK = "tbl_manual_bookmarks";
     static final String DB_TABLE_SCREEN = "tbl_screen_settings";
     static final String DB_TABLE_PERFORMANCE = "tbl_performance_flags";
-    private static final String[] DB_TABLES = {DB_TABLE_BOOKMARK, DB_TABLE_SCREEN,
-            DB_TABLE_PERFORMANCE};
+    private static final String[] DB_TABLES = {DB_TABLE_BOOKMARK, DB_TABLE_SCREEN, DB_TABLE_PERFORMANCE};
 
     static final String DB_KEY_SCREEN_COLORS = "colors";
     static final String DB_KEY_SCREEN_RESOLUTION = "resolution";
@@ -76,19 +75,19 @@ public class BookmarkDB extends SQLiteOpenHelper {
 
     private static List<String> GetColumns(SQLiteDatabase db, String tableName) {
         List<String> ar = null;
-		try (Cursor c = db.rawQuery("SELECT * FROM " + tableName + " LIMIT 1", null)) {
-			if (c != null) {
-				ar = new ArrayList<>(Arrays.asList(c.getColumnNames()));
-			}
-		} catch (Exception e) {
-			Log.v(tableName, e.getMessage(), e);
-			e.printStackTrace();
-		}
+        try (Cursor c = db.rawQuery("SELECT * FROM " + tableName + " LIMIT 1", null)) {
+            if (c != null) {
+                ar = new ArrayList<>(Arrays.asList(c.getColumnNames()));
+            }
+        } catch (Exception e) {
+            Log.v(tableName, e.getMessage(), e);
+            e.printStackTrace();
+        }
         return ar;
     }
 
     @SuppressWarnings("SameParameterValue")
-	private static String joinStrings(List<String> list, String denim) {
+    private static String joinStrings(List<String> list, String denim) {
         StringBuilder buf = new StringBuilder();
         int num = list.size();
         for (int i = 0; i < num; i++) {

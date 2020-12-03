@@ -14,13 +14,7 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
 
-
-        <!--屏幕密度-->
-        <meta-data
-            android:name="com.samsung.android.keepalive.density"
-            android:value="true" />
-
-        <activity android:name="com.freerdp.freerdpcore.presentation.HomeActivity">
+        <activity android:name="com.xiaoyv.main.home.HomeActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

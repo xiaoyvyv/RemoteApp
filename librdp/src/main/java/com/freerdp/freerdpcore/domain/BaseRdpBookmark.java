@@ -16,17 +16,16 @@ public class BaseRdpBookmark implements Parcelable, Cloneable {
     public static final int TYPE_MANUAL = 1;
     public static final int TYPE_QUICK_CONNECT = 2;
     public static final int TYPE_PLACEHOLDER = 3;
-    public static final Parcelable.Creator<BaseRdpBookmark> CREATOR =
-            new Parcelable.Creator<BaseRdpBookmark>() {
-                public BaseRdpBookmark createFromParcel(Parcel in) {
-                    return new BaseRdpBookmark(in);
-                }
+    public static final Parcelable.Creator<BaseRdpBookmark> CREATOR = new Parcelable.Creator<BaseRdpBookmark>() {
+        public BaseRdpBookmark createFromParcel(Parcel in) {
+            return new BaseRdpBookmark(in);
+        }
 
-                @Override
-                public BaseRdpBookmark[] newArray(int size) {
-                    return new BaseRdpBookmark[size];
-                }
-            };
+        @Override
+        public BaseRdpBookmark[] newArray(int size) {
+            return new BaseRdpBookmark[size];
+        }
+    };
     protected int type;
     private long id;
     private String label;

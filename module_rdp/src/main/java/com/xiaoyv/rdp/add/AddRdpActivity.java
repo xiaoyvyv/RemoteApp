@@ -1,10 +1,16 @@
 package com.xiaoyv.rdp.add;
 
+import android.content.SharedPreferences;
 import android.view.View;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
+import com.blankj.utilcode.util.GsonUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ThreadUtils;
+import com.freerdp.freerdpcore.application.RdpApp;
+import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
+import com.freerdp.freerdpcore.domain.RdpBookmark;
+import com.freerdp.freerdpcore.services.BookmarkBaseGateway;
 import com.xiaoyv.busines.base.BaseActivity;
 import com.xiaoyv.busines.config.NavigationPath;
 import com.xiaoyv.busines.room.database.DateBaseManger;
@@ -83,27 +89,72 @@ public class AddRdpActivity extends BaseActivity {
                     port = StringUtils.isEmpty(port) ? StringUtils.getString(R.string.rdp_add_port_default) : port;
                     group = StringUtils.isEmpty(group) ? StringUtils.getString(R.string.rdp_add_group_default) : group;
 
-                    // 保存配置信息
-                    ThreadUtils.executeByCached(new ThreadUtils.SimpleTask<Boolean>() {
-                        @Override
-                        public Boolean doInBackground() {
-                            RdpEntity rdpEntity = new RdpEntity();
-                            rdpEntity.label = label;
-                            rdpEntity.group = group;
-                            rdpEntity.ip = ip;
-                            rdpEntity.port = port;
-                            rdpEntity.account = account;
-                            rdpEntity.password = password;
-                            rdpEntity.domain = ip;
-                            DateBaseManger.get().getRdpDao().insert(rdpEntity);
-                            return true;
-                        }
+                    RdpEntity rdpEntity = new RdpEntity();
+                    rdpEntity.label = label;
+                    rdpEntity.group = group;
+                    rdpEntity.ip = ip;
+                    rdpEntity.port = port;
+                    rdpEntity.account = account;
+                    rdpEntity.password = password;
+                    rdpEntity.domain = ip;
 
-                        @Override
-                        public void onSuccess(Boolean result) {
-                            onBackPressed();
-                        }
-                    });
+                    saveRdpBookmark(rdpEntity);
                 });
+    }
+
+    /**
+     * 保存书签
+     *
+     * @param rdpEntity 配置的连接信息
+     */
+    private void saveRdpBookmark(RdpEntity rdpEntity) {
+        // 保存配置信息
+        ThreadUtils.executeByCached(new ThreadUtils.SimpleTask<Boolean>() {
+            @Override
+            public Boolean doInBackground() throws NumberFormatException {
+                RdpBookmark bookmark = new RdpBookmark();
+                bookmark.setHostname(rdpEntity.ip);
+                bookmark.setPort(Integer.parseInt(rdpEntity.port));
+                bookmark.setLabel(rdpEntity.label);
+                bookmark.setUsername(rdpEntity.account);
+                bookmark.setPassword(rdpEntity.password);
+                bookmark.setDomain(rdpEntity.domain);
+                SharedPreferences sp = getSharedPreferences("TEMP", MODE_PRIVATE);
+                bookmark.writeToSharedPreferences(sp);
+
+                // 重新取出
+                bookmark.readFromSharedPreferences(sp);
+
+                BookmarkBaseGateway bookmarkGateway;
+                if (bookmark.getType() == BaseRdpBookmark.TYPE_MANUAL) {
+                    bookmarkGateway = RdpApp.getManualBookmarkGateway();
+                    // remove any history entry for this
+                    // bookmark
+                    RdpApp.getQuickConnectHistoryGateway().removeHistoryItem(bookmark.<RdpBookmark>get().getHostname());
+                } else {
+                    return false;
+                }
+
+                // insert or update bookmark and leave
+                // activity
+                if (bookmark.getId() > 0) {
+                    bookmarkGateway.update(bookmark);
+                } else {
+                    bookmarkGateway.insert(bookmark);
+                }
+
+                rdpEntity.bookmark = GsonUtils.toJson(bookmark);
+
+                DateBaseManger.get().getRdpDao().insert(rdpEntity);
+                return true;
+            }
+
+            @Override
+            public void onSuccess(Boolean result) {
+                onBackPressed();
+            }
+        });
+
+
     }
 }

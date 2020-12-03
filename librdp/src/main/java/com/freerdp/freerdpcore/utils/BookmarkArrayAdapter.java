@@ -14,7 +14,6 @@ import android.widget.TextView;
 import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
 import com.freerdp.freerdpcore.domain.ConnectionReference;
 import com.freerdp.freerdpcore.domain.RdpBookmark;
-import com.freerdp.freerdpcore.domain.RdpHolderBookmark;
 import com.freerdp.freerdpcore.presentation.BookmarkActivity;
 import com.xiaoyv.librdp.R;
 
@@ -45,7 +44,7 @@ public class BookmarkArrayAdapter extends ArrayAdapter<BaseRdpBookmark> {
         label.setText(bookmark.getLabel());
         star_icon.setVisibility(View.VISIBLE);
 
-        String refStr;
+        String refStr =  "";
         if (bookmark.getType() == BaseRdpBookmark.TYPE_MANUAL) {
             hostname.setText(bookmark.<RdpBookmark>get().getHostname());
             refStr = ConnectionReference.getManualBookmarkReference(bookmark.getId());
@@ -57,10 +56,6 @@ public class BookmarkArrayAdapter extends ArrayAdapter<BaseRdpBookmark> {
             refStr = ConnectionReference.getHostnameReference(bookmark.getLabel());
             star_icon.setImageResource(R.drawable.icon_star_off);
         } else if (bookmark.getType() == BaseRdpBookmark.TYPE_PLACEHOLDER) {
-            hostname.setText(" ");
-            refStr = ConnectionReference.getPlaceholderReference(
-                    bookmark.<RdpHolderBookmark>get().getName());
-            star_icon.setVisibility(View.GONE);
         } else {
             // unknown bookmark type...
             refStr = "";
