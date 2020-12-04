@@ -20,5 +20,6 @@
                     android:scheme="freerdp" />
             </intent-filter>
         </activity>
+        <activity android:name=".setting.UiSettingActivity"/>
     </application>
 </manifest>

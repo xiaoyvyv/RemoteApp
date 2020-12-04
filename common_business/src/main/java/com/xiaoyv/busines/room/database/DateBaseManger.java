@@ -1,11 +1,14 @@
 package com.xiaoyv.busines.room.database;
 
+import androidx.annotation.NonNull;
 import androidx.room.Room;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.Utils;
 import com.xiaoyv.busines.room.dao.FtpDao;
 import com.xiaoyv.busines.room.dao.RdpDao;
 import com.xiaoyv.busines.room.dao.SshDao;
+import com.xiaoyv.busines.room.entity.RdpEntity;
 
 /**
  * DateBaseUtils
@@ -44,6 +47,25 @@ public class DateBaseManger {
 
     public RdpDao getRdpDao() {
         return rdpDao;
+    }
+
+    /**
+     * 保存或更新 Rdp
+     *
+     * @param rdpEntity rdp 信息
+     */
+    public void saveRdp(@NonNull RdpEntity rdpEntity) {
+        LogUtils.json(rdpEntity);
+        if (rdpEntity.id < 0) {
+            getRdpDao().insert(rdpEntity);
+            return;
+        }
+        RdpEntity entity = getRdpDao().getById(rdpEntity.id);
+        if (entity == null) {
+            getRdpDao().insert(rdpEntity);
+            return;
+        }
+        getRdpDao().update(entity);
     }
 
     public SshDao getSshDao() {

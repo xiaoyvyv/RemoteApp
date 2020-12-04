@@ -8,6 +8,11 @@ import android.os.Parcelable;
  * Rdp配置标签模型
  */
 public class RdpBookmark extends BaseRdpBookmark {
+    private String hostname;
+    private int port;
+    private boolean enableGatewaySettings;
+    private GatewaySettings gatewaySettings;
+
     public static final Parcelable.Creator<RdpBookmark> CREATOR =
             new Parcelable.Creator<RdpBookmark>() {
                 public RdpBookmark createFromParcel(Parcel in) {
@@ -19,20 +24,7 @@ public class RdpBookmark extends BaseRdpBookmark {
                     return new RdpBookmark[size];
                 }
             };
-    private String hostname;
-    private int port;
-    private boolean enableGatewaySettings;
-    private GatewaySettings gatewaySettings;
 
-    public RdpBookmark(Parcel parcel) {
-        super(parcel);
-        type = TYPE_MANUAL;
-        hostname = parcel.readString();
-        port = parcel.readInt();
-
-        enableGatewaySettings = (parcel.readInt() == 1);
-        gatewaySettings = parcel.readParcelable(GatewaySettings.class.getClassLoader());
-    }
 
     public RdpBookmark() {
         super();
@@ -45,6 +37,16 @@ public class RdpBookmark extends BaseRdpBookmark {
         port = 3389;
         enableGatewaySettings = false;
         gatewaySettings = new GatewaySettings();
+    }
+
+    public RdpBookmark(Parcel parcel) {
+        super(parcel);
+        type = TYPE_MANUAL;
+        hostname = parcel.readString();
+        port = parcel.readInt();
+
+        enableGatewaySettings = (parcel.readInt() == 1);
+        gatewaySettings = parcel.readParcelable(GatewaySettings.class.getClassLoader());
     }
 
     public String getHostname() {
@@ -77,11 +79,6 @@ public class RdpBookmark extends BaseRdpBookmark {
 
     public void setGatewaySettings(GatewaySettings gatewaySettings) {
         this.gatewaySettings = gatewaySettings;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
     }
 
     @Override
@@ -125,17 +122,6 @@ public class RdpBookmark extends BaseRdpBookmark {
 
     // 网关设置类
     public static class GatewaySettings implements Parcelable {
-        public static final Parcelable.Creator<GatewaySettings> CREATOR =
-                new Parcelable.Creator<GatewaySettings>() {
-                    public GatewaySettings createFromParcel(Parcel in) {
-                        return new GatewaySettings(in);
-                    }
-
-                    @Override
-                    public GatewaySettings[] newArray(int size) {
-                        return new GatewaySettings[size];
-                    }
-                };
         private String hostname;
         private int port;
         private String username;
@@ -157,6 +143,18 @@ public class RdpBookmark extends BaseRdpBookmark {
             password = parcel.readString();
             domain = parcel.readString();
         }
+
+        public static final Parcelable.Creator<GatewaySettings> CREATOR =
+                new Parcelable.Creator<GatewaySettings>() {
+                    public GatewaySettings createFromParcel(Parcel in) {
+                        return new GatewaySettings(in);
+                    }
+
+                    @Override
+                    public GatewaySettings[] newArray(int size) {
+                        return new GatewaySettings[size];
+                    }
+                };
 
         public String getHostname() {
             return hostname;

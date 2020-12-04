@@ -1,6 +1,6 @@
 package com.xiaoyv.rdp.main.view;
 
-import android.util.Log;
+import android.content.Intent;
 import android.view.View;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -12,15 +12,12 @@ import com.blankj.utilcode.util.ObjectUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 import com.drakeet.multitype.MultiTypeAdapter;
-import com.freerdp.freerdpcore.application.RdpApp;
-import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
-import com.freerdp.freerdpcore.presentation.BookmarkActivity;
+import com.freerdp.freerdpcore.presentation.ApplicationSettingsActivity;
 import com.google.android.material.tabs.TabLayout;
 import com.xiaoyv.busines.base.BaseMvpFragment;
 import com.xiaoyv.busines.base.BaseSubscriber;
 import com.xiaoyv.busines.config.NavigationPath;
 import com.xiaoyv.busines.exception.RxException;
-import com.xiaoyv.busines.room.database.DateBaseManger;
 import com.xiaoyv.busines.room.entity.RdpEntity;
 import com.xiaoyv.busines.utils.ScanUtils;
 import com.xiaoyv.rdp.R;
@@ -33,7 +30,6 @@ import com.xiaoyv.ui.dialog.OptionsDialog;
 import com.xiaoyv.ui.listener.SimpleRefreshListener;
 import com.xiaoyv.ui.listener.SimpleTabSelectListener;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import me.everything.android.ui.overscroll.IOverScrollDecor;
@@ -68,9 +64,7 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
         binding.toolbar
                 .setTitle(StringUtils.getString(R.string.rdp_main_title))
                 .setEndIcon(R.drawable.ui_icon_search)
-                .setEndClickListener(v -> {
-                    p2vShowToast("搜索遍历");
-                });
+                .setEndClickListener(v -> ActivityUtils.startActivity(ApplicationSettingsActivity.class));
 
         scrollDecor = OverScrollDecoratorHelper.setUpOverScroll(binding.rvContent, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
     }
@@ -99,31 +93,18 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
             optionsDialog.setLastTextColor(ColorUtils.getColor(R.color.ui_status_error));
             optionsDialog.show();
             optionsDialog.setOnItemChildClickListener(position -> {
-                // 连接
-                if (position == 0) {
-                    return;
-                }
-                // 编辑
-                if (position == 1) {
-                }
-                // 删除
-                if (position == 2) {
-                    multiTypeAdapter.getItems().remove(adapterPos);
-                    multiTypeAdapter.notifyItemRemoved(adapterPos);
-                    multiTypeAdapter.notifyItemRangeChanged(adapterPos, multiTypeAdapter.getItemCount());
-                    // 保存配置信息
-                    ThreadUtils.executeByCached(new ThreadUtils.SimpleTask<Boolean>() {
-                        @Override
-                        public Boolean doInBackground() {
-                            DateBaseManger.get().getRdpDao().delete(dataBean);
-                            return true;
-                        }
-
-                        @Override
-                        public void onSuccess(Boolean result) {
-                            presenter.v2pQueryLocalRdp();
-                        }
-                    });
+                switch (position) {
+                    // 连接
+                    case 0:
+                        break;
+                    // 编辑
+                    case 1:
+                        AddRdpActivity.openSelf(dataBean);
+                        break;
+                    // 删除
+                    case 2:
+                        removeItem(dataBean, adapterPos);
+                        break;
                 }
             });
         });
@@ -154,6 +135,14 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
 
 
     @Override
+    public void removeItem(RdpEntity dataBean, int adapterPos) {
+        multiTypeAdapter.getItems().remove(adapterPos);
+        multiTypeAdapter.notifyItemRemoved(adapterPos);
+        // 删除后重新查询
+        presenter.v2pDeleteRdp(dataBean, result -> presenter.v2pQueryLocalRdp());
+    }
+
+    @Override
     public void onResume() {
         super.onResume();
         presenter.v2pQueryLocalRdp();
@@ -161,7 +150,7 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
 
     @Override
     public void p2vQueryLocalRdp(List<RdpEntity> rdpEntities) {
-        presenter.resolveAllGroup(rdpEntities, new BaseSubscriber<List<String>>() {
+        presenter.v2pResolveAllGroup(rdpEntities, new BaseSubscriber<List<String>>() {
             @Override
             public void onError(RxException e) {
                 p2vShowToast(e.getMessage());
@@ -178,6 +167,7 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
                 for (String group : groups) {
                     binding.tlGroup.addTab(binding.tlGroup.newTab().setText(group));
                 }
+                p2vShowNormalView();
             }
         });
     }
@@ -188,4 +178,8 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
         multiTypeAdapter.notifyDataSetChanged();
     }
 
+    @Override
+    public TabLayout p2vGetTabLayout() {
+        return binding.tlGroup;
+    }
 }

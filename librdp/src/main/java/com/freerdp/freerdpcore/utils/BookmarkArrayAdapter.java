@@ -55,8 +55,7 @@ public class BookmarkArrayAdapter extends ArrayAdapter<BaseRdpBookmark> {
             hostname.setText(" ");
             refStr = ConnectionReference.getHostnameReference(bookmark.getLabel());
             star_icon.setImageResource(R.drawable.icon_star_off);
-        } else if (bookmark.getType() == BaseRdpBookmark.TYPE_PLACEHOLDER) {
-        } else {
+        }else {
             // unknown bookmark type...
             refStr = "";
             assert false;

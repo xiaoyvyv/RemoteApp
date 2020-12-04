@@ -22,6 +22,9 @@ public interface RdpDao {
     @Query("SELECT * FROM rdp")
     List<RdpEntity> getAll();
 
+    @Query("SELECT * FROM rdp WHERE id =:id LIMIT 1")
+    RdpEntity getById(long id);
+
     @Query("SELECT * FROM rdp WHERE ip IN (:ip)")
     List<RdpEntity> getAllByIps(int... ip);
 

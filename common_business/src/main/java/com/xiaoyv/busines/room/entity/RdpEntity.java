@@ -33,4 +33,5 @@ public class RdpEntity implements Serializable {
     public RdpEntity() {
         this.lastTime = TimeUtils.getNowMills();
     }
+
 }

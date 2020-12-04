@@ -9,32 +9,32 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.xiaoyv.ui.setting.AppSettingView
+    <com.xiaoyv.ui.setting.UiSettingView
         android:id="@+id/asv_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.xiaoyv.ui.setting.AppSettingView
+    <com.xiaoyv.ui.setting.UiSettingView
         android:id="@+id/asv_group"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.xiaoyv.ui.setting.AppSettingView
+    <com.xiaoyv.ui.setting.UiSettingView
         android:id="@+id/asv_ip"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.xiaoyv.ui.setting.AppSettingView
+    <com.xiaoyv.ui.setting.UiSettingView
         android:id="@+id/asv_port"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.xiaoyv.ui.setting.AppSettingView
+    <com.xiaoyv.ui.setting.UiSettingView
         android:id="@+id/asv_account"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
-    <com.xiaoyv.ui.setting.AppSettingView
+    <com.xiaoyv.ui.setting.UiSettingView
         android:id="@+id/asv_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />

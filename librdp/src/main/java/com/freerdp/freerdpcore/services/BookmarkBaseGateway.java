@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.util.Log;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
 
 import java.util.ArrayList;
@@ -108,9 +109,11 @@ public abstract class BookmarkBaseGateway {
         addBookmarkSpecificColumns(bookmark, values);
 
         // 插入书签并结束
-        db.insertOrThrow(getBookmarkTableName(), null, values);
+        long id = db.insertOrThrow(getBookmarkTableName(), null, values);
         db.setTransactionSuccessful();
         db.endTransaction();
+        // 保存 id
+        bookmark.setId(id);
     }
 
     public boolean update(BaseRdpBookmark bookmark) {

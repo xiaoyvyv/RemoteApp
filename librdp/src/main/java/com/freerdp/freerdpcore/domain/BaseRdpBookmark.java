@@ -12,20 +12,19 @@ import java.util.Locale;
  * RDP 基础标签
  */
 public class BaseRdpBookmark implements Parcelable, Cloneable {
+    /**
+     * 非法
+     */
     public static final int TYPE_INVALID = -1;
+    /**
+     * 用户配置的
+     */
     public static final int TYPE_MANUAL = 1;
+    /**
+     * 快速连接
+     */
     public static final int TYPE_QUICK_CONNECT = 2;
-    public static final int TYPE_PLACEHOLDER = 3;
-    public static final Parcelable.Creator<BaseRdpBookmark> CREATOR = new Parcelable.Creator<BaseRdpBookmark>() {
-        public BaseRdpBookmark createFromParcel(Parcel in) {
-            return new BaseRdpBookmark(in);
-        }
 
-        @Override
-        public BaseRdpBookmark[] newArray(int size) {
-            return new BaseRdpBookmark[size];
-        }
-    };
     protected int type;
     private long id;
     private String label;
@@ -37,20 +36,20 @@ public class BaseRdpBookmark implements Parcelable, Cloneable {
     private AdvancedSettings advancedSettings;
     private DebugSettings debugSettings;
 
-    public BaseRdpBookmark(Parcel parcel) {
-        type = parcel.readInt();
-        id = parcel.readLong();
-        label = parcel.readString();
-        username = parcel.readString();
-        password = parcel.readString();
-        domain = parcel.readString();
+    public static final Parcelable.Creator<BaseRdpBookmark> CREATOR = new Parcelable.Creator<BaseRdpBookmark>() {
+        public BaseRdpBookmark createFromParcel(Parcel in) {
+            return new BaseRdpBookmark(in);
+        }
 
-        screenSettings = parcel.readParcelable(ScreenSettings.class.getClassLoader());
-        performanceFlags = parcel.readParcelable(PerformanceFlags.class.getClassLoader());
-        advancedSettings = parcel.readParcelable(AdvancedSettings.class.getClassLoader());
-        debugSettings = parcel.readParcelable(DebugSettings.class.getClassLoader());
-    }
+        @Override
+        public BaseRdpBookmark[] newArray(int size) {
+            return new BaseRdpBookmark[size];
+        }
+    };
 
+    /**
+     * 默认值
+     */
     public BaseRdpBookmark() {
         type = TYPE_INVALID;
         id = -1;
@@ -63,6 +62,23 @@ public class BaseRdpBookmark implements Parcelable, Cloneable {
         performanceFlags = new PerformanceFlags();
         advancedSettings = new AdvancedSettings();
         debugSettings = new DebugSettings();
+    }
+
+    /**
+     * @param parcel parcel
+     */
+    public BaseRdpBookmark(Parcel parcel) {
+        type = parcel.readInt();
+        id = parcel.readLong();
+        label = parcel.readString();
+        username = parcel.readString();
+        password = parcel.readString();
+        domain = parcel.readString();
+
+        screenSettings = parcel.readParcelable(ScreenSettings.class.getClassLoader());
+        performanceFlags = parcel.readParcelable(PerformanceFlags.class.getClassLoader());
+        advancedSettings = parcel.readParcelable(AdvancedSettings.class.getClassLoader());
+        debugSettings = parcel.readParcelable(DebugSettings.class.getClassLoader());
     }
 
     @SuppressWarnings("unchecked")
@@ -473,6 +489,11 @@ public class BaseRdpBookmark implements Parcelable, Cloneable {
         public static final int AUTOMATIC = -1;
         public static final int CUSTOM = 0;
         public static final int PREDEFINED = 1;
+        private int resolution;
+        private int colors;
+        private int width;
+        private int height;
+
         public static final Parcelable.Creator<ScreenSettings> CREATOR =
                 new Parcelable.Creator<ScreenSettings>() {
                     public ScreenSettings createFromParcel(Parcel in) {
@@ -484,10 +505,6 @@ public class BaseRdpBookmark implements Parcelable, Cloneable {
                         return new ScreenSettings[size];
                     }
                 };
-        private int resolution;
-        private int colors;
-        private int width;
-        private int height;
 
         public ScreenSettings() {
             init();
@@ -642,6 +659,11 @@ public class BaseRdpBookmark implements Parcelable, Cloneable {
 
     // 调试设置
     public static class DebugSettings implements Parcelable {
+        private String debug;
+        private boolean asyncChannel;
+        private boolean asyncTransport;
+        private boolean asyncInput;
+        private boolean asyncUpdate;
 
         public static final Parcelable.Creator<DebugSettings> CREATOR =
                 new Parcelable.Creator<DebugSettings>() {
@@ -654,11 +676,6 @@ public class BaseRdpBookmark implements Parcelable, Cloneable {
                         return new DebugSettings[size];
                     }
                 };
-        private String debug;
-        private boolean asyncChannel;
-        private boolean asyncTransport;
-        private boolean asyncInput;
-        private boolean asyncUpdate;
 
         public DebugSettings() {
             init();
@@ -743,6 +760,17 @@ public class BaseRdpBookmark implements Parcelable, Cloneable {
 
     // 高级设置
     public static class AdvancedSettings implements Parcelable {
+        private boolean enable345GSettings;
+        private ScreenSettings screen345G;
+        private PerformanceFlags performance345G;
+        private boolean redirectSDCard;
+        private int redirectSound;
+        private boolean redirectMicrophone;
+        private int security;
+        private boolean consoleMode;
+        private String remoteProgram;
+        private String workDir;
+
         public static final Parcelable.Creator<AdvancedSettings> CREATOR =
                 new Parcelable.Creator<AdvancedSettings>() {
                     public AdvancedSettings createFromParcel(Parcel in) {
@@ -754,16 +782,6 @@ public class BaseRdpBookmark implements Parcelable, Cloneable {
                         return new AdvancedSettings[size];
                     }
                 };
-        private boolean enable345GSettings;
-        private ScreenSettings screen345G;
-        private PerformanceFlags performance345G;
-        private boolean redirectSDCard;
-        private int redirectSound;
-        private boolean redirectMicrophone;
-        private int security;
-        private boolean consoleMode;
-        private String remoteProgram;
-        private String workDir;
 
         public AdvancedSettings() {
             init();
