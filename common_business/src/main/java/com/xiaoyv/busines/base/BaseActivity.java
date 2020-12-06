@@ -29,15 +29,13 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseVie
         ScreenUtils.setPortrait(this);
         BarUtils.transparentStatusBar(this);
         BarUtils.setStatusBarLightMode(this, true);
-
-        rootBinding = BusinessActivityRootBinding.inflate(getLayoutInflater());
-        rootBinding.flRoot.addView(createContentView());
-        setContentView(rootBinding.getRoot());
-
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             initIntentData(getIntent(), bundle);
         }
+        rootBinding = BusinessActivityRootBinding.inflate(getLayoutInflater());
+        rootBinding.flRoot.addView(createContentView());
+        setContentView(rootBinding.getRoot());
         initView();
         initEvent();
     }

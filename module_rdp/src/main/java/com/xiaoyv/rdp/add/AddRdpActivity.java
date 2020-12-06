@@ -1,8 +1,9 @@
+
+
+
 package com.xiaoyv.rdp.add;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 
@@ -15,7 +16,6 @@ import com.blankj.utilcode.util.Utils;
 import com.freerdp.freerdpcore.application.RdpApp;
 import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
 import com.freerdp.freerdpcore.domain.RdpBookmark;
-import com.freerdp.freerdpcore.services.BookmarkBaseGateway;
 import com.freerdp.freerdpcore.services.ManualBookmarkGateway;
 import com.xiaoyv.busines.base.BaseActivity;
 import com.xiaoyv.busines.config.NavigationPath;
@@ -24,15 +24,13 @@ import com.xiaoyv.busines.room.entity.RdpEntity;
 import com.xiaoyv.rdp.R;
 import com.xiaoyv.rdp.databinding.RdpActivityAddBinding;
 
-import java.sql.DatabaseMetaData;
-
 /**
  * AddRdpActivity
  *
  * @author why
  * @since 2020/11/29
  **/
-@Route(path = NavigationPath.PATH_RDO_ADD_ACTIVITY)
+@Route(path = NavigationPath.PATH_RDP_ADD_ACTIVITY)
 public class AddRdpActivity extends BaseActivity {
     public static final String KEY_RDP_ENTITY = "BOOK_MARK";
     private RdpActivityAddBinding binding;
@@ -67,6 +65,7 @@ public class AddRdpActivity extends BaseActivity {
         rdpEntity = (RdpEntity) getIntent().getSerializableExtra(KEY_RDP_ENTITY);
         if (rdpEntity == null) {
             rdpEntity = new RdpEntity();
+            rdpEntity.label = "远程桌面";
             rdpEntity.group = StringUtils.getString(R.string.rdp_add_group_default);
             rdpEntity.port = StringUtils.getString(R.string.rdp_add_port_default);
         }
@@ -81,20 +80,26 @@ public class AddRdpActivity extends BaseActivity {
     protected void initView() {
         binding.asvLabel.setTitle(StringUtils.getString(R.string.rdp_add_label))
                 .setHint(StringUtils.getString(R.string.rdp_add_label_hint))
-                .setMessage(rdpEntity.label);
+                .setMessage(rdpEntity.label)
+                .setRequiredText(getString(R.string.rdp_add_label_required));
         binding.asvGroup.setTitle(StringUtils.getString(R.string.rdp_add_group))
                 .setHint(StringUtils.getString(R.string.rdp_add_group_hint))
-                .setMessage(rdpEntity.group);
+                .setMessage(rdpEntity.group)
+                .setRequiredText(null);
         binding.asvIp.setTitle(StringUtils.getString(R.string.rdp_add_ip))
                 .setHint(getString(R.string.rdp_add_ip_hint))
-                .setMessage(rdpEntity.ip);
+                .setMessage(rdpEntity.ip)
+                .setRequiredText(getString(R.string.rdp_add_ip_required));
+
         binding.asvPort.setTitle(StringUtils.getString(R.string.rdp_add_port))
                 .setInputNumberType(5)
                 .setHint(StringUtils.getString(R.string.rdp_add_port_hint))
-                .setMessage(rdpEntity.port);
+                .setMessage(rdpEntity.port)
+                .setRequiredText(null);
         binding.asvAccount.setTitle(StringUtils.getString(R.string.rdp_add_account))
                 .setHint(StringUtils.getString(R.string.rdp_add_account_hint))
-                .setMessage(rdpEntity.account);
+                .setMessage(rdpEntity.account)
+                .setRequiredText(getString(R.string.rdp_add_account_required));
         binding.asvPassword.setTitle(StringUtils.getString(R.string.rdp_add_password))
                 .setHint(StringUtils.getString(R.string.rdp_add_password_hint))
                 .setMessage(rdpEntity.password);
@@ -117,8 +122,16 @@ public class AddRdpActivity extends BaseActivity {
                         p2vShowToast(StringUtils.getString(R.string.rdp_add_label_empty));
                         return;
                     }
+                    if (StringUtils.isEmpty(group)) {
+                        p2vShowToast(StringUtils.getString(R.string.rdp_add_group_empty));
+                        return;
+                    }
                     if (StringUtils.isEmpty(ip)) {
                         p2vShowToast(StringUtils.getString(R.string.rdp_add_ip_empty));
+                        return;
+                    }
+                    if (StringUtils.isEmpty(port)) {
+                        p2vShowToast(StringUtils.getString(R.string.rdp_add_port_empty));
                         return;
                     }
                     if (StringUtils.isEmpty(account)) {

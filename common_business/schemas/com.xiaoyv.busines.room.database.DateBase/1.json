@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "dd4d76dc7e2996afd98f9e477cbfe053",
+    "identityHash": "44d709b616b8a6f0784444c1e002ca37",
     "entities": [
       {
         "tableName": "rdp",
@@ -89,11 +89,17 @@
       },
       {
         "tableName": "ssh",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `label` TEXT, `group` TEXT, `ip` TEXT, `port` TEXT, `account` TEXT, `password` TEXT, `domain` TEXT, `setting` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lastTime` INTEGER NOT NULL, `label` TEXT, `group` TEXT, `ip` TEXT, `port` TEXT, `account` TEXT, `password` TEXT, `domain` TEXT, `setting` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastTime",
+            "columnName": "lastTime",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -166,11 +172,17 @@
       },
       {
         "tableName": "ftp",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `label` TEXT, `group` TEXT, `ip` TEXT, `port` TEXT, `account` TEXT, `password` TEXT, `domain` TEXT, `setting` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lastTime` INTEGER NOT NULL, `label` TEXT, `group` TEXT, `ip` TEXT, `port` TEXT, `account` TEXT, `password` TEXT, `domain` TEXT, `setting` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastTime",
+            "columnName": "lastTime",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -245,7 +257,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'dd4d76dc7e2996afd98f9e477cbfe053')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '44d709b616b8a6f0784444c1e002ca37')"
     ]
   }
 }

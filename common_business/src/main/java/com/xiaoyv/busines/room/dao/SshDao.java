@@ -7,6 +7,7 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
+import com.xiaoyv.busines.room.entity.RdpEntity;
 import com.xiaoyv.busines.room.entity.SshEntity;
 
 import java.util.List;
@@ -27,6 +28,9 @@ public interface SshDao {
 
     @Query("SELECT * FROM ssh WHERE label LIKE :label")
     List<SshEntity> findAllByLabel(String label);
+
+    @Query("SELECT * FROM ssh WHERE `group` IN (:group)")
+    List<SshEntity> getAllByGroup(String... group);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertAll(SshEntity... sshEntities);

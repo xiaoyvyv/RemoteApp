@@ -92,7 +92,7 @@
     <string name="settings_enable_3g_settings">3G设置</string>
     <string name="settings_screen_3g">使用3G网络时的显示设置</string>
     <string name="settings_performance_3g">使用3G网络时的连接性能</string>
-    <string name="settings_cat_gateway">路由</string>
+    <string name="settings_cat_gateway">路由设置</string>
     <string name="settings_enable_gateway_settings">使用路由</string>
     <string name="settings_gateway_settings">路由设置</string>
     <string name="settings_redirect_sdcard">SDCard 重定向</string>
@@ -119,17 +119,17 @@
     <!-- App settings strings -->
     <string name="settings_password_present">*******</string>
     <string name="settings_password_empty">未设置</string>
-    <string name="settings_cat_ui">用户界面</string>
+    <string name="settings_cat_ui">用户界面设置</string>
     <string name="settings_ui_hide_status_bar">隐藏状态栏</string>
-    <string name="settings_ui_hide_action_bar">隱藏操作欄</string>
+    <string name="settings_ui_hide_action_bar">隱藏操作栏</string>
     <string name="settings_ui_hide_zoom_controls">隐藏缩放控件</string>
     <string name="settings_ui_swap_mouse_buttons">交换鼠标左右键</string>
     <string name="settings_ui_invert_scrolling">翻转滚动</string>
     <string name="settings_ui_auto_scroll_touchpointer">触摸指针自动滚屏</string>
     <string name="settings_ui_ask_on_exit">退出时确认是否退出</string>
-    <string name="settings_cat_power">省电设计</string>
+    <string name="settings_cat_power">省电设置</string>
     <string name="settings_power_disconnect_timeout">关闭空闲连接</string>
-    <string name="settings_cat_security">安全</string>
+    <string name="settings_cat_security">安全设置</string>
     <string name="settings_security_accept_certificates">接受所有证书</string>
     <string name="settings_security_clear_certificate_cache">清除证书缓存</string>
     <string name="settings_description_after_minutes">%1$d 秒后</string>
@@ -166,9 +166,9 @@
     <string name="dlg_msg_exit">是否退出？</string>
     <string name="dlg_title_clear_cert_cache">清除证书缓存？</string>
     <string name="dlg_msg_clear_cert_cache">是否清除所有的证书缓存？</string>
-    <string name="preference_title_client">客户机</string>
-    <string name="settings_cat_client">客户机</string>
-    <string name="preference_title_client_name">Client Name</string>
+    <string name="preference_title_client">客户端</string>
+    <string name="settings_cat_client">客户端设置</string>
+    <string name="preference_title_client_name">客户端名称</string>
     <string name="settings_perf_gfx" translatable="false">GFX</string>
     <string name="settings_perf_gfx_h264" translatable="false">H264</string>
     <string name="debug_level">调试等级</string>

@@ -5,9 +5,6 @@
 
     <string name="rdp_main_title">Windows 远程桌面</string>
     <string name="rdp_main_group">默认组</string>
-    <string name="rdp_main_connect">连接</string>
-    <string name="rdp_main_edit">编辑</string>
-    <string name="rdp_main_delete">删除</string>
     <string name="rdp_main_list_empty">您还未连接过任何远程桌面</string>
     <string name="rdp_main_add_now">立即添加</string>
 
@@ -17,18 +14,23 @@
     <string name="rdp_add_label">Windows 标签</string>
     <string name="rdp_add_label_empty">标签不能为空</string>
     <string name="rdp_add_label_hint">设置标签便于识别</string>
+    <string name="rdp_add_label_required">请输入一个标签</string>
     <string name="rdp_add_group">Windows 分组</string>
     <string name="rdp_add_group_default">默认分组</string>
+    <string name="rdp_add_group_empty">分组名称不能为空</string>
     <string name="rdp_add_group_hint">保存至分组以方便管理</string>
     <string name="rdp_add_ip">Windows IP地址或域名</string>
     <string name="rdp_add_ip_empty">IP或域名不能为空</string>
     <string name="rdp_add_ip_hint">例：192.168.0.1</string>
+    <string name="rdp_add_ip_required">请输入远程地址或域名</string>
     <string name="rdp_add_port">Windows 端口</string>
+    <string name="rdp_add_port_empty">端口不能为空</string>
     <string name="rdp_add_port_default">3389</string>
     <string name="rdp_add_port_hint">请输入远程RDP端口，默认3389</string>
     <string name="rdp_add_account">Windows 用户名</string>
     <string name="rdp_add_account_empty">用户名不能为空</string>
     <string name="rdp_add_account_hint">例：Administrator</string>
+    <string name="rdp_add_account_required">请输入远程用户名</string>
     <string name="rdp_add_password">Windows 密码</string>
     <string name="rdp_add_password_hint">Windows 密码</string>
     <string name="rdp_add_success">远程 Windows 保存成功</string>

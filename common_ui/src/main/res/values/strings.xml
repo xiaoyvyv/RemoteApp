@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="ui_common_timeout">网络走丢了，请稍后再试</string>
+    <string name="ui_common_connect">连接</string>
+    <string name="ui_common_edit">编辑</string>
+    <string name="ui_common_delete">删除</string>
 
     <!--标题栏-->
     <string name="ui_view_toolbar_title">请设置标题栏文字</string>
@@ -10,6 +13,9 @@
     <string name="ui_view_setting_input_title">请输入内容</string>
     <string name="ui_view_setting_input_done">确定</string>
     <string name="ui_view_setting_input_clear">取消</string>
+    <string name="ui_view_setting_open">打开</string>
+    <string name="ui_view_setting_close">关闭</string>
+    <string name="ui_view_setting_empty">请输入内容</string>
 
     <!--状态布局-->
     <string name="ui_view_status_empty">暂时没有内容</string>

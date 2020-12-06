@@ -1,12 +1,78 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.xiaoyv.ui.setting.UiSettingView
+    <com.xiaoyv.ui.toolbar.AppToolbar
+        android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
+        <com.xiaoyv.ui.setting.UiSettingScreen
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:ui_sp="TEMP">
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_default_boolean="true"
+                app:ui_key="@string/preference_key_ui_hide_status_bar"
+                app:ui_title="@string/settings_ui_hide_status_bar"
+                app:ui_type="type_boolean" />
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_default_boolean="true"
+                app:ui_key="@string/preference_key_ui_hide_zoom_controls"
+                app:ui_title="@string/settings_ui_hide_zoom_controls"
+                app:ui_type="type_boolean" />
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_key="@string/preference_key_ui_swap_mouse_buttons"
+                app:ui_title="@string/settings_ui_swap_mouse_buttons"
+                app:ui_type="type_boolean" />
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_default_boolean="true"
+                app:ui_key="@string/preference_key_ui_invert_scrolling"
+                app:ui_title="@string/settings_ui_invert_scrolling"
+                app:ui_type="type_boolean" />
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_key="@string/preference_key_ui_auto_scroll_touchpointer"
+                app:ui_title="@string/settings_ui_auto_scroll_touchpointer"
+                app:ui_type="type_boolean" />
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_default_boolean="true"
+                app:ui_key="@string/preference_key_ui_ask_on_exit"
+                app:ui_title="@string/settings_ui_ask_on_exit"
+                app:ui_type="type_boolean" />
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_default_boolean="true"
+                app:ui_key="@string/preference_key_ui_hide_action_bar"
+                app:ui_title="@string/settings_ui_hide_action_bar"
+                app:ui_type="type_boolean" />
+
+        </com.xiaoyv.ui.setting.UiSettingScreen>
+    </androidx.core.widget.NestedScrollView>
 </androidx.appcompat.widget.LinearLayoutCompat>

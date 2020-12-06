@@ -50,6 +50,7 @@
         <CheckBoxPreference
             android:key="bookmark.redirect_sdcard"
             android:title="@string/settings_redirect_sdcard" />
+
         <com.freerdp.freerdpcore.utils.IntListPreference
             android:entries="@array/redirect_sound_array"
             android:entryValues="@array/redirect_sound_values_array"

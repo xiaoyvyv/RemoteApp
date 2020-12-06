@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="ssh_main_title">SSH 客户端</string>
+    <string name="ssh_main_group">默认组</string>
+    <string name="ssh_main_list_empty">您还未连接过任何远程SSH客户端</string>
+    <string name="ssh_main_add_now">立即添加</string>
+
+
+</resources>

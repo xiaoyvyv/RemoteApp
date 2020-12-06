@@ -51,7 +51,7 @@ public class RdpListPresenter extends ImplBasePresenter<RdpListContract.View> im
                         // 没有配置的桌面则显示去创建
                         getView().p2vGetStatusView()
                                 .showTryAgain(StringUtils.getString(R.string.rdp_main_list_empty), StringUtils.getString(R.string.rdp_main_add_now), v ->
-                                                ARouter.getInstance().build(NavigationPath.PATH_RDO_ADD_ACTIVITY).navigation());
+                                                ARouter.getInstance().build(NavigationPath.PATH_RDP_ADD_ACTIVITY).navigation());
                         getView().p2vGetTabLayout().removeAllTabs();
                     }
 

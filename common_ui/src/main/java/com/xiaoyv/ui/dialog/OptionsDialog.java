@@ -14,6 +14,7 @@ import com.blankj.utilcode.util.ScreenUtils;
 import com.drakeet.multitype.MultiTypeAdapter;
 import com.xiaoyv.ui.databinding.UiDialogOptionsBinding;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -59,43 +60,61 @@ public class OptionsDialog extends AlertDialog {
         multiTypeAdapter.register(String.class, defaultBinder);
         binding.uiOptions.setAdapter(multiTypeAdapter);
         defaultBinder.setOnItemChildClickListener(position -> {
-            if (canCloseable) {
-                dismiss();
-            }
             if (clickListener != null) {
                 clickListener.onItemChildClick(position);
+            }
+            if (canCloseable) {
+                dismiss();
             }
         });
     }
 
-    public void setTextColor(int textColor) {
+    public OptionsDialog setTextColor(int textColor) {
         this.defaultBinder.setTextColor(textColor);
+        return this;
     }
 
-    public void setLastTextColor(int lastTextColor) {
+    public OptionsDialog setLastTextColor(int lastTextColor) {
         this.defaultBinder.setLastTextColor(lastTextColor);
+        return this;
     }
 
-    public void setTextSize(int textSize) {
+    public OptionsDialog setTextSize(int textSize) {
         this.defaultBinder.setTextSize(textSize);
+        return this;
     }
 
-    public void setTextStyle(Typeface textStyle) {
+    public OptionsDialog setTextStyle(Typeface textStyle) {
         this.defaultBinder.setTextStyle(textStyle);
+        return this;
     }
 
-    public void setOnItemChildClickListener(OptionsDialogItemBinder.OnItemChildClickListener clickListener) {
+    public OptionsDialog setOnItemChildClickListener(OptionsDialogItemBinder.OnItemChildClickListener clickListener) {
         this.clickListener = clickListener;
+        return this;
     }
 
-    public void setOptions(List<String> options) {
+    public OptionsDialog setOptions(List<String> options) {
         this.multiTypeAdapter.setItems(options);
         this.multiTypeAdapter.notifyDataSetChanged();
+        return this;
     }
 
-    public void setOptions(String... options) {
+    public OptionsDialog setOptions(CharSequence... charSequences) {
+        List<CharSequence> list = Arrays.asList(charSequences);
+        List<String> options = new ArrayList<>();
+        for (int i = 0; i < list.size(); i++) {
+            options.add(String.valueOf(list.get(i)));
+        }
+        this.multiTypeAdapter.setItems(options);
+        this.multiTypeAdapter.notifyDataSetChanged();
+        return this;
+    }
+
+    public OptionsDialog setOptions(String... options) {
         this.multiTypeAdapter.setItems(Arrays.asList(options));
         this.multiTypeAdapter.notifyDataSetChanged();
+        return this;
     }
 
     @Override
@@ -115,4 +134,5 @@ public class OptionsDialog extends AlertDialog {
         this.canCloseable = flag;
         super.setCancelable(flag);
     }
+
 }

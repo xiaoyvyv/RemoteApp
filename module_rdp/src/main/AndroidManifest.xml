@@ -3,7 +3,6 @@
     package="com.xiaoyv.rdp">
 
     <application>
-        <activity android:name=".add.AddRdpActivity" />
         <activity
             android:name=".screen.view.ScreenActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|density|screenLayout|navigation"
@@ -20,6 +19,8 @@
                     android:scheme="freerdp" />
             </intent-filter>
         </activity>
-        <activity android:name=".setting.UiSettingActivity"/>
+        <activity android:name=".add.AddRdpActivity" />
+        <activity android:name=".setting.AppSettingActivity"/>
+        <activity android:name=".setting.BookmarkSettingActivity"/>
     </application>
 </manifest>

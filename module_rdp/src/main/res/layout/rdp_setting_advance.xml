@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <com.xiaoyv.ui.toolbar.AppToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <com.xiaoyv.ui.setting.UiSettingScreen
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:animateLayoutChanges="true"
+            app:ui_sp="TEMP">
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:id="@+id/usv_enable_gateway"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_key="bookmark.enable_gateway_settings"
+                app:ui_title="@string/settings_enable_gateway_settings"
+                app:ui_type="type_boolean" />
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:id="@+id/usv_gateway"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:ui_key="bookmark.gateway_settings"
+                app:ui_title="@string/settings_gateway_settings"
+                app:ui_type="type_string" />
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:id="@+id/usv_enable_3g"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_key="bookmark.enable_3g_settings"
+                app:ui_title="@string/settings_enable_3g_settings"
+                app:ui_type="type_boolean" />
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:id="@+id/usv_screen_3g"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:ui_key="bookmark.screen_3g"
+                app:ui_title="@string/settings_screen_3g"
+                app:ui_type="type_string" />
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:id="@+id/usv_performance_3g"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:ui_key="bookmark.performance_3g"
+                app:ui_title="@string/settings_performance_3g"
+                app:ui_type="type_string" />
+
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_key="bookmark.redirect_sdcard"
+                app:ui_title="@string/settings_redirect_sdcard"
+                app:ui_type="type_boolean" />
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_key="bookmark.redirect_sound"
+                app:ui_list_title="@array/redirect_sound_array"
+                app:ui_list_value="@array/redirect_sound_values_array"
+                app:ui_title="@string/settings_redirect_sound"
+                app:ui_type="type_list_integer" />
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_key="bookmark.redirect_microphone"
+                app:ui_title="@string/settings_redirect_microphone"
+                app:ui_type="type_boolean" />
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_key="bookmark.security"
+                app:ui_list_title="@array/security_array"
+                app:ui_list_value="@array/security_values_array"
+                app:ui_title="@string/settings_security"
+                app:ui_type="type_list_integer" />
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_key="bookmark.remote_program"
+                app:ui_title="@string/settings_remote_program"
+                app:ui_type="type_string" />
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_key="bookmark.work_dir"
+                app:ui_title="@string/settings_work_dir"
+                app:ui_type="type_string" />
+
+            <com.xiaoyv.ui.setting.UiSettingView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_default_boolean="false"
+                app:ui_key="bookmark.console_mode"
+                app:ui_title="@string/settings_console_mode"
+                app:ui_type="type_boolean" />
+
+        </com.xiaoyv.ui.setting.UiSettingScreen>
+    </androidx.core.widget.NestedScrollView>
+</androidx.appcompat.widget.LinearLayoutCompat>

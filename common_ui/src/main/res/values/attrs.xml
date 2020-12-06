@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <!-- 设置控件父布局属性 -->
+    <declare-styleable name="UiSettingScreen">
+        <attr name="ui_sp" format="string" />
+    </declare-styleable>
+
+    <!-- 设置控件属性 -->
     <declare-styleable name="UiSettingView">
         <attr name="ui_key" format="string" />
         <attr name="ui_title" format="string" />
@@ -8,11 +15,16 @@
         <attr name="ui_default_boolean" format="boolean" />
         <attr name="ui_default_integer" format="integer" />
         <attr name="ui_default_float" format="float" />
+        <attr name="ui_default_list" format="integer" />
+        <attr name="ui_list_title" format="string" />
+        <attr name="ui_list_value" format="string" />
         <attr name="ui_type" format="enum">
-            <enum name="type_string" value="1"/>
-            <enum name="type_boolean" value="2"/>
-            <enum name="type_integer" value="3"/>
-            <enum name="type_float" value="4"/>
+            <enum name="type_string" value="1" />
+            <enum name="type_boolean" value="2" />
+            <enum name="type_integer" value="3" />
+            <enum name="type_float" value="4" />
+            <enum name="type_list_string" value="5" />
+            <enum name="type_list_integer" value="6" />
         </attr>
     </declare-styleable>
 </resources>

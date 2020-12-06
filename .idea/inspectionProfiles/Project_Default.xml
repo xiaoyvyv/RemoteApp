@@ -61,6 +61,10 @@
     <inspection_tool class="AlibabaUnsupportedExceptionWithModifyAsList" enabled="false" level="CRITICAL" enabled_by_default="false" />
     <inspection_tool class="AlibabaUseQuietReferenceNotation" enabled="false" level="MAJOR" enabled_by_default="false" />
     <inspection_tool class="AlibabaUseRightCaseForDateFormat" enabled="false" level="CRITICAL" enabled_by_default="false" />
+    <inspection_tool class="ConstantConditions" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="SUGGEST_NULLABLE_ANNOTATIONS" value="false" />
+      <option name="DONT_REPORT_TRUE_ASSERT_STATEMENTS" value="false" />
+    </inspection_tool>
     <inspection_tool class="JavaDoc" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="TOP_LEVEL_CLASS_OPTIONS">
         <value>
@@ -98,5 +102,6 @@
       <option name="superClassString" value="java.awt.Component" />
     </inspection_tool>
     <inspection_tool class="ShrinkerUnresolvedReference" enabled="false" level="ERROR" enabled_by_default="false" />
+    <inspection_tool class="UnusedReturnValue" enabled="false" level="WARNING" enabled_by_default="false" />
   </profile>
 </component>

@@ -19,6 +19,7 @@ public class FtpEntity implements Serializable {
     private static final long serialVersionUID = 8962195813711670211L;
     @PrimaryKey(autoGenerate = true)
     public int id;
+    public long lastTime;
     public String label;
     public String group;
     public String ip;

@@ -1,18 +1,14 @@
 package com.xiaoyv.rdp.main.view;
 
-import android.content.Intent;
 import android.view.View;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
-import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.ColorUtils;
-import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ObjectUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 import com.drakeet.multitype.MultiTypeAdapter;
-import com.freerdp.freerdpcore.presentation.ApplicationSettingsActivity;
 import com.google.android.material.tabs.TabLayout;
 import com.xiaoyv.busines.base.BaseMvpFragment;
 import com.xiaoyv.busines.base.BaseSubscriber;
@@ -26,6 +22,7 @@ import com.xiaoyv.rdp.databinding.RdpFragmentMainBinding;
 import com.xiaoyv.rdp.main.adapter.RdpListBinder;
 import com.xiaoyv.rdp.main.contract.RdpListContract;
 import com.xiaoyv.rdp.main.presenter.RdpListPresenter;
+import com.xiaoyv.rdp.setting.BookmarkSettingActivity;
 import com.xiaoyv.ui.dialog.OptionsDialog;
 import com.xiaoyv.ui.listener.SimpleRefreshListener;
 import com.xiaoyv.ui.listener.SimpleTabSelectListener;
@@ -64,7 +61,15 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
         binding.toolbar
                 .setTitle(StringUtils.getString(R.string.rdp_main_title))
                 .setEndIcon(R.drawable.ui_icon_search)
-                .setEndClickListener(v -> ActivityUtils.startActivity(ApplicationSettingsActivity.class));
+                .setEndClickListener(v -> {
+                    //AppSettingActivity.openSelf(AppSettingActivity.TYPE_SETTING_UI);
+                    //AppSettingActivity.openSelf(AppSettingActivity.TYPE_SETTING_POWER);
+                    //AppSettingActivity.openSelf(AppSettingActivity.TYPE_SETTING_SECURITY);
+                    BookmarkSettingActivity.openSelf(BookmarkSettingActivity.TYPE_SETTING_ADVANCE);
+                    BookmarkSettingActivity.openSelf(BookmarkSettingActivity.TYPE_SETTING_DEBUG);
+                    BookmarkSettingActivity.openSelf(BookmarkSettingActivity.TYPE_SETTING_SCREEN);
+                    BookmarkSettingActivity.openSelf(BookmarkSettingActivity.TYPE_SETTING_PERFORMANCE);
+                });
 
         scrollDecor = OverScrollDecoratorHelper.setUpOverScroll(binding.rvContent, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
     }
@@ -75,7 +80,6 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
         multiTypeAdapter = new MultiTypeAdapter();
         multiTypeAdapter.register(RdpEntity.class, rdpBinder);
         binding.rvContent.setAdapter(multiTypeAdapter);
-
     }
 
 
@@ -89,7 +93,7 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
             }
             OptionsDialog optionsDialog = OptionsDialog.get(activity);
             optionsDialog.setCancelable(true);
-            optionsDialog.setOptions(StringUtils.getStringArray(R.array.rdp_context_menu));
+            optionsDialog.setOptions(StringUtils.getStringArray(R.array.ui_context_menu));
             optionsDialog.setLastTextColor(ColorUtils.getColor(R.color.ui_status_error));
             optionsDialog.show();
             optionsDialog.setOnItemChildClickListener(position -> {
@@ -110,7 +114,7 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
         });
 
         binding.fabAdd.setOnClickListener(v -> {
-            ARouter.getInstance().build(NavigationPath.PATH_RDO_ADD_ACTIVITY).navigation();
+            ARouter.getInstance().build(NavigationPath.PATH_RDP_ADD_ACTIVITY).navigation();
         });
 
         binding.tlGroup.addOnTabSelectedListener(new SimpleTabSelectListener() {

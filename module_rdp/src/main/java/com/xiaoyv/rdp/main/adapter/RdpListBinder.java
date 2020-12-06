@@ -16,6 +16,8 @@ import com.xiaoyv.rdp.databinding.RdpFragmentMainItemBinding;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Locale;
+
 /**
  * RdpListAdapter
  *
@@ -34,7 +36,7 @@ public class RdpListBinder extends BaseItemBinder<RdpEntity, RdpListBinder.ViewH
     @Override
     public void onBindViewHolder(@NotNull ViewHolder viewHolder, RdpEntity rdpEntity) {
         viewHolder.binding.tvLabel.setText(rdpEntity.label);
-        viewHolder.binding.tvAccount.setText(rdpEntity.account);
+        viewHolder.binding.tvAccount.setText(String.format(Locale.getDefault(), "%s：%s", rdpEntity.account, rdpEntity.ip));
         viewHolder.binding.tvTime.setText(TimeUtils.getFriendlyTimeSpanByNow(rdpEntity.lastTime));
         addClickListener(viewHolder, viewHolder.binding.getRoot());
     }

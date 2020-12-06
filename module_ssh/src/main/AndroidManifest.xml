@@ -2,4 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.xiaoyv.ssh">
 
+    <application>
+        <activity
+            android:name=".terminal.view.TerminalActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden" />
+    </application>
 </manifest>
