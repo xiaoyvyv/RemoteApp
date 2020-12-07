@@ -28,6 +28,6 @@ android {
 }
 
 dependencies {
-    api files('libs/trilead-ssh2-1.0.0.jar')
     implementation 'androidx.appcompat:appcompat:' + rootProject.ext.appcompatVersion
+    api files('libs/trilead-ssh2-1.0.0.jar')
 }

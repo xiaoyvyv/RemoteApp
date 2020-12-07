@@ -4,6 +4,8 @@ import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
 
+import com.blankj.utilcode.util.TimeUtils;
+import com.xiaoyv.busines.config.SshLoginType;
 import com.xiaoyv.busines.room.database.DateBaseConfig;
 
 import java.io.Serializable;
@@ -19,6 +21,8 @@ public class SshEntity implements Serializable {
     private static final long serialVersionUID = 8962195813711670211L;
     @PrimaryKey(autoGenerate = true)
     public int id;
+    @SshLoginType
+    public int authType = SshLoginType.TYPE_PASSWORD;
     public long lastTime;
     public String label;
     public String group;
@@ -28,4 +32,8 @@ public class SshEntity implements Serializable {
     public String password;
     public String domain;
     public String setting;
+
+    public SshEntity() {
+        this.lastTime = TimeUtils.getNowMills();
+    }
 }

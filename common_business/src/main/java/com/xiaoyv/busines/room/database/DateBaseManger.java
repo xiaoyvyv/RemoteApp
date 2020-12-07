@@ -9,6 +9,7 @@ import com.xiaoyv.busines.room.dao.FtpDao;
 import com.xiaoyv.busines.room.dao.RdpDao;
 import com.xiaoyv.busines.room.dao.SshDao;
 import com.xiaoyv.busines.room.entity.RdpEntity;
+import com.xiaoyv.busines.room.entity.SshEntity;
 
 /**
  * DateBaseUtils
@@ -71,6 +72,27 @@ public class DateBaseManger {
     public SshDao getSshDao() {
         return sshDao;
     }
+
+
+    /**
+     * 保存或更新 Rdp
+     *
+     * @param sshEntity rdp 信息
+     */
+    public void saveSsh(@NonNull SshEntity sshEntity) {
+        LogUtils.json(sshEntity);
+        if (sshEntity.id < 0) {
+            getSshDao().insert(sshEntity);
+            return;
+        }
+        SshEntity entity = getSshDao().getById(sshEntity.id);
+        if (entity == null) {
+            getSshDao().insert(sshEntity);
+            return;
+        }
+        getSshDao().update(entity);
+    }
+
 
     public FtpDao getFtpDao() {
         return ftpDao;

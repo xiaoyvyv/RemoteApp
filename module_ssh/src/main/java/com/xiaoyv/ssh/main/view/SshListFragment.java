@@ -4,10 +4,12 @@ import android.view.View;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.ColorUtils;
 import com.blankj.utilcode.util.ObjectUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ThreadUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.drakeet.multitype.MultiTypeAdapter;
 import com.google.android.material.tabs.TabLayout;
 import com.trilead.ssh2.Session;
@@ -18,10 +20,12 @@ import com.xiaoyv.busines.exception.RxException;
 import com.xiaoyv.busines.room.entity.SshEntity;
 import com.xiaoyv.busines.utils.ScanUtils;
 import com.xiaoyv.ssh.R;
+import com.xiaoyv.ssh.add.AddSshActivity;
 import com.xiaoyv.ssh.databinding.SshFragmentMainBinding;
 import com.xiaoyv.ssh.main.adapter.SshListBinder;
 import com.xiaoyv.ssh.main.contract.SshListContract;
 import com.xiaoyv.ssh.main.presenter.SshListPresenter;
+import com.xiaoyv.ssh.terminal.view.TerminalActivity;
 import com.xiaoyv.ui.dialog.OptionsDialog;
 import com.xiaoyv.ui.listener.SimpleRefreshListener;
 import com.xiaoyv.ui.listener.SimpleTabSelectListener;
@@ -39,8 +43,7 @@ import me.everything.android.ui.overscroll.OverScrollDecoratorHelper;
  * @since 2020/11/29
  **/
 @Route(path = NavigationPath.PATH_SSH_FRAGMENT)
-public class SshFragment extends BaseMvpFragment<SshListContract.View, SshListPresenter> implements SshListContract.View {
-    public static LinkedHashMap<SshEntity, Session> sessions = new LinkedHashMap<>();
+public class SshListFragment extends BaseMvpFragment<SshListContract.View, SshListPresenter> implements SshListContract.View {
     private SshFragmentMainBinding binding;
     private MultiTypeAdapter multiTypeAdapter;
     private SshListBinder sshListBinder;
@@ -63,7 +66,7 @@ public class SshFragment extends BaseMvpFragment<SshListContract.View, SshListPr
                 .setTitle(StringUtils.getString(R.string.ssh_main_title))
                 .setEndIcon(R.drawable.ui_icon_search)
                 .setEndClickListener(v -> {
-
+                    ActivityUtils.startActivity(AddSshActivity.class);
                 });
 
         scrollDecor = OverScrollDecoratorHelper.setUpOverScroll(binding.rvContent, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
@@ -135,7 +138,7 @@ public class SshFragment extends BaseMvpFragment<SshListContract.View, SshListPr
         sshListBinder.setOnItemChildClickListener((view, dataBean, adapterPos, longClick) -> {
             // 连接
             if (!longClick) {
-                ThreadUtils.executeByFixed(10, new ScanUtils.ScanIpTask());
+                TerminalActivity.openSelf(dataBean);
                 return;
             }
             OptionsDialog optionsDialog = OptionsDialog.get(activity);
@@ -147,10 +150,11 @@ public class SshFragment extends BaseMvpFragment<SshListContract.View, SshListPr
                 switch (position) {
                     // 连接
                     case 0:
+                        TerminalActivity.openSelf(dataBean);
                         break;
                     // 编辑
                     case 1:
-                        //AddSshActivity.openSelf(dataBean);
+                        AddSshActivity.openSelf(dataBean);
                         break;
                     // 删除
                     case 2:
@@ -160,7 +164,7 @@ public class SshFragment extends BaseMvpFragment<SshListContract.View, SshListPr
             });
         });
 
-        binding.fabAdd.setOnClickListener(v ->
+        binding.fabAddSsh.setOnClickListener(v ->
                 ARouter.getInstance().build(NavigationPath.PATH_SSH_ADD_ACTIVITY).navigation());
 
         binding.tlGroup.addOnTabSelectedListener(new SimpleTabSelectListener() {

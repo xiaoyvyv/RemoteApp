@@ -7,7 +7,6 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 import androidx.room.Update;
 
-import com.xiaoyv.busines.room.entity.RdpEntity;
 import com.xiaoyv.busines.room.entity.SshEntity;
 
 import java.util.List;
@@ -23,6 +22,9 @@ public interface SshDao {
     @Query("SELECT * FROM ssh")
     List<SshEntity> getAll();
 
+    @Query("SELECT * FROM ssh WHERE id =:id LIMIT 1")
+    SshEntity getById(long id);
+
     @Query("SELECT * FROM ssh WHERE ip IN (:ip)")
     List<SshEntity> loadAllByIps(int... ip);
 
@@ -33,7 +35,7 @@ public interface SshDao {
     List<SshEntity> getAllByGroup(String... group);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAll(SshEntity... sshEntities);
+    void insert(SshEntity... sshEntities);
 
     @Update
     void update(SshEntity... sshEntities);

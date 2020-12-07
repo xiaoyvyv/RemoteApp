@@ -29,7 +29,7 @@ public interface FtpDao {
     List<FtpEntity> findAllByLabel(String label);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAll(FtpEntity... ftpEntities);
+    void insert(FtpEntity... ftpEntities);
 
     @Update
     void update(FtpEntity... ftpEntities);

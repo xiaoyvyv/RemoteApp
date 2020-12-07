@@ -109,7 +109,7 @@ public class AddRdpActivity extends BaseActivity {
     protected void initData() {
         binding.toolbar.setTitle(getString(R.string.rdp_add_title))
                 .setStartClickListener(v -> onBackPressed())
-                .setEndIcon(R.drawable.rdp_icon_save)
+                .setEndIcon(R.drawable.ui_icon_save)
                 .setEndClickListener(v -> {
                     label = binding.asvLabel.getMessage();
                     group = binding.asvGroup.getMessage();
