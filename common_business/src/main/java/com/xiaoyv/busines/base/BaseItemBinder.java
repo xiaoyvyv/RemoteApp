@@ -38,6 +38,7 @@ public abstract class BaseItemBinder<T, VH extends RecyclerView.ViewHolder> exte
         });
     }
 
+
     public interface OnItemChildClickListener<BEAN> {
         /**
          * 子条目点击事件

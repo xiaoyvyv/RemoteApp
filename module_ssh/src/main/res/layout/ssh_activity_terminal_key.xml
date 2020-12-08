@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fitsSystemWindows="true">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_key"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="true"
+        android:gravity="center"
+        android:paddingTop="@dimen/ui_size_8"
+        android:paddingBottom="@dimen/ui_size_8"
+        android:textColor="@color/ui_text_c2"
+        android:textSize="@dimen/ui_font_12" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

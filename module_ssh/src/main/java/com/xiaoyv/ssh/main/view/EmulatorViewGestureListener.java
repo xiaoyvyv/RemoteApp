@@ -11,11 +11,10 @@ import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.KeyboardUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.Utils;
+import com.romide.terminal.emulatorview.EmulatorView;
 
-import java.security.Key;
 import java.util.List;
 
-import jackpal.androidterm.emulatorview.EmulatorView;
 
 public class EmulatorViewGestureListener extends GestureDetector.SimpleOnGestureListener {
     private EmulatorView view;

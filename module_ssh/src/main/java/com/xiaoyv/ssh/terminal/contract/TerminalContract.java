@@ -4,9 +4,10 @@ import com.trilead.ssh2.Session;
 import com.xiaoyv.busines.base.IBaseModel;
 import com.xiaoyv.busines.base.IBasePresenter;
 import com.xiaoyv.busines.base.IBaseView;
+import com.xiaoyv.busines.bean.ssh.KeyCodeBean;
 import com.xiaoyv.busines.room.entity.SshEntity;
 
-import java.io.IOException;
+import java.util.List;
 
 import io.reactivex.rxjava3.core.Observable;
 
@@ -21,9 +22,10 @@ public interface TerminalContract {
     interface View extends IBaseView {
         /**
          * 连接成功
+         *
          * @param session session
          */
-        void p2vConnectSuccess(Session session)  ;
+        void p2vConnectSuccess(Session session);
     }
 
     interface Presenter extends IBasePresenter {
@@ -34,6 +36,13 @@ public interface TerminalContract {
          * @param sshEntity ssh
          */
         void v2pConnectSsh(SshEntity sshEntity);
+
+        /**
+         * 获取符号
+         *
+         * @return 符号
+         */
+        List<KeyCodeBean> v2pGetSymbol();
     }
 
     interface Model extends IBaseModel {

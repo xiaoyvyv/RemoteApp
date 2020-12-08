@@ -1,28 +1,35 @@
 package com.xiaoyv.ssh.terminal.view;
 
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.KeyEvent;
 import android.view.View;
 
 import com.blankj.utilcode.util.ActivityUtils;
+import com.blankj.utilcode.util.ColorUtils;
 import com.blankj.utilcode.util.ObjectUtils;
+import com.blankj.utilcode.util.ThreadUtils;
 import com.blankj.utilcode.util.Utils;
+import com.drakeet.multitype.MultiTypeAdapter;
+import com.romide.terminal.emulatorview.ColorScheme;
+import com.romide.terminal.emulatorview.EmulatorView;
+import com.romide.terminal.emulatorview.TermSession;
+import com.romide.terminal.emulatorview.compat.KeycodeConstants;
 import com.trilead.ssh2.Session;
 import com.xiaoyv.busines.base.BaseMvpActivity;
+import com.xiaoyv.busines.bean.ssh.KeyCodeBean;
 import com.xiaoyv.busines.room.entity.SshEntity;
+import com.xiaoyv.ssh.R;
 import com.xiaoyv.ssh.databinding.SshActivityTerminalBinding;
 import com.xiaoyv.ssh.main.view.EmulatorViewGestureListener;
+import com.xiaoyv.ssh.terminal.adapter.TerminalBinder;
 import com.xiaoyv.ssh.terminal.contract.TerminalContract;
 import com.xiaoyv.ssh.terminal.presenter.TerminalPresenter;
 
 import java.io.InputStream;
 import java.io.OutputStream;
-
-import jackpal.androidterm.emulatorview.ColorScheme;
-import jackpal.androidterm.emulatorview.TermSession;
+import java.util.Locale;
 
 /**
  * TerminalActivity
@@ -35,6 +42,10 @@ public class TerminalActivity extends BaseMvpActivity<TerminalContract.View, Ter
     private SshActivityTerminalBinding binding;
     private Session session;
     private SshEntity sshEntity;
+    private TerminalBinder terminalBinder;
+    private MultiTypeAdapter typeAdapter;
+    private ColorScheme colorScheme;
+    private EmulatorView emulatorView;
 
 
     public static void openSelf(SshEntity sshEntity) {
@@ -65,12 +76,29 @@ public class TerminalActivity extends BaseMvpActivity<TerminalContract.View, Ter
     @Override
     protected void initView() {
         binding.toolbar.setStartClickListener(v -> onBackPressed())
-                .setTitle(sshEntity.account + "：" + sshEntity.ip)
+                .setTitle(String.format(Locale.getDefault(), "%s：%s", sshEntity.account, sshEntity.ip))
                 .setNeedStatusBar(false);
     }
 
     @Override
     protected void initData() {
+        colorScheme = new ColorScheme(ColorUtils.getColor(R.color.ui_text_c4),
+                ColorUtils.getColor(R.color.ui_system_black),
+                ColorUtils.getColor(R.color.ui_system_black),
+                ColorUtils.getColor(R.color.ui_text_c4));
+
+        binding.evTerminal.setBackgroundColor(colorScheme.getBackColor());
+        binding.vHr.setBackgroundColor(colorScheme.getForeColor());
+
+        terminalBinder = new TerminalBinder();
+
+        typeAdapter = new MultiTypeAdapter();
+        typeAdapter.register(KeyCodeBean.class, terminalBinder);
+
+        binding.rvKeyboard.setAdapter(typeAdapter);
+
+        typeAdapter.setItems(presenter.v2pGetSymbol());
+        typeAdapter.notifyDataSetChanged();
 
     }
 
@@ -80,39 +108,73 @@ public class TerminalActivity extends BaseMvpActivity<TerminalContract.View, Ter
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (emulatorView != null) {
+            emulatorView.onResume();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (emulatorView != null) {
+            emulatorView.onPause();
+        }
+    }
+
+    @Override
     public void p2vConnectSuccess(Session session) {
         InputStream stdout = session.getStdout();
         OutputStream stdin = session.getStdin();
 
-        TermSession termSession = new TermSession();
+        TermSession termSession = new TermSession(){
+            @Override
+            protected void onProcessExit() {
+                super.onProcessExit();
+                finish();
+            }
+        };
         termSession.setTermIn(stdout);
         termSession.setTermOut(stdin);
-        termSession.setColorScheme(new ColorScheme(Color.WHITE, Color.BLACK, Color.WHITE, Color.BLACK));
+        termSession.setColorScheme(colorScheme);
         termSession.setDefaultUTF8Mode(true);
-        termSession.setTitle("");
-        termSession.initializeEmulator(160, 24);
+        termSession.setTitle(String.format(Locale.getDefault(), "%s：%s", sshEntity.account, sshEntity.ip));
         termSession.setUpdateCallback(() -> {
 
         });
+
         DisplayMetrics displayMetrics = new DisplayMetrics();
         activity.getDisplay().getRealMetrics(displayMetrics);
-        binding.evTerminal.attachSession(termSession);
-        binding.evTerminal.setDensity(displayMetrics);
-        binding.evTerminal.setTextSize(16);
-        binding.evTerminal.setUseCookedIME(true);
-        binding.evTerminal.setBackKeyCharacter(32);
-        binding.evTerminal.setAltSendsEsc(false);
-        binding.evTerminal.setControlKeyCode(0);
-        binding.evTerminal.setFnKeyCode(1);
-        binding.evTerminal.setMouseTracking(false);
-        binding.evTerminal.setTermType("vt100");
-        binding.evTerminal.setOnKeyListener(new View.OnKeyListener() {
-            @Override
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-                return false;
+        emulatorView = new EmulatorView(this, termSession, displayMetrics);
+        binding.evTerminal.addView(emulatorView);
+
+        terminalBinder.bindTerminal(emulatorView);
+        emulatorView.setTextSize(12);
+        emulatorView.setColorScheme(colorScheme);
+        emulatorView.updateSize(false);
+        emulatorView.setUseCookedIME(true);
+        emulatorView.setBackKeyCharacter(0);
+        emulatorView.setAltSendsEsc(false);
+        emulatorView.setControlKeyCode(KeycodeConstants.KEYCODE_CTRL_LEFT);
+        emulatorView.setFnKeyCode(KeycodeConstants.KEYCODE_FUNCTION);
+        emulatorView.setMouseTracking(true);
+        emulatorView.setTermType("vt100");
+        emulatorView.setCursorBlink(0);
+        emulatorView.setCursorBlinkPeriod(250);
+        emulatorView.setExtGestureListener(new EmulatorViewGestureListener(emulatorView));
+        emulatorView.onResume();
+
+        registerForContextMenu(binding.evTerminal);
+    }
+
+    @Override
+    protected void onDestroy() {
+        ThreadUtils.getCachedPool().execute(() -> {
+            if (emulatorView != null) {
+                emulatorView.getTermSession().finish();
             }
         });
-        binding.evTerminal.setExtGestureListener(new EmulatorViewGestureListener(binding.evTerminal));
-        registerForContextMenu(binding.evTerminal);
+        super.onDestroy();
     }
 }
