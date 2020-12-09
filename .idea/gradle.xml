@@ -19,6 +19,7 @@
             <option value="$PROJECT_DIR$/libssh" />
             <option value="$PROJECT_DIR$/module_ftp" />
             <option value="$PROJECT_DIR$/module_main" />
+            <option value="$PROJECT_DIR$/module_mine" />
             <option value="$PROJECT_DIR$/module_rdp" />
             <option value="$PROJECT_DIR$/module_ssh" />
           </set>

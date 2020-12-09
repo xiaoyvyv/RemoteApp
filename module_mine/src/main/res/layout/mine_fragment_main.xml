@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.xiaoyv.ui.toolbar.AppToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_import_rdp"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/ui_size_80"
+        android:layout_marginStart="@dimen/ui_size_16"
+        android:layout_marginTop="@dimen/ui_size_16"
+        android:background="#CC2196F3"
+        app:layout_constraintEnd_toStartOf="@+id/cl_import_ssh"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_rdp"
+            android:layout_width="@dimen/ui_size_30"
+            android:layout_height="@dimen/ui_size_30"
+            android:tint="@color/ui_system_background"
+            app:layout_constraintBottom_toTopOf="@+id/tv_rdp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ui_icon_windows" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_rdp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="批量导入 Win"
+            android:textColor="@color/ui_text_c5"
+            android:textSize="@dimen/ui_font_12"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv_rdp" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_import_ssh"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/ui_size_80"
+        android:layout_margin="@dimen/ui_size_16"
+        android:background="#CC4CAF50"
+        app:layout_constraintEnd_toStartOf="@+id/cl_import_ftp"
+        app:layout_constraintStart_toEndOf="@+id/cl_import_rdp"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_ssh"
+            android:layout_width="@dimen/ui_size_30"
+            android:layout_height="@dimen/ui_size_30"
+            android:tint="@color/ui_system_background"
+            app:layout_constraintBottom_toTopOf="@+id/tv_ssh"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ui_icon_linux" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_ssh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="批量导入 SSH"
+            android:textColor="@color/ui_text_c5"
+            android:textSize="@dimen/ui_font_12"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv_ssh" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/cl_import_ftp"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/ui_size_80"
+        android:layout_marginTop="@dimen/ui_size_16"
+        android:layout_marginEnd="@dimen/ui_size_16"
+        android:background="#CCF44336"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/cl_import_ssh"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/iv_ftp"
+            android:layout_width="@dimen/ui_size_30"
+            android:layout_height="@dimen/ui_size_30"
+            android:tint="@color/ui_system_background"
+            app:layout_constraintBottom_toTopOf="@+id/tv_ftp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/ui_icon_ftp" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/tv_ftp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="批量导入 FTP"
+            android:textColor="@color/ui_text_c5"
+            android:textSize="@dimen/ui_font_12"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/iv_ftp" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_help"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="@dimen/ui_size_12"
+        android:paddingEnd="@dimen/ui_size_16"
+        android:text="导入帮助？"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/cl_import_rdp" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

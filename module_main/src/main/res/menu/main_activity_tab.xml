@@ -14,4 +14,9 @@
         android:icon="@drawable/main_selector_ftp"
         android:id="@+id/main_home_ftp"
         android:title="@string/main_home_ftp" />
+
+    <item
+        android:icon="@drawable/main_selector_mine"
+       android:id="@+id/main_home_mine"
+        android:title="@string/main_home_mine" />
 </menu>

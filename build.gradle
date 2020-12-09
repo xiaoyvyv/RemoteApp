@@ -47,7 +47,7 @@ ext {
     appcompatVersion = '1.2.0'
     materialVersion = '1.2.1'
     constraintlayoutVersion = '2.0.4'
-    refreshVersion= '1.1.0'
+    refreshVersion = '1.1.0'
 
     // 第三方
     buglyCrashVersion = '3.2.422'
@@ -60,6 +60,8 @@ ext {
     autoDisposeVersion = '2.0.0'
     overscrollVersion = '1.0.4'
     dialogplusVersion = '1.11@aar'
+    poiVersion = '2.6.12'
+
 }
 
 task clean(type: Delete) {

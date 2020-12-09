@@ -45,6 +45,7 @@ dependencies {
     implementation project(':module_ftp')
     implementation project(':module_ssh')
     implementation project(':module_rdp')
+    implementation project(':module_mine')
 
     implementation 'androidx.appcompat:appcompat:' + rootProject.ext.appcompatVersion
     implementation 'com.google.android.material:material:' + rootProject.ext.materialVersion

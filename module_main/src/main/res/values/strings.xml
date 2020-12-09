@@ -4,7 +4,8 @@
     <string name="main_splash_enter">进入</string>
 
     <!-- 首页 -->
-    <string name="main_home_rdp">Windows桌面</string>
-    <string name="main_home_ssh">SSH终端</string>
-    <string name="main_home_ftp">FTP管理器</string>
+    <string name="main_home_rdp">Windows</string>
+    <string name="main_home_ssh">SSH</string>
+    <string name="main_home_ftp">FTP</string>
+    <string name="main_home_mine">我的</string>
 </resources>

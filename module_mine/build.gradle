@@ -21,10 +21,6 @@ android {
         javaCompileOptions {
             annotationProcessorOptions {
                 arguments = [AROUTER_MODULE_NAME: project.getName()]
-                arguments += [
-                        "room.schemaLocation"  : "$projectDir/schemas".toString(),
-                        "room.incremental"     : "true",
-                        "room.expandProjection": "true"]
             }
         }
     }
@@ -42,37 +38,15 @@ android {
     }
 
     // 限定资源前缀
-    resourcePrefix "business_"
+    resourcePrefix "mine_"
 }
 
 dependencies {
-    api project(':common_ui')
-
-    // 腾讯Bugly
-    api 'com.tencent.bugly:crashreport:' + rootProject.ext.buglyCrashVersion
-
-    // RxAndroid
-    api 'io.reactivex.rxjava3:rxandroid:' + rootProject.ext.rxAndroidVersion
-    api 'io.reactivex.rxjava3:rxjava:' + rootProject.ext.rxAndroidVersion
-    // RxAndroid自动解绑订阅
-    api 'com.uber.autodispose2:autodispose-android:' + rootProject.ext.autoDisposeVersion
-    api 'com.uber.autodispose2:autodispose-androidx-lifecycle:' + rootProject.ext.autoDisposeVersion
-
-    // Excel 操作
-    api 'net.sourceforge.jexcelapi:jxl:'+ rootProject.ext.poiVersion
-
-    // 数据库
-    implementation 'androidx.room:room-runtime:' + rootProject.ext.roomVersion
-    annotationProcessor 'androidx.room:room-compiler:' + rootProject.ext.roomVersion
-
-    // 调试环境查看数据库
-    debugImplementation 'com.amitshekhar.android:debug-db:' + rootProject.ext.debugDbVersion;
+    implementation project(':common_business')
 
     implementation 'androidx.appcompat:appcompat:' + rootProject.ext.appcompatVersion
     implementation 'com.google.android.material:material:' + rootProject.ext.materialVersion
     implementation 'androidx.constraintlayout:constraintlayout:' + rootProject.ext.constraintlayoutVersion
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
     implementation 'com.alibaba:arouter-api:' + rootProject.ext.arouterVersion
     annotationProcessor 'com.alibaba:arouter-compiler:' + rootProject.ext.arouterVersion

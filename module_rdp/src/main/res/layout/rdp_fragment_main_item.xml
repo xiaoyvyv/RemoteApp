@@ -17,7 +17,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/rdp_icon_windows" />
+        app:srcCompat="@drawable/ui_icon_windows" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_label"

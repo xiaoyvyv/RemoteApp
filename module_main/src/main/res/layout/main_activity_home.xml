@@ -18,6 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="@dimen/ui_size_56"
         android:background="?android:attr/windowBackground"
+        app:elevation="@dimen/ui_size_1"
         app:itemTextAppearanceActive="@style/main_bottom_nav_selected"
         app:itemTextAppearanceInactive="@style/main_bottom_nav_normal"
         app:labelVisibilityMode="labeled"
