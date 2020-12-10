@@ -1,5 +1,6 @@
 package com.xiaoyv.busines.room.entity;
 
+import androidx.annotation.Nullable;
 import androidx.room.Entity;
 import androidx.room.Index;
 import androidx.room.PrimaryKey;
@@ -35,5 +36,15 @@ public class SshEntity implements Serializable {
 
     public SshEntity() {
         this.lastTime = TimeUtils.getNowMills();
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        return super.equals(obj);
     }
 }

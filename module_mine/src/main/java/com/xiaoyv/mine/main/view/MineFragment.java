@@ -2,24 +2,15 @@ package com.xiaoyv.mine.main.view;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
 import android.view.Gravity;
 import android.view.View;
-import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
-import android.widget.SimpleAdapter;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatTextView;
-import androidx.appcompat.widget.LinearLayoutCompat;
+import androidx.recyclerview.widget.ItemTouchHelper;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.StringUtils;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.drakeet.multitype.MultiTypeAdapter;
 import com.orhanobut.dialogplus.DialogPlus;
 import com.orhanobut.dialogplus.ViewHolder;
 import com.xiaoyv.busines.base.BaseFragment;
@@ -29,6 +20,8 @@ import com.xiaoyv.busines.utils.SelectUtils;
 import com.xiaoyv.mine.R;
 import com.xiaoyv.mine.databinding.MineFragmentDialogBinding;
 import com.xiaoyv.mine.databinding.MineFragmentMainBinding;
+import com.xiaoyv.mine.main.adapter.MineItemBinder;
+import com.xiaoyv.mine.main.adapter.MineItemHelper;
 import com.xiaoyv.ui.listener.SimpleResultListener;
 
 import java.io.File;
@@ -46,6 +39,7 @@ public class MineFragment extends BaseFragment implements SimpleResultListener<F
     private MineFragmentDialogBinding dialogBinding;
     private MineFragmentMainBinding binding;
     private DialogPlus bottomSheet;
+    private MultiTypeAdapter multiTypeAdapter;
 
     @Override
     protected View createContentView() {
@@ -70,10 +64,20 @@ public class MineFragment extends BaseFragment implements SimpleResultListener<F
     @Override
     protected void initData() {
         bottomSheet = DialogPlus.newDialog(activity)
+                .setCancelable(false)
                 .setContentHolder(new ViewHolder(dialogBinding.getRoot()))
                 .setContentBackgroundResource(android.R.color.transparent)
                 .setGravity(Gravity.BOTTOM)
                 .create();
+
+        MineItemBinder itemBinder = new MineItemBinder();
+        multiTypeAdapter = new MultiTypeAdapter();
+        multiTypeAdapter.register(List.class, itemBinder);
+        dialogBinding.rvItem.setAdapter(multiTypeAdapter);
+
+        // 长按交互
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new MineItemHelper(itemBinder));
+        itemTouchHelper.attachToRecyclerView(dialogBinding.rvItem);
     }
 
     @Override
@@ -100,20 +104,9 @@ public class MineFragment extends BaseFragment implements SimpleResultListener<F
 
     @Override
     public void onResult(File selectFile) {
-        ExcelUtils.readExcel(selectFile, result -> {
-            dialogBinding.llColumn.removeAllViews();
-            for (int i = 0; i < result.size(); i++) {
-                List<String> rows = result.get(i);
-                LinearLayoutCompat layoutCompat = new LinearLayoutCompat(activity);
-                layoutCompat.setOrientation(LinearLayoutCompat.HORIZONTAL);
-                for (int j = 0; j < rows.size(); j++) {
-                    String row = rows.get(j);
-                    AppCompatTextView itemView = new AppCompatTextView(activity);
-                    itemView.setText(row);
-                    layoutCompat.addView(itemView);
-                }
-                dialogBinding.llColumn.addView(layoutCompat, new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            }
+        ExcelUtils.readExcelByCol(selectFile, result -> {
+            multiTypeAdapter.setItems(result);
+            multiTypeAdapter.notifyDataSetChanged();
             bottomSheet.show();
         });
     }

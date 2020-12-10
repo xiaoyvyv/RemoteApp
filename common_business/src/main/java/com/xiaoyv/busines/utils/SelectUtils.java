@@ -24,7 +24,7 @@ import java.io.InputStream;
  * @since 2020/12/09
  **/
 public class SelectUtils {
-    public static final String selectSavePath = PathUtils.getInternalAppCachePath() + "/select";
+    public static final String selectSavePath = PathUtils.getExternalAppCachePath() + "/select";
 
     public static void copySelectFile(@NonNull Uri uri, @NonNull SimpleResultListener<File> listener) {
         ThreadUtils.executeByCached(new ThreadUtils.SimpleTask<File>() {
