@@ -1,5 +1,6 @@
 package com.xiaoyv.ssh.terminal.model;
 
+import com.blankj.utilcode.util.ThreadUtils;
 import com.trilead.ssh2.Connection;
 import com.trilead.ssh2.Session;
 import com.xiaoyv.busines.config.SshLoginType;
@@ -8,7 +9,6 @@ import com.xiaoyv.busines.room.entity.SshEntity;
 import com.xiaoyv.ssh.terminal.contract.TerminalContract;
 
 import java.io.File;
-import java.util.LinkedHashMap;
 
 import io.reactivex.rxjava3.core.Observable;
 
@@ -19,23 +19,15 @@ import io.reactivex.rxjava3.core.Observable;
  * @since 2020/12/06
  **/
 public class TerminalModel implements TerminalContract.Model {
-    public static final LinkedHashMap<SshEntity, Session> MAP_SESSIONS = new LinkedHashMap<>();
+    private Connection connection;
 
     @Override
     public Observable<Session> p2mConnectSsh(SshEntity sshEntity) {
         return Observable.create(emitter -> {
             try {
-                if (MAP_SESSIONS.containsKey(sshEntity)) {
-                    Session session = MAP_SESSIONS.get(sshEntity);
-                    if (session != null) {
-                        emitter.onNext(session);
-                        emitter.onComplete();
-                        return;
-                    }
-                }
                 int port = Integer.parseInt(sshEntity.port);
-                Connection connection = new Connection(sshEntity.ip, port);
-                connection.connect();
+                connection = new Connection(sshEntity.ip, port);
+                connection.connect((sHost, sPort, sEntType, bytes) -> true, 5000, 5000);
                 boolean authenticate = false;
                 switch (sshEntity.authType) {
                     case SshLoginType.TYPE_NONE:
@@ -60,7 +52,6 @@ public class TerminalModel implements TerminalContract.Model {
                 session.requestPTY("vt100");
                 session.startShell();
 
-                MAP_SESSIONS.put(sshEntity, session);
                 emitter.onNext(session);
                 emitter.onComplete();
             } catch (Exception e) {
@@ -68,5 +59,15 @@ public class TerminalModel implements TerminalContract.Model {
                 emitter.onComplete();
             }
         });
+    }
+
+    @Override
+    public void p2mClose() {
+        if (connection != null) {
+            ThreadUtils.getCachedPool().execute(() -> {
+                connection.close();
+                connection = null;
+            });
+        }
     }
 }

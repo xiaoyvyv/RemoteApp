@@ -43,8 +43,9 @@ public class MineItemHelper extends ItemTouchHelper.Callback {
      */
     @Override
     public boolean isLongPressDragEnabled() {
-        return true;
+        return false;
     }
+
     /**
      * 返回 true 支持滑动，false 不支持
      *

@@ -1,5 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="mine_main_title">我的信息</string>
+    <string name="mine_main_import_help">仅支持导入xls类型的文件，点击下方模板可查看导入的模板表格</string>
+    <string name="mine_main_temp">模板文件</string>
+    <string name="mine_main_adjust_sort">导入信息部分预览</string>
+    <string name="mine_main_sort_label">标签</string>
+    <string name="mine_main_sort_group">分组</string>
+    <string name="mine_main_sort_host">地址</string>
+    <string name="mine_main_sort_port">端口</string>
+    <string name="mine_main_sort_account">用户</string>
+    <string name="mine_main_sort_password">密码</string>
 
 </resources>

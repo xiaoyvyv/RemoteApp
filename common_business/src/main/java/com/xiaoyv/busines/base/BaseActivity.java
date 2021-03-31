@@ -6,13 +6,17 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
 import com.blankj.utilcode.util.BarUtils;
+import com.blankj.utilcode.util.FragmentUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SnackbarUtils;
 import com.xiaoyv.business.databinding.BusinessActivityRootBinding;
 import com.xiaoyv.ui.status.ContentStatusView;
+
+import java.util.List;
 
 /**
  * BaseActivity
@@ -40,11 +44,19 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseVie
         initEvent();
     }
 
+    /**
+     * 导入视图
+     *
+     * @return 视图
+     */
     protected abstract View createContentView();
 
     protected void initIntentData(Intent intent, Bundle bundle) {
     }
 
+    /**
+     * 初始化
+     */
     protected abstract void initView();
 
     protected void initEvent() {
@@ -52,9 +64,13 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseVie
         initListener();
     }
 
+    /**
+     * 初始化数据
+     */
     protected abstract void initData();
 
     protected void initListener() {
+
     }
 
     @Override
@@ -113,4 +129,17 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseVie
         return rootBinding.csvStatus;
     }
 
+    @Override
+    public void onBackPressed() {
+        List<Fragment> fragments = FragmentUtils.getFragments(getSupportFragmentManager());
+        for (Fragment fragment : fragments) {
+            if (fragment instanceof BaseFragment) {
+                BaseFragment baseFragment = (BaseFragment) fragment;
+                if (baseFragment.onFragmentBackPressed()) {
+                    return;
+                }
+            }
+        }
+        super.onBackPressed();
+    }
 }

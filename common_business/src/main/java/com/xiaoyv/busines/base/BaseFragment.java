@@ -140,5 +140,4 @@ public abstract class BaseFragment extends Fragment implements IBaseView {
     public ContentStatusView p2vGetStatusView() {
         return rootBinding.csvStatus;
     }
-
 }
