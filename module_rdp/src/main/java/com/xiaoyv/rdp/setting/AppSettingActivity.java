@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RecentlyNonNull;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -42,7 +43,7 @@ public class AppSettingActivity extends BaseActivity {
     }
 
     @Override
-    protected void initIntentData(Intent intent, Bundle bundle) {
+    protected void initIntentData(@RecentlyNonNull Intent intent, @RecentlyNonNull Bundle bundle) {
         type = getIntent().getStringExtra(KEY_SETTING);
     }
 

@@ -36,21 +36,21 @@ android {
 
 dependencies {
     // 多类型适配器
-    api 'com.drakeet.multitype:multitype:' + rootProject.ext.multitypeVersion
+    api "com.drakeet.multitype:multitype:${rootProject.ext.multitypeVersion}"
     // 常用工具类
-    api 'com.blankj:utilcodex:' + rootProject.ext.utilCodeXVersion
+    api "com.blankj:utilcodex:${rootProject.ext.utilCodeXVersion}"
     // 刷新
-    api "androidx.swiperefreshlayout:swiperefreshlayout:" + rootProject.ext.refreshVersion
+    api "androidx.swiperefreshlayout:swiperefreshlayout:${rootProject.ext.refreshVersion}"
     // 越界回弹
-    api 'me.everything:overscroll-decor-android:' + rootProject.ext.overscrollVersion
+    api "me.everything:overscroll-decor-android:${rootProject.ext.overscrollVersion}"
     // 对话框
-    api 'com.orhanobut:dialogplus:' + rootProject.ext.dialogplusVersion
+    api "com.orhanobut:dialogplus:${rootProject.ext.dialogplusVersion}"
 
-    implementation 'androidx.appcompat:appcompat:' + rootProject.ext.appcompatVersion
-    implementation 'com.google.android.material:material:' + rootProject.ext.materialVersion
-    implementation 'androidx.constraintlayout:constraintlayout:' + rootProject.ext.constraintlayoutVersion
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"
+    implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
+    implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
 
-    testImplementation 'junit:junit:' + rootProject.ext.junitVersion
-    androidTestImplementation 'androidx.test.ext:junit:' + rootProject.ext.extJunitVersion
-    androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.ext.espressoVersion
+    testImplementation "junit:junit:${rootProject.ext.junitVersion}"
+    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.extJunitVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoVersion}"
 }

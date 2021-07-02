@@ -17,7 +17,6 @@ import android.graphics.drawable.BitmapDrawable;
 import android.inputmethodservice.Keyboard;
 import android.inputmethodservice.KeyboardView;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -56,7 +55,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class SessionActivity extends AppCompatActivity
-        implements LibFreeRDP.UIEventListener, KeyboardView.OnKeyboardActionListener,
+        implements LibFreeRDP.UiEventListener, KeyboardView.OnKeyboardActionListener,
         RdpScrollView.ScrollView2DListener, RdpKeyboardMapper.KeyProcessingListener,
         RdpSessionView.SessionViewListener, RdpPointerView.TouchPointerListener,
         ClipboardManagerProxy.OnClipboardChangedListener {
@@ -116,24 +115,18 @@ public class SessionActivity extends AppCompatActivity
                 new AlertDialog.Builder(this)
                         .setTitle(R.string.dlg_title_verify_certificate)
                         .setPositiveButton(android.R.string.yes,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        callbackDialogResult = true;
-                                        synchronized (dialog) {
-                                            dialog.notify();
-                                        }
+                                (dialog, which) -> {
+                                    callbackDialogResult = true;
+                                    synchronized (dialog) {
+                                        dialog.notify();
                                     }
                                 })
                         .setNegativeButton(android.R.string.no,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        callbackDialogResult = false;
-                                        connectCancelledByUser = true;
-                                        synchronized (dialog) {
-                                            dialog.notify();
-                                        }
+                                (dialog, which) -> {
+                                    callbackDialogResult = false;
+                                    connectCancelledByUser = true;
+                                    synchronized (dialog) {
+                                        dialog.notify();
                                     }
                                 })
                         .setCancelable(false)
@@ -146,13 +139,10 @@ public class SessionActivity extends AppCompatActivity
                         .setView(userCredView)
                         .setTitle(R.string.dlg_title_credentials)
                         .setPositiveButton(android.R.string.ok,
-                                new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        callbackDialogResult = true;
-                                        synchronized (dialog) {
-                                            dialog.notify();
-                                        }
+                                (dialog, which) -> {
+                                    callbackDialogResult = true;
+                                    synchronized (dialog) {
+                                        dialog.notify();
                                     }
                                 })
                         .setNegativeButton(android.R.string.cancel,
@@ -171,17 +161,9 @@ public class SessionActivity extends AppCompatActivity
     }
 
     private boolean hasHardwareMenuButton() {
-        if (Build.VERSION.SDK_INT <= 10)
-            return true;
-
-        if (Build.VERSION.SDK_INT >= 14) {
-            boolean rc = false;
-            final ViewConfiguration cfg = ViewConfiguration.get(this);
-
-            return cfg.hasPermanentMenuKey();
-        }
-
-        return false;
+        boolean rc = false;
+        final ViewConfiguration cfg = ViewConfiguration.get(this);
+        return cfg.hasPermanentMenuKey();
     }
 
     @Override
@@ -197,8 +179,9 @@ public class SessionActivity extends AppCompatActivity
         this.setContentView(R.layout.session);
         if (hasHardwareMenuButton() || ApplicationSettingsActivity.getHideActionBar(this)) {
             this.getSupportActionBar().hide();
-        } else
+        } else {
             this.getSupportActionBar().show();
+        }
 
         Log.v(TAG, "Session.onCreate");
 
@@ -210,18 +193,14 @@ public class SessionActivity extends AppCompatActivity
         // A bit weird looking
         // but this is the only way ...
         final View activityRootView = findViewById(R.id.session_root_view);
-        activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(
-                new OnGlobalLayoutListener() {
-                    @Override
-                    public void onGlobalLayout() {
-                        screen_width = activityRootView.getWidth();
-                        screen_height = activityRootView.getHeight();
+        activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+                    screen_width = activityRootView.getWidth();
+                    screen_height = activityRootView.getHeight();
 
-                        // start session
-                        if (!sessionRunning && getIntent() != null) {
-                            processIntent(getIntent());
-                            sessionRunning = true;
-                        }
+                    // start session
+                    if (!sessionRunning && getIntent() != null) {
+                        processIntent(getIntent());
+                        sessionRunning = true;
                     }
                 });
 
@@ -251,6 +230,7 @@ public class SessionActivity extends AppCompatActivity
         modifiersKeyboardView = (KeyboardView) findViewById(R.id.extended_keyboard_header);
         modifiersKeyboardView.setKeyboard(modifiersKeyboard);
         modifiersKeyboardView.setOnKeyboardActionListener(this);
+
 
         scrollView = (RdpScrollView) findViewById(R.id.sessionScrollView);
         scrollView.setScrollViewListener(this);
@@ -436,7 +416,7 @@ public class SessionActivity extends AppCompatActivity
     }
 
     private void connectWithTitle(String title) {
-        session.setUIEventListener(this);
+        session.setUiEventListener(this);
 
         progressDialog = new ProgressDialog(this);
         progressDialog.setTitle(title);
@@ -465,7 +445,7 @@ public class SessionActivity extends AppCompatActivity
      */
     private void bindSession() {
         Log.v(TAG, "bindSession called");
-        session.setUIEventListener(this);
+        session.setUiEventListener(this);
         rdpSessionView.onSurfaceChange(session);
         scrollView.requestLayout();
         rdpKeyboardMapper.reset(this);
@@ -730,7 +710,7 @@ public class SessionActivity extends AppCompatActivity
     // ****************************************************************************
     // LibFreeRDP UI event listener implementation
     @Override
-    public void OnSettingsChanged(int width, int height, int bpp) {
+    public void onSettingsChanged(int width, int height, int bpp) {
 
         if (bpp > 16)
             bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
@@ -758,7 +738,7 @@ public class SessionActivity extends AppCompatActivity
     }
 
     @Override
-    public void OnGraphicsUpdate(int x, int y, int width, int height) {
+    public void onGraphicsUpdate(int x, int y, int width, int height) {
         LibFreeRDP.updateGraphics(session.getInstance(), bitmap, x, y, width, height);
 
         rdpSessionView.addInvalidRegion(new Rect(x, y, x + width, y + height));
@@ -772,7 +752,7 @@ public class SessionActivity extends AppCompatActivity
     }
 
     @Override
-    public void OnGraphicsResize(int width, int height, int bpp) {
+    public void onGraphicsResize(int width, int height, int bpp) {
         // replace bitmap
         if (bpp > 16)
             bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
@@ -788,7 +768,7 @@ public class SessionActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean OnAuthenticate(StringBuilder username, StringBuilder domain,
+    public boolean onAuthenticate(StringBuilder username, StringBuilder domain,
                                   StringBuilder password) {
         // this is where the return code of our dialog will be stored
         callbackDialogResult = false;
@@ -826,7 +806,7 @@ public class SessionActivity extends AppCompatActivity
     }
 
     @Override
-    public boolean OnGatewayAuthenticate(StringBuilder username, StringBuilder domain,
+    public boolean onGatewayAuthenticate(StringBuilder username, StringBuilder domain,
                                          StringBuilder password) {
         // this is where the return code of our dialog will be stored
         callbackDialogResult = false;
@@ -864,7 +844,7 @@ public class SessionActivity extends AppCompatActivity
     }
 
     @Override
-    public int OnVerifiyCertificate(String commonName, String subject, String issuer,
+    public int onVerifiyCertificate(String commonName, String subject, String issuer,
                                     String fingerprint, boolean mismatch) {
         // see if global settings says accept all
         if (ApplicationSettingsActivity.getAcceptAllCertificates(this))
@@ -894,7 +874,7 @@ public class SessionActivity extends AppCompatActivity
     }
 
     @Override
-    public int OnVerifyChangedCertificate(String commonName, String subject, String issuer,
+    public int onVerifyChangedCertificate(String commonName, String subject, String issuer,
                                           String fingerprint, String oldSubject, String oldIssuer,
                                           String oldFingerprint) {
         // see if global settings says accept all
@@ -925,7 +905,7 @@ public class SessionActivity extends AppCompatActivity
     }
 
     @Override
-    public void OnRemoteClipboardChanged(String data) {
+    public void onRemoteClipboardChanged(String data) {
         Log.v(TAG, "OnRemoteClipboardChanged: " + data);
         mClipboardManager.setClipboardData(data);
     }
@@ -962,20 +942,24 @@ public class SessionActivity extends AppCompatActivity
 
     @Override
     public void onSessionViewLeftTouch(int x, int y, boolean down) {
-        if (!down)
+        if (!down) {
             cancelDelayedMoveEvent();
+        }
 
         LibFreeRDP.sendCursorEvent(session.getInstance(), x, y,
                 toggleMouseButtons ? RdpMouseMapper.getRightButtonEvent(this, down)
                         : RdpMouseMapper.getLeftButtonEvent(this, down));
 
-        if (!down)
+        if (!down) {
             toggleMouseButtons = false;
+        }
     }
 
+    @Override
     public void onSessionViewRightTouch(int x, int y, boolean down) {
-        if (!down)
+        if (!down) {
             toggleMouseButtons = !toggleMouseButtons;
+        }
     }
 
     @Override
@@ -1292,7 +1276,7 @@ public class SessionActivity extends AppCompatActivity
                 progressDialog = null;
             }
 
-            session.setUIEventListener(null);
+            session.setUiEventListener(null);
             closeSessionActivity(RESULT_OK);
         }
     }

@@ -10,9 +10,13 @@ import android.os.Parcelable;
 import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
 import com.freerdp.freerdpcore.services.LibFreeRDP;
 
+/**
+ * @author Admin
+ */
 public class RdpSessionState implements Parcelable {
     public static final Parcelable.Creator<RdpSessionState> CREATOR =
             new Parcelable.Creator<RdpSessionState>() {
+                @Override
                 public RdpSessionState createFromParcel(Parcel in) {
                     return new RdpSessionState(in);
                 }
@@ -26,7 +30,7 @@ public class RdpSessionState implements Parcelable {
     private final BaseRdpBookmark bookmark;
     private final Uri openUri;
     private BitmapDrawable surface;
-    private LibFreeRDP.UIEventListener uiEventListener;
+    private LibFreeRDP.UiEventListener uiEventListener;
 
     public RdpSessionState(Parcel parcel) {
         instance = parcel.readLong();
@@ -72,11 +76,11 @@ public class RdpSessionState implements Parcelable {
         return openUri;
     }
 
-    public LibFreeRDP.UIEventListener getUIEventListener() {
+    public LibFreeRDP.UiEventListener getUiEventListener() {
         return uiEventListener;
     }
 
-    public void setUIEventListener(LibFreeRDP.UIEventListener uiEventListener) {
+    public void setUiEventListener(LibFreeRDP.UiEventListener uiEventListener) {
         this.uiEventListener = uiEventListener;
     }
 

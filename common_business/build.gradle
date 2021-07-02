@@ -49,35 +49,45 @@ dependencies {
     api project(':common_ui')
 
     // 腾讯Bugly
-    api 'com.tencent.bugly:crashreport:' + rootProject.ext.buglyCrashVersion
+    api "com.tencent.bugly:crashreport:${rootProject.ext.buglyCrashVersion}"
 
     // RxAndroid
-    api 'io.reactivex.rxjava3:rxandroid:' + rootProject.ext.rxAndroidVersion
-    api 'io.reactivex.rxjava3:rxjava:' + rootProject.ext.rxAndroidVersion
+    api "io.reactivex.rxjava3:rxandroid:${rootProject.ext.rxAndroidVersion}"
+    api "io.reactivex.rxjava3:rxjava:${rootProject.ext.rxAndroidVersion}"
     // RxAndroid自动解绑订阅
-    api 'com.uber.autodispose2:autodispose-android:' + rootProject.ext.autoDisposeVersion
-    api 'com.uber.autodispose2:autodispose-androidx-lifecycle:' + rootProject.ext.autoDisposeVersion
+    api "com.uber.autodispose2:autodispose-android:${rootProject.ext.autoDisposeVersion}"
+    api "com.uber.autodispose2:autodispose-androidx-lifecycle:${rootProject.ext.autoDisposeVersion}"
+
+    // Excel 操作
+    api "net.sourceforge.jexcelapi:jxl:${rootProject.ext.poiVersion}"
 
     // Excel 操作
     api 'net.sourceforge.jexcelapi:jxl:'+ rootProject.ext.poiVersion
 
     // 数据库
-    implementation 'androidx.room:room-runtime:' + rootProject.ext.roomVersion
-    annotationProcessor 'androidx.room:room-compiler:' + rootProject.ext.roomVersion
+    implementation "androidx.room:room-runtime:${rootProject.ext.roomVersion}"
+    annotationProcessor "androidx.room:room-compiler:${rootProject.ext.roomVersion}"
 
     // 调试环境查看数据库
-    debugImplementation 'com.amitshekhar.android:debug-db:' + rootProject.ext.debugDbVersion;
+    debugImplementation "com.amitshekhar.android:debug-db:${rootProject.ext.debugDbVersion}"
 
-    implementation 'androidx.appcompat:appcompat:' + rootProject.ext.appcompatVersion
-    implementation 'com.google.android.material:material:' + rootProject.ext.materialVersion
-    implementation 'androidx.constraintlayout:constraintlayout:' + rootProject.ext.constraintlayoutVersion
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
+    implementation "androidx.arch.core:core-runtime:2.1.0"
 
-    implementation 'com.alibaba:arouter-api:' + rootProject.ext.arouterVersion
-    annotationProcessor 'com.alibaba:arouter-compiler:' + rootProject.ext.arouterVersion
+    // Kotlin
+    api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${rootProject.ext.kotlinVersion}"
+    api "org.jetbrains.kotlin:kotlin-reflect:${rootProject.ext.kotlinVersion}"
+    api "androidx.core:core-ktx:${rootProject.ext.kotlinKtxVersion}"
 
-    testImplementation 'junit:junit:' + rootProject.ext.junitVersion
-    androidTestImplementation 'androidx.test.ext:junit:' + rootProject.ext.extJunitVersion
-    androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.ext.espressoVersion
+
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"
+    implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
+    implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"
+
+    implementation "com.alibaba:arouter-api:${rootProject.ext.arouterVersion}"
+    annotationProcessor "com.alibaba:arouter-compiler:${rootProject.ext.arouterVersion}"
+
+    testImplementation "junit:junit:${rootProject.ext.junitVersion}"
+    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.extJunitVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoVersion}"
 }

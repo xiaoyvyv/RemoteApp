@@ -193,6 +193,12 @@
             "notNull": true
           },
           {
+            "fieldPath": "lastTime",
+            "columnName": "lastTime",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "label",
             "columnName": "label",
             "affinity": "TEXT",

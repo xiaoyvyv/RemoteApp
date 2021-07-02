@@ -1,14 +1,17 @@
 package com.xiaoyv.rdp.main.view;
 
+import android.app.Activity;
 import android.view.View;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.alibaba.android.arouter.launcher.ARouter;
+import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.ColorUtils;
 import com.blankj.utilcode.util.ObjectUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 import com.drakeet.multitype.MultiTypeAdapter;
+import com.freerdp.freerdpcore.presentation.HomeActivity;
 import com.google.android.material.tabs.TabLayout;
 import com.xiaoyv.busines.base.BaseMvpFragment;
 import com.xiaoyv.busines.base.BaseSubscriber;
@@ -22,6 +25,8 @@ import com.xiaoyv.rdp.databinding.RdpFragmentMainBinding;
 import com.xiaoyv.rdp.main.adapter.RdpListBinder;
 import com.xiaoyv.rdp.main.contract.RdpListContract;
 import com.xiaoyv.rdp.main.presenter.RdpListPresenter;
+import com.xiaoyv.rdp.screen.view.ScreenActivity;
+import com.xiaoyv.rdp.setting.AppSettingActivity;
 import com.xiaoyv.rdp.setting.BookmarkSettingActivity;
 import com.xiaoyv.ui.dialog.OptionsDialog;
 import com.xiaoyv.ui.listener.SimpleRefreshListener;
@@ -62,13 +67,13 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
                 .setTitle(StringUtils.getString(R.string.rdp_main_title))
                 .setEndIcon(R.drawable.ui_icon_search)
                 .setEndClickListener(v -> {
-                    //AppSettingActivity.openSelf(AppSettingActivity.TYPE_SETTING_UI);
-                    //AppSettingActivity.openSelf(AppSettingActivity.TYPE_SETTING_POWER);
-                    //AppSettingActivity.openSelf(AppSettingActivity.TYPE_SETTING_SECURITY);
-                    BookmarkSettingActivity.openSelf(BookmarkSettingActivity.TYPE_SETTING_ADVANCE);
-                    BookmarkSettingActivity.openSelf(BookmarkSettingActivity.TYPE_SETTING_DEBUG);
-                    BookmarkSettingActivity.openSelf(BookmarkSettingActivity.TYPE_SETTING_SCREEN);
-                    BookmarkSettingActivity.openSelf(BookmarkSettingActivity.TYPE_SETTING_PERFORMANCE);
+                    AppSettingActivity.openSelf(AppSettingActivity.TYPE_SETTING_UI);
+                    AppSettingActivity.openSelf(AppSettingActivity.TYPE_SETTING_POWER);
+                    AppSettingActivity.openSelf(AppSettingActivity.TYPE_SETTING_SECURITY);
+//                    BookmarkSettingActivity.openSelf(BookmarkSettingActivity.TYPE_SETTING_ADVANCE);
+//                    BookmarkSettingActivity.openSelf(BookmarkSettingActivity.TYPE_SETTING_DEBUG);
+//                    BookmarkSettingActivity.openSelf(BookmarkSettingActivity.TYPE_SETTING_SCREEN);
+//                    BookmarkSettingActivity.openSelf(BookmarkSettingActivity.TYPE_SETTING_PERFORMANCE);
                 });
 
         scrollDecor = OverScrollDecoratorHelper.setUpOverScroll(binding.rvContent, OverScrollDecoratorHelper.ORIENTATION_VERTICAL);
@@ -100,6 +105,7 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
                 switch (position) {
                     // 连接
                     case 0:
+                        ScreenActivity.openSelf(new RdpEntity());
                         break;
                     // 编辑
                     case 1:

@@ -145,6 +145,14 @@ public class LibFreeRDP {
         return "-" + name;
     }
 
+    /**
+     * 配置连接信息
+     *
+     * @param context  context
+     * @param inst     实例ID
+     * @param bookmark bookmark
+     * @return 是否成功
+     */
     public static boolean setConnectionInfo(Context context, long inst, BaseRdpBookmark bookmark) {
         BaseRdpBookmark.ScreenSettings screenSettings = bookmark.getActiveScreenSettings();
         BaseRdpBookmark.AdvancedSettings advanced = bookmark.getAdvancedSettings();
@@ -184,7 +192,7 @@ public class LibFreeRDP {
             args.add("/p:" + arg);
         }
 
-		args.add(String.format(Locale.CANADA, "/size:%dx%d", screenSettings.getWidth(), screenSettings.getHeight()));
+        args.add(String.format(Locale.CANADA, "/size:%dx%d", screenSettings.getWidth(), screenSettings.getHeight()));
         args.add("/bpp:" + String.valueOf(screenSettings.getColors()));
 
         if (advanced.getConsoleMode()) {
@@ -255,7 +263,7 @@ public class LibFreeRDP {
             RdpBookmark.GatewaySettings gateway =
                     bookmark.<RdpBookmark>get().getGatewaySettings();
 
-            args.add(String.format("/g:%s:%d", gateway.getHostname(), gateway.getPort()));
+            args.add(String.format(Locale.getDefault(), "/g:%s:%d", gateway.getHostname(), gateway.getPort()));
 
             arg = gateway.getUsername();
             if (!arg.isEmpty()) {
@@ -367,8 +375,9 @@ public class LibFreeRDP {
     }
 
     private static void OnConnectionSuccess(long inst) {
-        if (listener != null)
-            listener.OnConnectionSuccess(inst);
+        if (listener != null) {
+            listener.onConnectionSuccess(inst);
+        }
         synchronized (mInstanceState) {
             mInstanceState.append(inst, true);
             mInstanceState.notifyAll();
@@ -376,8 +385,9 @@ public class LibFreeRDP {
     }
 
     private static void OnConnectionFailure(long inst) {
-        if (listener != null)
-            listener.OnConnectionFailure(inst);
+        if (listener != null) {
+            listener.onConnectionFailure(inst);
+        }
         synchronized (mInstanceState) {
             mInstanceState.remove(inst);
             mInstanceState.notifyAll();
@@ -385,18 +395,21 @@ public class LibFreeRDP {
     }
 
     private static void OnPreConnect(long inst) {
-        if (listener != null)
-            listener.OnPreConnect(inst);
+        if (listener != null) {
+            listener.onPreConnect(inst);
+        }
     }
 
     private static void OnDisconnecting(long inst) {
-        if (listener != null)
-            listener.OnDisconnecting(inst);
+        if (listener != null) {
+            listener.onDisconnecting(inst);
+        }
     }
 
     private static void OnDisconnected(long inst) {
-        if (listener != null)
-            listener.OnDisconnected(inst);
+        if (listener != null) {
+            listener.onDisconnected(inst);
+        }
         synchronized (mInstanceState) {
             mInstanceState.remove(inst);
             mInstanceState.notifyAll();
@@ -405,44 +418,52 @@ public class LibFreeRDP {
 
     private static void OnSettingsChanged(long inst, int width, int height, int bpp) {
         RdpSessionState s = RdpApp.getSession(inst);
-        if (s == null)
+        if (s == null) {
             return;
-        UIEventListener uiEventListener = s.getUIEventListener();
-        if (uiEventListener != null)
-            uiEventListener.OnSettingsChanged(width, height, bpp);
+        }
+        UiEventListener uiEventListener = s.getUiEventListener();
+        if (uiEventListener != null) {
+            uiEventListener.onSettingsChanged(width, height, bpp);
+        }
     }
 
     private static boolean OnAuthenticate(long inst, StringBuilder username, StringBuilder domain,
                                           StringBuilder password) {
         RdpSessionState s = RdpApp.getSession(inst);
-        if (s == null)
+        if (s == null) {
             return false;
-        UIEventListener uiEventListener = s.getUIEventListener();
-        if (uiEventListener != null)
-            return uiEventListener.OnAuthenticate(username, domain, password);
+        }
+        UiEventListener uiEventListener = s.getUiEventListener();
+        if (uiEventListener != null) {
+            return uiEventListener.onAuthenticate(username, domain, password);
+        }
         return false;
     }
 
     private static boolean OnGatewayAuthenticate(long inst, StringBuilder username,
                                                  StringBuilder domain, StringBuilder password) {
-        RdpSessionState s = RdpApp.getSession(inst);
-        if (s == null)
+        RdpSessionState session = RdpApp.getSession(inst);
+        if (session == null) {
             return false;
-        UIEventListener uiEventListener = s.getUIEventListener();
-        if (uiEventListener != null)
-            return uiEventListener.OnGatewayAuthenticate(username, domain, password);
+        }
+        UiEventListener uiEventListener = session.getUiEventListener();
+        if (uiEventListener != null) {
+            return uiEventListener.onGatewayAuthenticate(username, domain, password);
+        }
         return false;
     }
 
     private static int OnVerifyCertificate(long inst, String commonName, String subject,
                                            String issuer, String fingerprint, boolean hostMismatch) {
         RdpSessionState s = RdpApp.getSession(inst);
-        if (s == null)
+        if (s == null) {
             return 0;
-        UIEventListener uiEventListener = s.getUIEventListener();
-        if (uiEventListener != null)
-            return uiEventListener.OnVerifiyCertificate(commonName, subject, issuer, fingerprint,
+        }
+        UiEventListener uiEventListener = s.getUiEventListener();
+        if (uiEventListener != null) {
+            return uiEventListener.onVerifiyCertificate(commonName, subject, issuer, fingerprint,
                     hostMismatch);
+        }
         return 0;
     }
 
@@ -451,78 +472,92 @@ public class LibFreeRDP {
                                                   String oldSubject, String oldIssuer,
                                                   String oldFingerprint) {
         RdpSessionState s = RdpApp.getSession(inst);
-        if (s == null)
+        if (s == null) {
             return 0;
-        UIEventListener uiEventListener = s.getUIEventListener();
-        if (uiEventListener != null)
-            return uiEventListener.OnVerifyChangedCertificate(
+        }
+        UiEventListener uiEventListener = s.getUiEventListener();
+        if (uiEventListener != null) {
+            return uiEventListener.onVerifyChangedCertificate(
                     commonName, subject, issuer, fingerprint, oldSubject, oldIssuer, oldFingerprint);
+        }
         return 0;
     }
 
     private static void OnGraphicsUpdate(long inst, int x, int y, int width, int height) {
         RdpSessionState s = RdpApp.getSession(inst);
-        if (s == null)
+        if (s == null) {
             return;
-        UIEventListener uiEventListener = s.getUIEventListener();
-        if (uiEventListener != null)
-            uiEventListener.OnGraphicsUpdate(x, y, width, height);
+        }
+        UiEventListener uiEventListener = s.getUiEventListener();
+        if (uiEventListener != null) {
+            uiEventListener.onGraphicsUpdate(x, y, width, height);
+        }
     }
 
     private static void OnGraphicsResize(long inst, int width, int height, int bpp) {
         RdpSessionState s = RdpApp.getSession(inst);
-        if (s == null)
+        if (s == null) {
             return;
-        UIEventListener uiEventListener = s.getUIEventListener();
-        if (uiEventListener != null)
-            uiEventListener.OnGraphicsResize(width, height, bpp);
+        }
+        UiEventListener uiEventListener = s.getUiEventListener();
+        if (uiEventListener != null) {
+            uiEventListener.onGraphicsResize(width, height, bpp);
+        }
     }
 
     private static void OnRemoteClipboardChanged(long inst, String data) {
         RdpSessionState s = RdpApp.getSession(inst);
-        if (s == null)
+        if (s == null) {
             return;
-        UIEventListener uiEventListener = s.getUIEventListener();
-        if (uiEventListener != null)
-            uiEventListener.OnRemoteClipboardChanged(data);
+        }
+        UiEventListener uiEventListener = s.getUiEventListener();
+        if (uiEventListener != null) {
+            uiEventListener.onRemoteClipboardChanged(data);
+        }
     }
 
     public static String getVersion() {
         return freerdp_get_version();
     }
 
-    public static interface EventListener {
-        void OnPreConnect(long instance);
+    /**
+     * EventListener
+     */
+    public interface EventListener {
+        void onPreConnect(long instance);
 
-        void OnConnectionSuccess(long instance);
+        void onConnectionSuccess(long instance);
 
-        void OnConnectionFailure(long instance);
+        void onConnectionFailure(long instance);
 
-        void OnDisconnecting(long instance);
+        void onDisconnecting(long instance);
 
-        void OnDisconnected(long instance);
+        void onDisconnected(long instance);
     }
 
-    public static interface UIEventListener {
-        void OnSettingsChanged(int width, int height, int bpp);
+    /**
+     * UiEventListener
+     */
+    public interface UiEventListener {
+        void onSettingsChanged(int width, int height, int bpp);
 
-        boolean OnAuthenticate(StringBuilder username, StringBuilder domain,
+        boolean onAuthenticate(StringBuilder username, StringBuilder domain,
                                StringBuilder password);
 
-        boolean OnGatewayAuthenticate(StringBuilder username, StringBuilder domain,
+        boolean onGatewayAuthenticate(StringBuilder username, StringBuilder domain,
                                       StringBuilder password);
 
-        int OnVerifiyCertificate(String commonName, String subject, String issuer,
+        int onVerifiyCertificate(String commonName, String subject, String issuer,
                                  String fingerprint, boolean mismatch);
 
-        int OnVerifyChangedCertificate(String commonName, String subject, String issuer,
+        int onVerifyChangedCertificate(String commonName, String subject, String issuer,
                                        String fingerprint, String oldSubject, String oldIssuer,
                                        String oldFingerprint);
 
-        void OnGraphicsUpdate(int x, int y, int width, int height);
+        void onGraphicsUpdate(int x, int y, int width, int height);
 
-        void OnGraphicsResize(int width, int height, int bpp);
+        void onGraphicsResize(int width, int height, int bpp);
 
-        void OnRemoteClipboardChanged(String data);
+        void onRemoteClipboardChanged(String data);
     }
 }

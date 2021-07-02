@@ -29,13 +29,36 @@ import java.util.TimerTask;
 public class RdpApp implements LibFreeRDP.EventListener {
     private static volatile RdpApp globalApp;
     private static final String TAG = "GlobalApp";
-    // 事件通知定义
+
+    /**
+     * Rdp广播通知定义
+     */
     public static final String EVENT_TYPE = "EVENT_TYPE";
     public static final String EVENT_PARAM = "EVENT_PARAM";
     public static final String ACTION_EVENT_FREERDP = "com.freerdp.freerdp.event.freerdp";
+
+    /**
+     * Rdp广播事件  开设连接
+     */
+    public static final int FREERDP_EVENT_PREPARE_CONNECT = 0;
+    /**
+     * Rdp广播事件  连接成功
+     */
     public static final int FREERDP_EVENT_CONNECTION_SUCCESS = 1;
+    /**
+     * Rdp广播事件  连接失败
+     */
     public static final int FREERDP_EVENT_CONNECTION_FAILURE = 2;
-    public static final int FREERDP_EVENT_DISCONNECTED = 3;
+    /**
+     * Rdp广播事件  连接断开中
+     */
+    public static final int FREERDP_EVENT_DISCONNECTING = 3;
+    /**
+     * Rdp广播事件  连接断开
+     */
+    public static final int FREERDP_EVENT_DISCONNECTED = 4;
+
+
     public static boolean ConnectedToMobileWork = false;
     public static Map<Long, RdpSessionState> sessionMap;
     public static BookmarkDB bookmarkDB;
@@ -62,6 +85,29 @@ public class RdpApp implements LibFreeRDP.EventListener {
             }
         }
         globalApp.onCreate(application);
+    }
+
+    private void onCreate(Application application) {
+        // 初始化首选项
+        ApplicationSettingsActivity.get(application);
+
+        sessionMap = Collections.synchronizedMap(new HashMap<>(0));
+
+        LibFreeRDP.setEventListener(this);
+
+        bookmarkDB = new BookmarkDB(application);
+
+        manualBookmarkGateway = new ManualBookmarkGateway(bookmarkDB);
+
+        historyDB = new HistoryDB(application);
+        quickConnectHistoryGateway = new QuickConnectHistoryGateway(historyDB);
+
+        ConnectedToMobileWork = NetworkUtils.is5G() || NetworkUtils.is4G();
+
+        // 亮屏息屏广播监听
+        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
+        filter.addAction(Intent.ACTION_SCREEN_OFF);
+        application.registerReceiver(new RdpScreenReceiver(), filter);
     }
 
     public static ManualBookmarkGateway getManualBookmarkGateway() {
@@ -91,13 +137,27 @@ public class RdpApp implements LibFreeRDP.EventListener {
         }
     }
 
-    // RDP session handling
+    /**
+     * 创建一个新的会话
+     *
+     * @param bookmark 配置参数
+     * @param context  context
+     * @return RdpSessionState
+     */
     static public RdpSessionState createSession(BaseRdpBookmark bookmark, Context context) {
         RdpSessionState session = new RdpSessionState(LibFreeRDP.newInstance(context), bookmark);
         sessionMap.put(session.getInstance(), session);
         return session;
     }
 
+
+    /**
+     * 创建一个新的会话
+     *
+     * @param openUri openUri
+     * @param context context
+     * @return RdpSessionState
+     */
     static public RdpSessionState createSession(Uri openUri, Context context) {
         RdpSessionState session = new RdpSessionState(LibFreeRDP.newInstance(context), openUri);
         sessionMap.put(session.getInstance(), session);
@@ -120,64 +180,48 @@ public class RdpApp implements LibFreeRDP.EventListener {
         }
     }
 
-    public void onCreate(Application application) {
-        // 初始化首选项
-        ApplicationSettingsActivity.get(application);
 
-        sessionMap = Collections.synchronizedMap(new HashMap<>());
-
-        LibFreeRDP.setEventListener(this);
-
-        bookmarkDB = new BookmarkDB(application);
-
-        manualBookmarkGateway = new ManualBookmarkGateway(bookmarkDB);
-
-        historyDB = new HistoryDB(application);
-        quickConnectHistoryGateway = new QuickConnectHistoryGateway(historyDB);
-
-        ConnectedToMobileWork = NetworkUtils.is5G() || NetworkUtils.is4G();
-
-        IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
-        filter.addAction(Intent.ACTION_SCREEN_OFF);
-        application.registerReceiver(new RdpScreenReceiver(), filter);
-    }
-
-    // 发送FreeRDP通知的助手
-    private void sendRDPNotification(int type, long param) {
-        // 发送广播
-        Intent intent = new Intent(ACTION_EVENT_FREERDP);
-        intent.putExtra(EVENT_TYPE, type);
-        intent.putExtra(EVENT_PARAM, param);
-        application.sendBroadcast(intent);
+    /**
+     * LibFreeRDP.EventListener 的实现 =============================================================
+     */
+    @Override
+    public void onPreConnect(long instance) {
+        sendRdpNotification(FREERDP_EVENT_PREPARE_CONNECT, instance);
     }
 
     @Override
-    public void OnPreConnect(long instance) {
-        Log.v(TAG, "OnPreConnect");
+    public void onConnectionSuccess(long instance) {
+        sendRdpNotification(FREERDP_EVENT_CONNECTION_SUCCESS, instance);
     }
 
-    // //////////////////////////////////////////////////////////////////////
-    // Implementation of LibFreeRDP.EventListener
-    public void OnConnectionSuccess(long instance) {
-        Log.v(TAG, "OnConnectionSuccess");
-        sendRDPNotification(FREERDP_EVENT_CONNECTION_SUCCESS, instance);
+    @Override
+    public void onConnectionFailure(long instance) {
+        sendRdpNotification(FREERDP_EVENT_CONNECTION_FAILURE, instance);
     }
 
-    public void OnConnectionFailure(long instance) {
-        Log.v(TAG, "OnConnectionFailure");
-
-        // 向会话活动发送通知
-        sendRDPNotification(FREERDP_EVENT_CONNECTION_FAILURE, instance);
+    @Override
+    public void onDisconnecting(long instance) {
+        sendRdpNotification(FREERDP_EVENT_DISCONNECTING, instance);
     }
 
-    public void OnDisconnecting(long instance) {
-        Log.v(TAG, "OnDisconnecting");
+    @Override
+    public void onDisconnected(long instance) {
+        sendRdpNotification(FREERDP_EVENT_DISCONNECTED, instance);
     }
 
-    public void OnDisconnected(long instance) {
-        Log.v(TAG, "OnDisconnected");
-        sendRDPNotification(FREERDP_EVENT_DISCONNECTED, instance);
+    /**
+     * 发送 Rdp 状态广播
+     *
+     * @param type     类型
+     * @param instance 实例
+     */
+    private void sendRdpNotification(int type, long instance) {
+        Intent intent = new Intent(ACTION_EVENT_FREERDP);
+        intent.putExtra(EVENT_TYPE, type);
+        intent.putExtra(EVENT_PARAM, instance);
+        application.sendBroadcast(intent);
     }
+
 
     // TimerTask用于在屏幕关闭后断开会话
     private static class DisconnectTask extends TimerTask {

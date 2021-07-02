@@ -45,14 +45,14 @@ dependencies {
     implementation project(':libftp')
     implementation project(':common_business')
 
-    implementation 'androidx.appcompat:appcompat:' + rootProject.ext.appcompatVersion
-    implementation 'com.google.android.material:material:' + rootProject.ext.materialVersion
-    implementation 'androidx.constraintlayout:constraintlayout:' + rootProject.ext.constraintlayoutVersion
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"
+    implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
+    implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
 
-    implementation 'com.alibaba:arouter-api:' + rootProject.ext.arouterVersion
-    annotationProcessor 'com.alibaba:arouter-compiler:' + rootProject.ext.arouterVersion
+    implementation "com.alibaba:arouter-api:${rootProject.ext.arouterVersion}"
+    annotationProcessor "com.alibaba:arouter-compiler:${rootProject.ext.arouterVersion}"
 
-    testImplementation 'junit:junit:' + rootProject.ext.junitVersion
-    androidTestImplementation 'androidx.test.ext:junit:' + rootProject.ext.extJunitVersion
-    androidTestImplementation 'androidx.test.espresso:espresso-core:' + rootProject.ext.espressoVersion
+    testImplementation "junit:junit:${rootProject.ext.junitVersion}"
+    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.extJunitVersion}"
+    androidTestImplementation "androidx.test.espresso:espresso-core:${rootProject.ext.espressoVersion}"
 }

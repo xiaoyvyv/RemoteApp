@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RecentlyNonNull;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -49,35 +50,34 @@ public class BookmarkSettingActivity extends BaseActivity {
 
 
     @Override
-    protected void initIntentData(Intent intent, Bundle bundle) {
+    protected void initIntentData(@RecentlyNonNull Intent intent, @RecentlyNonNull Bundle bundle) {
         type = getIntent().getStringExtra(KEY_SETTING);
     }
 
     @Override
     protected View createContentView() {
-        advanceBinding = RdpSettingAdvanceBinding.inflate(getLayoutInflater());
-        debugBinding = RdpSettingDebugBinding.inflate(getLayoutInflater());
-        screenBinding = RdpSettingScreenBinding.inflate(getLayoutInflater());
-        screen3gBinding = RdpSettingScreen3gBinding.inflate(getLayoutInflater());
-        performanceBinding = RdpSettingPerformanceBinding.inflate(getLayoutInflater());
-        performance3gBinding = RdpSettingPerformance3gBinding.inflate(getLayoutInflater());
-
         if (StringUtils.equals(TYPE_SETTING_ADVANCE, type)) {
+            advanceBinding = RdpSettingAdvanceBinding.inflate(getLayoutInflater());
             return advanceBinding.getRoot();
         }
         if (StringUtils.equals(TYPE_SETTING_DEBUG, type)) {
+            debugBinding = RdpSettingDebugBinding.inflate(getLayoutInflater());
             return debugBinding.getRoot();
         }
         if (StringUtils.equals(TYPE_SETTING_SCREEN, type)) {
+            screenBinding = RdpSettingScreenBinding.inflate(getLayoutInflater());
             return screenBinding.getRoot();
         }
         if (StringUtils.equals(TYPE_SETTING_SCREEN3G, type)) {
+            screen3gBinding = RdpSettingScreen3gBinding.inflate(getLayoutInflater());
             return screen3gBinding.getRoot();
         }
         if (StringUtils.equals(TYPE_SETTING_PERFORMANCE, type)) {
+            performanceBinding = RdpSettingPerformanceBinding.inflate(getLayoutInflater());
             return performanceBinding.getRoot();
         }
         if (StringUtils.equals(TYPE_SETTING_PERFORMANCE3G, type)) {
+            performance3gBinding = RdpSettingPerformance3gBinding.inflate(getLayoutInflater());
             return performance3gBinding.getRoot();
         }
         throw new IllegalStateException("Unexpected value: " + type);
@@ -115,8 +115,9 @@ public class BookmarkSettingActivity extends BaseActivity {
 
     @Override
     protected void initData() {
-        initAdvance();
-
+        if (StringUtils.equals(TYPE_SETTING_ADVANCE, type)) {
+            initAdvance();
+        }
     }
 
     private void initAdvance() {

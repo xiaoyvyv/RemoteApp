@@ -28,5 +28,5 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:' + rootProject.ext.appcompatVersion
+    implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"
 }

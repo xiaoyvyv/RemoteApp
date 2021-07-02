@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
+import androidx.annotation.RecentlyNonNull;
+
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -52,7 +54,7 @@ public class AddSshActivity extends BaseActivity {
     }
 
     @Override
-    protected void initIntentData(Intent intent, Bundle bundle) {
+    protected void initIntentData(@RecentlyNonNull Intent intent, @RecentlyNonNull Bundle bundle) {
         sshEntity = (SshEntity) getIntent().getSerializableExtra(KEY_SSH_ENTITY);
         if (sshEntity == null) {
             sshEntity = new SshEntity();

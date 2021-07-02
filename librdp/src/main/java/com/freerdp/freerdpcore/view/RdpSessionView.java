@@ -232,15 +232,18 @@ public class RdpSessionView extends View {
     private class SessionGestureListener extends GestureDetector.SimpleOnGestureListener {
         boolean longPressInProgress = false;
 
+        @Override
         public boolean onDown(MotionEvent e) {
             return true;
         }
 
+        @Override
         public boolean onUp(MotionEvent e) {
             sessionViewListener.onSessionViewEndTouch();
             return true;
         }
 
+        @Override
         public void onLongPress(MotionEvent e) {
             MotionEvent mappedEvent = mapTouchEvent(e);
             sessionViewListener.onSessionViewBeginTouch();
@@ -248,6 +251,7 @@ public class RdpSessionView extends View {
             longPressInProgress = true;
         }
 
+        @Override
         public void onLongPressUp(MotionEvent e) {
             MotionEvent mappedEvent = mapTouchEvent(e);
             sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(), (int) mappedEvent.getY(), false);
@@ -255,6 +259,7 @@ public class RdpSessionView extends View {
             sessionViewListener.onSessionViewEndTouch();
         }
 
+        @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             if (longPressInProgress) {
                 MotionEvent mappedEvent = mapTouchEvent(e2);
@@ -265,6 +270,7 @@ public class RdpSessionView extends View {
             return false;
         }
 
+        @Override
         public boolean onDoubleTap(MotionEvent e) {
             // 发送双击事件
             MotionEvent mappedEvent = mapTouchEvent(e);
@@ -274,6 +280,7 @@ public class RdpSessionView extends View {
         }
 
 
+        @Override
         public boolean onSingleTapUp(MotionEvent e) {
             // 发送单击事件
             MotionEvent mappedEvent = mapTouchEvent(e);
@@ -288,12 +295,14 @@ public class RdpSessionView extends View {
     private class SessionDoubleGestureListener implements DoubleGestureDetector.OnDoubleGestureListener {
         private MotionEvent prevEvent = null;
 
+        @Override
         public boolean onDoubleTouchDown(MotionEvent e) {
             sessionViewListener.onSessionViewBeginTouch();
             prevEvent = MotionEvent.obtain(e);
             return true;
         }
 
+        @Override
         public boolean onDoubleTouchUp(MotionEvent e) {
             if (prevEvent != null) {
                 prevEvent.recycle();
@@ -303,6 +312,7 @@ public class RdpSessionView extends View {
             return true;
         }
 
+        @Override
         public boolean onDoubleTouchScroll(MotionEvent e1, MotionEvent e2) {
             // 计算用户向上或向下滚动（或根本没有滚动）
             float deltaY = e2.getY() - prevEvent.getY();
@@ -318,6 +328,7 @@ public class RdpSessionView extends View {
             return true;
         }
 
+        @Override
         public boolean onDoubleTouchSingleTap(MotionEvent e) {
             // 发送点击
             MotionEvent mappedEvent = mapDoubleTouchEvent(e);
