@@ -4,13 +4,10 @@ import android.net.Uri;
 
 import androidx.annotation.NonNull;
 
-import com.blankj.utilcode.util.ConvertUtils;
 import com.blankj.utilcode.util.FileIOUtils;
 import com.blankj.utilcode.util.FileUtils;
-import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.PathUtils;
 import com.blankj.utilcode.util.ThreadUtils;
-import com.blankj.utilcode.util.UriUtils;
 import com.blankj.utilcode.util.Utils;
 import com.xiaoyv.ui.listener.SimpleResultListener;
 
@@ -24,7 +21,7 @@ import java.io.InputStream;
  * @since 2020/12/09
  **/
 public class SelectUtils {
-    public static final String selectSavePath = PathUtils.getExternalAppCachePath() + "/select";
+    public static final String SELECT_SAVE_PATH = PathUtils.getExternalAppCachePath() + "/select";
 
     public static void copySelectFile(@NonNull Uri uri, @NonNull SimpleResultListener<File> listener) {
         ThreadUtils.executeByCached(new ThreadUtils.SimpleTask<File>() {
@@ -32,7 +29,7 @@ public class SelectUtils {
             public File doInBackground() throws Throwable{
                 InputStream inputStream = Utils.getApp().getContentResolver().openInputStream(uri);
                 String fileName = FileUtils.getFileName(uri.getPath());
-                String newFile = selectSavePath + "/" + fileName;
+                String newFile = SELECT_SAVE_PATH + "/" + fileName;
                 FileUtils.createFileByDeleteOldFile(newFile);
                 FileIOUtils.writeFileFromIS(newFile, inputStream);
                 return new File(newFile);

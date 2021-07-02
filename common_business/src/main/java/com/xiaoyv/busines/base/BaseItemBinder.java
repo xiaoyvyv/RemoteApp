@@ -16,6 +16,7 @@ import com.xiaoyv.ui.listener.SimpleFastClickListener;
  * @since 2020/12/01
  **/
 public abstract class BaseItemBinder<T, VH extends RecyclerView.ViewHolder> extends ItemViewBinder<T, VH> {
+    protected RecyclerView rvRootRecycler;
     protected OnItemChildClickListener<T> onItemChildClickListener = (view, dataBean, position, longClick) ->
             LogUtils.v("empty impl click listener for the item'child");
 
@@ -38,6 +39,9 @@ public abstract class BaseItemBinder<T, VH extends RecyclerView.ViewHolder> exte
         });
     }
 
+    public void bindRecycler(RecyclerView rvItem) {
+        this.rvRootRecycler = rvItem;
+    }
 
     public interface OnItemChildClickListener<BEAN> {
         /**

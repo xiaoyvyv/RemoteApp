@@ -9,6 +9,8 @@ import com.tencent.bugly.crashreport.CrashReport;
 import com.xiaoyv.busines.exception.RxGlobalExceptionHandler;
 import com.xiaoyv.busines.exception.RxExceptionHandler;
 
+import io.reactivex.rxjava3.plugins.RxJavaPlugins;
+
 /**
  * BaseApp
  *
@@ -26,7 +28,9 @@ public class BaseApp  {
         // 路由
         ARouter.init(application);
 
-        //设置全局异常处理器
+        // 设置全局异常处理器
         RxExceptionHandler.setExceptionHandler(new RxGlobalExceptionHandler());
+        // 设置全局未捕获异常拦截器
+        RxJavaPlugins.setErrorHandler(Throwable::printStackTrace);
     }
 }

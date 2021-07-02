@@ -63,4 +63,9 @@ public class TerminalPresenter extends ImplBasePresenter<TerminalContract.View> 
         keyCodeBeans.add(new KeyCodeBean(0, "↔"));
         return keyCodeBeans;
     }
+
+    @Override
+    public void v2pOnDestroy() {
+        model.p2mClose();
+    }
 }

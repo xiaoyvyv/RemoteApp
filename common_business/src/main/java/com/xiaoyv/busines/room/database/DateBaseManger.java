@@ -8,6 +8,7 @@ import com.blankj.utilcode.util.Utils;
 import com.xiaoyv.busines.room.dao.FtpDao;
 import com.xiaoyv.busines.room.dao.RdpDao;
 import com.xiaoyv.busines.room.dao.SshDao;
+import com.xiaoyv.busines.room.entity.FtpEntity;
 import com.xiaoyv.busines.room.entity.RdpEntity;
 import com.xiaoyv.busines.room.entity.SshEntity;
 
@@ -73,11 +74,14 @@ public class DateBaseManger {
         return sshDao;
     }
 
+    public FtpDao getFtpDao() {
+        return ftpDao;
+    }
 
     /**
-     * 保存或更新 Rdp
+     * 保存或更新 ssh
      *
-     * @param sshEntity rdp 信息
+     * @param sshEntity ssh 信息
      */
     public void saveSsh(@NonNull SshEntity sshEntity) {
         LogUtils.json(sshEntity);
@@ -94,7 +98,24 @@ public class DateBaseManger {
     }
 
 
-    public FtpDao getFtpDao() {
-        return ftpDao;
+    /**
+     * 保存或更新 ftp
+     *
+     * @param ftpEntity ftp 信息
+     */
+    public void saveFtp(@NonNull FtpEntity ftpEntity) {
+        LogUtils.json(ftpEntity);
+        if (ftpEntity.id < 0) {
+            getFtpDao().insert(ftpEntity);
+            return;
+        }
+        FtpEntity entity = getFtpDao().getById(ftpEntity.id);
+        if (entity == null) {
+            getFtpDao().insert(ftpEntity);
+            return;
+        }
+        getFtpDao().update(entity);
     }
+
+
 }

@@ -8,6 +8,7 @@ import androidx.room.Query;
 import androidx.room.Update;
 
 import com.xiaoyv.busines.room.entity.FtpEntity;
+import com.xiaoyv.busines.room.entity.SshEntity;
 
 import java.util.List;
 
@@ -21,6 +22,9 @@ import java.util.List;
 public interface FtpDao {
     @Query("SELECT * FROM ftp")
     List<FtpEntity> getAll();
+
+    @Query("SELECT * FROM ftp WHERE id =:id LIMIT 1")
+    FtpEntity getById(long id);
 
     @Query("SELECT * FROM ftp WHERE ip IN (:ip)")
     List<FtpEntity> loadAllByIps(int... ip);

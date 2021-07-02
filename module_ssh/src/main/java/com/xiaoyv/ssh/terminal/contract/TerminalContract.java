@@ -53,5 +53,11 @@ public interface TerminalContract {
          * @return 观察者
          */
         Observable<Session> p2mConnectSsh(SshEntity sshEntity);
+
+
+        /**
+         * 关闭连接
+         */
+        void p2mClose();
     }
 }

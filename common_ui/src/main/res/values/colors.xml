@@ -20,6 +20,8 @@
     <color name="ui_system_button">#f3f3f5</color>
     <color name="ui_system_error">#e02020</color>
     <color name="ui_system_black">#000000</color>
+    <color name="ui_system_translate">#00000000</color>
+
 
     <!-- 字体颜色 -->
     <color name="ui_text_c0">@color/ui_system_c0</color>

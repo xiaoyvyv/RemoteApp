@@ -11,6 +11,12 @@ import com.xiaoyv.busines.config.NavigationPath;
 import com.xiaoyv.main.R;
 import com.xiaoyv.main.databinding.MainActivityHomeBinding;
 
+/**
+ * HomeActivity
+ *
+ * @author why
+ * @since 2020/12/12
+ */
 public class HomeActivity extends BaseActivity {
     private MainActivityHomeBinding binding;
     private Fragment rdpFragment;
