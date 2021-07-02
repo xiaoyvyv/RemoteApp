@@ -3,7 +3,6 @@ package com.xiaoyv.ssh.terminal.view;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
-import android.view.KeyEvent;
 import android.view.View;
 
 import com.blankj.utilcode.util.ActivityUtils;
@@ -128,7 +127,7 @@ public class TerminalActivity extends BaseMvpActivity<TerminalContract.View, Ter
         InputStream stdout = session.getStdout();
         OutputStream stdin = session.getStdin();
 
-        TermSession termSession = new TermSession(){
+        TermSession termSession = new TermSession() {
             @Override
             protected void onProcessExit() {
                 super.onProcessExit();
@@ -144,8 +143,7 @@ public class TerminalActivity extends BaseMvpActivity<TerminalContract.View, Ter
 
         });
 
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        activity.getDisplay().getRealMetrics(displayMetrics);
+        DisplayMetrics displayMetrics = activity.getResources().getDisplayMetrics();
         emulatorView = new EmulatorView(this, termSession, displayMetrics);
         binding.evTerminal.addView(emulatorView);
 
