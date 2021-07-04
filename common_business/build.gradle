@@ -79,13 +79,6 @@ dependencies {
 
     implementation "androidx.arch.core:core-runtime:2.1.0"
 
-
-    // Kotlin
-    api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${rootProject.ext.kotlinVersion}"
-    api "org.jetbrains.kotlin:kotlin-reflect:${rootProject.ext.kotlinVersion}"
-    api "androidx.core:core-ktx:${rootProject.ext.kotlinKtxVersion}"
-
-
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"
     implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"

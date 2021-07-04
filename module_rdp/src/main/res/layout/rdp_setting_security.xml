@@ -19,21 +19,19 @@
             android:layout_height="wrap_content"
             app:ui_sp="TEMP">
 
-            <com.xiaoyv.ui.setting.UiSettingView
+            <com.xiaoyv.ui.setting.item.UiSettingTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:ui_default_boolean="true"
+                app:ui_hint="是否接受所有证书"
                 app:ui_key="@string/preference_key_accept_certificates"
-                app:ui_title="@string/settings_security_accept_certificates"
-                app:ui_type="type_boolean" />
+                app:ui_title="@string/settings_security_accept_certificates" />
 
-            <com.xiaoyv.ui.setting.UiSettingView
+            <com.xiaoyv.ui.setting.item.UiSettingTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                app:ui_hint="点击清空缓存的证书文件"
                 app:ui_key="@string/preference_key_security_clear_certificate_cache"
-                app:ui_message="点击清空缓存的证书文件"
-                app:ui_title="@string/settings_security_clear_certificate_cache"
-                app:ui_type="type_string" />
+                app:ui_title="@string/settings_security_clear_certificate_cache" />
 
         </com.xiaoyv.ui.setting.UiSettingScreen>
     </androidx.core.widget.NestedScrollView>
