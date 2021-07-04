@@ -23,19 +23,19 @@ import com.xiaoyv.ui.databinding.UiViewToolbarBinding;
  * @since 2020/11/29
  **/
 @SuppressWarnings("UnusedReturnValue")
-public class AppToolbar extends FrameLayout {
+public class UiAppToolbar extends FrameLayout {
     protected final UiViewToolbarBinding binding;
     protected final Context context;
 
-    public AppToolbar(@NonNull Context context) {
+    public UiAppToolbar(@NonNull Context context) {
         this(context, null, 0);
     }
 
-    public AppToolbar(@NonNull Context context, @Nullable AttributeSet attrs) {
+    public UiAppToolbar(@NonNull Context context, @Nullable AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
-    public AppToolbar(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public UiAppToolbar(@NonNull Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         this.context = context;
         this.binding = UiViewToolbarBinding.inflate(LayoutInflater.from(context));
@@ -59,52 +59,52 @@ public class AppToolbar extends FrameLayout {
      *
      * @param needStatus 是否需要占位
      */
-    public AppToolbar setNeedStatusBar(boolean needStatus) {
+    public UiAppToolbar setNeedStatusBar(boolean needStatus) {
         ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, BarUtils.getStatusBarHeight());
         binding.vStatus.setLayoutParams(layoutParams);
         binding.vStatus.setVisibility(needStatus ? VISIBLE : GONE);
         return this;
     }
 
-    public AppToolbar setTitle(@Nullable String title) {
+    public UiAppToolbar setTitle(@Nullable String title) {
         binding.tvTitle.setText(title);
         return this;
     }
 
-    public AppToolbar setStartIcon(@DrawableRes int icon) {
+    public UiAppToolbar setStartIcon(@DrawableRes int icon) {
         binding.ivStart.setImageResource(icon);
         binding.ivStart.setVisibility(VISIBLE);
         return this;
     }
 
-    public AppToolbar setEndIcon(@DrawableRes int icon) {
+    public UiAppToolbar setEndIcon(@DrawableRes int icon) {
         binding.ivEnd.setImageResource(icon);
         binding.ivEnd.setVisibility(VISIBLE);
         return this;
     }
 
-    public AppToolbar hideEndIcon() {
+    public UiAppToolbar hideEndIcon() {
         binding.ivEnd.setVisibility(INVISIBLE);
         return this;
     }
 
-    public AppToolbar hideStartIcon() {
+    public UiAppToolbar hideStartIcon() {
         binding.ivStart.setVisibility(INVISIBLE);
         return this;
     }
 
-    public AppToolbar hideDivider() {
+    public UiAppToolbar hideDivider() {
         binding.vDivider.setVisibility(INVISIBLE);
         return this;
     }
 
-    public AppToolbar setStartClickListener(@Nullable View.OnClickListener clickListener) {
+    public UiAppToolbar setStartClickListener(@Nullable View.OnClickListener clickListener) {
         binding.ivStart.setVisibility(VISIBLE);
         binding.ivStart.setOnClickListener(clickListener);
         return this;
     }
 
-    public AppToolbar setEndClickListener(@Nullable View.OnClickListener clickListener) {
+    public UiAppToolbar setEndClickListener(@Nullable View.OnClickListener clickListener) {
         binding.ivEnd.setVisibility(VISIBLE);
         binding.ivEnd.setOnClickListener(clickListener);
         return this;

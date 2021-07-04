@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <com.xiaoyv.ui.toolbar.AppToolbar
+    <com.xiaoyv.ui.toolbar.UiAppToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
@@ -31,6 +31,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:ui_key="@string/preference_key_security_clear_certificate_cache"
+                app:ui_message="点击清空缓存的证书文件"
                 app:ui_title="@string/settings_security_clear_certificate_cache"
                 app:ui_type="type_string" />
 

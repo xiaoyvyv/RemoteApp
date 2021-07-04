@@ -17,6 +17,7 @@
     <!-- 系统界面 -->
     <color name="ui_system_background">#ffffff</color>
     <color name="ui_system_divider">#ebebeb</color>
+    <color name="ui_system_divider_light">#f0f0f0</color>
     <color name="ui_system_button">#f3f3f5</color>
     <color name="ui_system_error">#e02020</color>
     <color name="ui_system_black">#000000</color>

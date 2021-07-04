@@ -2,19 +2,15 @@ package com.xiaoyv.mine.main.view;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.view.Gravity;
 import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.ItemTouchHelper;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 import com.drakeet.multitype.MultiTypeAdapter;
-import com.orhanobut.dialogplus.DialogPlus;
-import com.orhanobut.dialogplus.ViewHolder;
 import com.xiaoyv.busines.base.BaseFragment;
 import com.xiaoyv.busines.config.NavigationPath;
 import com.xiaoyv.busines.room.database.DateBaseManger;
@@ -30,6 +26,7 @@ import com.xiaoyv.mine.databinding.MineFragmentDialogHelpBinding;
 import com.xiaoyv.mine.databinding.MineFragmentMainBinding;
 import com.xiaoyv.mine.main.adapter.MineItemBinder;
 import com.xiaoyv.mine.main.adapter.MineItemHelper;
+import com.xiaoyv.ui.dialog.normal.NormalDialog;
 import com.xiaoyv.ui.listener.SimpleResultListener;
 
 import java.io.File;
@@ -52,8 +49,8 @@ public class MineFragment extends BaseFragment implements SimpleResultListener<F
     private MineFragmentDialogBinding dialogBinding;
     private MineFragmentDialogHelpBinding helpBinding;
     private MineFragmentMainBinding binding;
-    private DialogPlus bottomSheet;
-    private DialogPlus helpDialog;
+    private NormalDialog bottomSheet;
+    private NormalDialog helpDialog;
     private MultiTypeAdapter multiTypeAdapter;
     private int currentImportType = IMPORT_TYPE_RDP;
     /**
@@ -80,18 +77,11 @@ public class MineFragment extends BaseFragment implements SimpleResultListener<F
 
     @Override
     protected void initData() {
-        bottomSheet = DialogPlus.newDialog(activity)
-                .setContentHolder(new ViewHolder(dialogBinding.getRoot()))
-                .setContentBackgroundResource(android.R.color.transparent)
-                .setGravity(Gravity.BOTTOM)
-                .create();
+        bottomSheet = new NormalDialog(activity);
+        bottomSheet.setCustomView(dialogBinding.getRoot());
 
-        helpDialog = DialogPlus.newDialog(activity)
-                .setContentHolder(new ViewHolder(helpBinding.getRoot()))
-                .setGravity(Gravity.CENTER)
-                .setContentBackgroundResource(R.color.ui_system_translate)
-                .setContentWidth(ScreenUtils.getScreenWidth() - 100)
-                .create();
+        helpDialog = new NormalDialog(activity);
+        helpDialog.setCustomView(helpBinding.getRoot());
 
         MineItemBinder itemBinder = new MineItemBinder(activity);
         itemBinder.bindRecycler(dialogBinding.rvItem);

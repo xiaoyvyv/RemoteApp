@@ -1,6 +1,5 @@
 package com.xiaoyv.rdp.main.view;
 
-import android.app.Activity;
 import android.view.View;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
@@ -11,7 +10,6 @@ import com.blankj.utilcode.util.ObjectUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 import com.drakeet.multitype.MultiTypeAdapter;
-import com.freerdp.freerdpcore.presentation.HomeActivity;
 import com.google.android.material.tabs.TabLayout;
 import com.xiaoyv.busines.base.BaseMvpFragment;
 import com.xiaoyv.busines.base.BaseSubscriber;
@@ -27,7 +25,6 @@ import com.xiaoyv.rdp.main.contract.RdpListContract;
 import com.xiaoyv.rdp.main.presenter.RdpListPresenter;
 import com.xiaoyv.rdp.screen.view.ScreenActivity;
 import com.xiaoyv.rdp.setting.AppSettingActivity;
-import com.xiaoyv.rdp.setting.BookmarkSettingActivity;
 import com.xiaoyv.ui.dialog.OptionsDialog;
 import com.xiaoyv.ui.listener.SimpleRefreshListener;
 import com.xiaoyv.ui.listener.SimpleTabSelectListener;

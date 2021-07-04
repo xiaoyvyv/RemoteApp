@@ -15,8 +15,11 @@ import androidx.appcompat.widget.LinearLayoutCompat;
 import com.blankj.utilcode.util.BarUtils;
 import com.blankj.utilcode.util.ConvertUtils;
 import com.blankj.utilcode.util.StringUtils;
+import com.blankj.utilcode.util.Utils;
 import com.xiaoyv.ui.R;
 import com.xiaoyv.ui.databinding.UiViewContentBinding;
+
+import me.jessyan.autosize.utils.AutoSizeUtils;
 
 /**
  * ContentStatusView
@@ -97,7 +100,7 @@ public class ContentStatusView extends FrameLayout {
      * 状态栏占位、标题栏
      */
     public void fitTopWindows() {
-        int height = BarUtils.getStatusBarHeight() + ConvertUtils.dp2px(44);
+        int height = BarUtils.getStatusBarHeight() + AutoSizeUtils.dp2px(Utils.getApp(),44);
         LinearLayoutCompat.LayoutParams layoutParams = new LinearLayoutCompat.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, height);
         binding.vFakeTop.setLayoutParams(layoutParams);
     }

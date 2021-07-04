@@ -1,18 +1,13 @@
-package com.xiaoyv.busines.base;
+package com.xiaoyv.busines.base
 
-import android.os.Bundle;
-
-import androidx.annotation.CallSuper;
-import androidx.annotation.MainThread;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.Lifecycle;
-
-import org.jetbrains.annotations.NotNull;
-
-import autodispose2.AutoDispose;
-import autodispose2.AutoDisposeConverter;
-import autodispose2.androidx.lifecycle.AndroidLifecycleScopeProvider;
+import android.os.Bundle
+import androidx.annotation.CallSuper
+import androidx.annotation.MainThread
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import autodispose2.AutoDispose
+import autodispose2.AutoDisposeConverter
+import autodispose2.androidx.lifecycle.AndroidLifecycleScopeProvider
 
 /**
  * Mvp Activity基类
@@ -20,27 +15,27 @@ import autodispose2.androidx.lifecycle.AndroidLifecycleScopeProvider;
  * @author why
  * @since 2020/10/16
  */
-public abstract class BaseMvpActivity<V extends IBaseView, T extends ImplBasePresenter<V>> extends BaseActivity implements IBaseView {
-    protected AppCompatActivity activity;
-    public T presenter;
+abstract class BaseMvpActivity<V : IBaseView, T : ImplBasePresenter<V>> : BaseActivity(),
+    IBaseView {
 
-    @Override
-    protected void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        activity = this;
-        presenter = createPresenter();
-        presenter.attachView((V) this, this);
+    protected lateinit var activity: AppCompatActivity
+    protected lateinit var presenter: T
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        activity = this
+        presenter = createPresenter()
+        presenter.attachView(this as V, this)
         // 生命周期监听
-        initLifecycleObserver(getLifecycle());
+        initLifecycleObserver(lifecycle)
         // P层创建完成
-        onPresenterCreated();
+        onPresenterCreated()
 
         // 执行 BaseActivity 初始化事件
-        super.initEvent();
+        super.initEvent()
     }
 
-    @Override
-    protected final void initEvent() {
+    override fun initEvent() {
         // 拦截 BaseActivity 初始化事件
     }
 
@@ -49,32 +44,29 @@ public abstract class BaseMvpActivity<V extends IBaseView, T extends ImplBasePre
      *
      * @return T
      */
-    abstract protected T createPresenter();
+    protected abstract fun createPresenter(): T
 
     /**
      * P层初始化完成，在这使用Presenter进行数据请求
      */
-    protected void onPresenterCreated() {
+    protected open fun onPresenterCreated() {
 
     }
 
-    protected <O> AutoDisposeConverter<O> bindLifecycle() {
-        return AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this));
+    protected fun <O> bindLifecycle(): AutoDisposeConverter<O> {
+        return AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this))
     }
 
     @CallSuper
     @MainThread
-    protected void initLifecycleObserver(@NotNull Lifecycle lifecycle) {
-        presenter.setLifecycleOwner(this);
+    protected fun initLifecycleObserver(lifecycle: Lifecycle) {
+        presenter.setLifecycleOwner(this)
         // 监听生命周期，可在P层处理
-        lifecycle.addObserver(presenter);
+        lifecycle.addObserver(presenter)
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (presenter != null) {
-            presenter.detachView();
-        }
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.detachView()
     }
 }

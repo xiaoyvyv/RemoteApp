@@ -30,7 +30,7 @@
         android:paddingEnd="@dimen/ui_size_20"
         android:text="@string/mine_main_import_help"
         android:textColor="@color/ui_text_c1"
-        android:textSize="@dimen/ui_font_16"
+        android:textSize="@dimen/ui_font_14"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tv_title" />
 
@@ -49,7 +49,7 @@
         android:paddingBottom="@dimen/ui_size_8"
         android:text="@string/mine_main_temp"
         android:textColor="@color/ui_theme_c1"
-        android:textSize="@dimen/ui_font_16"
+        android:textSize="@dimen/ui_font_14"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/tv_done"
@@ -71,7 +71,7 @@
         android:paddingBottom="@dimen/ui_size_8"
         android:text="@string/ui_view_setting_input_done"
         android:textColor="@color/ui_theme_c1"
-        android:textSize="@dimen/ui_font_16"
+        android:textSize="@dimen/ui_font_14"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

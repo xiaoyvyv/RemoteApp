@@ -195,6 +195,7 @@
     <string name="dlg_title_verify_certificate">Verify Certificate</string>
     <string name="dlg_msg_verify_certificate">The identity of the remote computer cannot be verified. Do you want to connect anyway?</string>
     <string name="dlg_title_credentials">Please enter your credentials</string>
+    <string name="dlg_title_credentials_gateway">Please enter your gateway credentials</string>
     <string name="dlg_title_create_shortcut">Create Shortcut</string>
     <string name="dlg_msg_create_shortcut">Shortcut name:</string>
     <string name="dlg_msg_connecting">Connecting &#8230;</string>

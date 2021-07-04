@@ -15,7 +15,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 
-import com.freerdp.freerdpcore.application.RdpSessionState;
+import com.freerdp.freerdpcore.domain.RdpSession;
 import com.freerdp.freerdpcore.utils.DoubleGestureDetector;
 import com.freerdp.freerdpcore.utils.GestureDetector;
 
@@ -42,7 +42,7 @@ public class RdpSessionView extends View {
     private Matrix invScaleMatrix;
     private RectF invalidRegionF;
     private GestureDetector gestureDetector;
-    private RdpSessionState currentSession;
+    private RdpSession currentSession;
 
     private DoubleGestureDetector doubleGestureDetector;
 
@@ -92,8 +92,11 @@ public class RdpSessionView extends View {
         invalidate(invalidRegions.pop());
     }
 
-    public void onSurfaceChange(RdpSessionState session) {
+    public void onSurfaceChange(RdpSession session) {
         surface = session.getSurface();
+        if (surface == null) {
+            return;
+        }
         Bitmap bitmap = surface.getBitmap();
         width = bitmap.getWidth();
         height = bitmap.getHeight();

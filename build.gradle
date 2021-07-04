@@ -11,16 +11,35 @@ buildscript {
         classpath 'com.android.tools.build:gradle:4.2.1'
         // Kotlin
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.20"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.20"
     }
 }
 
 allprojects {
+    subprojects {
+        afterEvaluate { subproject ->
+            if (subproject.hasProperty("android")) {
+                android {
+                    buildFeatures {
+                        viewBinding true
+                    }
+
+                    compileOptions {
+                        sourceCompatibility JavaVersion.VERSION_1_8
+                        targetCompatibility JavaVersion.VERSION_1_8
+                    }
+
+                    kotlinOptions {
+                        jvmTarget = '1.8'
+                    }
+                }
+            }
+        }
+    }
+
     repositories {
         maven {
             url 'https://maven.aliyun.com/repository/public/'
-        }
-        maven {
-            url 'https://maven.aliyun.com/nexus/content/repositories/jcenter'
         }
         maven {
             url 'https://jitpack.io'
@@ -42,6 +61,7 @@ configure(subprojects) { project ->
     }
     apply plugin: 'kotlin-android'
     apply plugin: 'kotlin-parcelize'
+    apply plugin: 'kotlin-kapt'
 }
 
 ext {
@@ -49,8 +69,8 @@ ext {
     buildToolsVersion = "30.0.2"
     minSdkVersion = 21
     targetSdkVersion = 30
-    versionCode = 1
-    versionName = "1.0"
+    versionCode = 2
+    versionName = "1.1"
 
     println '----------------- 项目配置信息 -------------------'
     println 'VERSION_NAME:         ' + versionName
@@ -86,8 +106,9 @@ ext {
     rxAndroidVersion = '3.0.0'
     autoDisposeVersion = '2.0.0'
     overscrollVersion = '1.0.4'
-    dialogplusVersion = '1.11@aar'
     poiVersion = '2.6.12'
+    // 今日头条屏幕适配
+    autoSizeVersion = '1.2.1'
 
 }
 

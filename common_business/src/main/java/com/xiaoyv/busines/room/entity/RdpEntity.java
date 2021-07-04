@@ -28,7 +28,7 @@ public class RdpEntity implements Serializable {
     public String account;
     public String password;
     public String domain;
-    public String bookmark;
+    public String configStr;
 
     public RdpEntity() {
         this.lastTime = TimeUtils.getNowMills();

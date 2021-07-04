@@ -1,7 +1,3 @@
-plugins {
-    id 'com.android.library'
-}
-
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -43,8 +39,8 @@ dependencies {
     api "androidx.swiperefreshlayout:swiperefreshlayout:${rootProject.ext.refreshVersion}"
     // 越界回弹
     api "me.everything:overscroll-decor-android:${rootProject.ext.overscrollVersion}"
-    // 对话框
-    api "com.orhanobut:dialogplus:${rootProject.ext.dialogplusVersion}"
+    // 今日头条屏幕适配
+    api "me.jessyan:autosize:${rootProject.ext.autoSizeVersion}"
 
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"
     implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"

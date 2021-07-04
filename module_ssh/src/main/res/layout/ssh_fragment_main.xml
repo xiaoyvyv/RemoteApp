@@ -18,7 +18,7 @@
         app:layout_constraintTop_toBottomOf="@+id/v_divider"
         tools:listitem="@layout/ssh_fragment_main_item" />
 
-    <com.xiaoyv.ui.toolbar.AppToolbar
+    <com.xiaoyv.ui.toolbar.UiAppToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

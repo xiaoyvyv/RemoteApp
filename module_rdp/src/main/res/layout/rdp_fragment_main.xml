@@ -18,7 +18,7 @@
         app:layout_constraintTop_toBottomOf="@+id/v_divider"
         tools:listitem="@layout/rdp_fragment_main_item" />
 
-    <com.xiaoyv.ui.toolbar.AppToolbar
+    <com.xiaoyv.ui.toolbar.UiAppToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -29,14 +29,17 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/tl_group"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_size_40"
+        android:layout_height="@dimen/ui_size_36"
         android:visibility="gone"
         app:layout_constraintTop_toBottomOf="@+id/toolbar"
         app:tabContentStart="@dimen/ui_size_20"
         app:tabIndicatorFullWidth="false"
         app:tabIndicatorHeight="@dimen/ui_size_0"
         app:tabMode="scrollable"
-        app:tabUnboundedRipple="true" />
+        app:tabTextAppearance="@style/UiApp.TabFontBold.12"
+        app:tabUnboundedRipple="true"
+        tools:layout_height="@dimen/ui_size_44"
+        tools:visibility="visible" />
 
     <View
         android:id="@+id/v_divider"

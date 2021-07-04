@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RecentlyNonNull;
+import androidx.annotation.NonNull;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -50,7 +50,7 @@ public class BookmarkSettingActivity extends BaseActivity {
 
 
     @Override
-    protected void initIntentData(@RecentlyNonNull Intent intent, @RecentlyNonNull Bundle bundle) {
+    protected void initIntentData(@NonNull Intent intent, @NonNull Bundle bundle) {
         type = getIntent().getStringExtra(KEY_SETTING);
     }
 

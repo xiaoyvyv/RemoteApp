@@ -8,6 +8,7 @@
 
     <!-- 设置控件属性 -->
     <declare-styleable name="UiSettingView">
+        <attr name="ui_enable_sp" format="boolean" />
         <attr name="ui_key" format="string" />
         <attr name="ui_title" format="string" />
         <attr name="ui_message" format="string" />

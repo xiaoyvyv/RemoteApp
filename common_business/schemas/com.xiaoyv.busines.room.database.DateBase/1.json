@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "e983c64d9d1a28562aab1f026ff4f5dc",
+    "identityHash": "a1c514d852e7dce4652c17e970b0c26d",
     "entities": [
       {
         "tableName": "rdp",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lastTime` INTEGER NOT NULL, `label` TEXT, `group` TEXT, `ip` TEXT, `port` TEXT, `account` TEXT, `password` TEXT, `domain` TEXT, `bookmark` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lastTime` INTEGER NOT NULL, `label` TEXT, `group` TEXT, `ip` TEXT, `port` TEXT, `account` TEXT, `password` TEXT, `domain` TEXT, `rdpConfigStr` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -63,8 +63,8 @@
             "notNull": false
           },
           {
-            "fieldPath": "bookmark",
-            "columnName": "bookmark",
+            "fieldPath": "rdpConfigStr",
+            "columnName": "rdpConfigStr",
             "affinity": "TEXT",
             "notNull": false
           }
@@ -193,12 +193,6 @@
             "notNull": true
           },
           {
-            "fieldPath": "lastTime",
-            "columnName": "lastTime",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
             "fieldPath": "label",
             "columnName": "label",
             "affinity": "TEXT",
@@ -269,7 +263,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'e983c64d9d1a28562aab1f026ff4f5dc')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a1c514d852e7dce4652c17e970b0c26d')"
     ]
   }
 }

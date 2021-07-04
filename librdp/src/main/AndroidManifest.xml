@@ -20,56 +20,24 @@
         android:resizeableActivity="true"
         tools:targetApi="n">
 
-        <provider
-            android:name="com.freerdp.freerdpcore.services.FreeRDPSuggestionProvider"
-            android:authorities="com.xiaoyv.rdp.services.provider"
-            android:exported="false" />
-
         <!-- 创建快捷方式的活动 -->
-        <activity
-            android:name="com.freerdp.freerdpcore.presentation.ShortcutsActivity"
-            android:label="@string/title_create_shortcut"
-            android:theme="@style/Theme.Main">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
 
         <!-- 建议您使用活动别名来提供“ CREATE_SHORTCUT” -->
         <!-- 目的过滤器。这为您提供了一种设置文本的方法（以及可选的 -->
         <!-- 图标），将在启动器的创建快捷方式用户界面中看到该图标。 -->
-        <activity-alias
-            android:name=".presentation.CreateShortcuts"
-            android:label="@string/title_create_shortcut"
-            android:targetActivity="com.freerdp.freerdpcore.presentation.ShortcutsActivity">
+<!--        <activity-alias-->
+<!--            android:name=".presentation.CreateShortcuts"-->
+<!--            android:label="@string/title_create_shortcut"-->
+<!--            android:targetActivity="com.freerdp.freerdpcore.presentation.ShortcutsActivity">-->
 
-            <!-- 此意图过滤器允许您在启动器中创建快捷方式。-->
-            <intent-filter>
-                <action android:name="android.intent.action.CREATE_SHORTCUT" />
+<!--            &lt;!&ndash; 此意图过滤器允许您在启动器中创建快捷方式。&ndash;&gt;-->
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.CREATE_SHORTCUT" />-->
 
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity-alias>
+<!--                <category android:name="android.intent.category.DEFAULT" />-->
+<!--            </intent-filter>-->
+<!--        </activity-alias>-->
 
-        <activity
-            android:name="com.freerdp.freerdpcore.presentation.BookmarkActivity"
-            android:label="@string/title_bookmark_settings"
-            android:theme="@style/Theme.Settings">
-            <intent-filter>
-                <action android:name="freerdp.intent.action.BOOKMARK" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:scheme="preferences" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name="com.freerdp.freerdpcore.presentation.ApplicationSettingsActivity"
-            android:label="@string/title_application_settings"
-            android:theme="@style/Theme.Settings"
-            android:windowSoftInputMode="stateHidden" />
         <activity
             android:name="com.freerdp.freerdpcore.presentation.SessionActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|density|screenLayout|navigation"
@@ -86,6 +54,5 @@
                     android:scheme="freerdp" />
             </intent-filter>
         </activity>
-        <activity android:name="com.freerdp.freerdpcore.presentation.HomeActivity"/>
     </application>
 </manifest>

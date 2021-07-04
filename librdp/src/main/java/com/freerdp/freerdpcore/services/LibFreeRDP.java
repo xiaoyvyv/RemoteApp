@@ -7,19 +7,15 @@ import android.util.Log;
 
 import androidx.collection.LongSparseArray;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.freerdp.freerdpcore.application.RdpApp;
-import com.freerdp.freerdpcore.application.RdpSessionState;
-import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
-import com.freerdp.freerdpcore.domain.RdpBookmark;
-import com.freerdp.freerdpcore.presentation.ApplicationSettingsActivity;
-
-import java.util.ArrayList;
-import java.util.Locale;
+import com.freerdp.freerdpcore.domain.RdpConfig;
+import com.freerdp.freerdpcore.domain.RdpSession;
 
 public class LibFreeRDP {
-    private static final String TAG = "LibFreeRDP";
+    public static final String TAG = "LibFreeRDP";
+    public static boolean mHasH264 = true;
     private static EventListener listener;
-    private static boolean mHasH264 = true;
 
     private static final LongSparseArray<Boolean> mInstanceState = new LongSparseArray<>();
 
@@ -138,7 +134,7 @@ public class LibFreeRDP {
         }
     }
 
-    private static String addFlag(String name, boolean enabled) {
+    public static String addFlag(String name, boolean enabled) {
         if (enabled) {
             return "+" + name;
         }
@@ -148,209 +144,20 @@ public class LibFreeRDP {
     /**
      * 配置连接信息
      *
-     * @param context  context
-     * @param inst     实例ID
-     * @param bookmark bookmark
+     * @param inst      实例ID
+     * @param rdpConfig bookmark
      * @return 是否成功
      */
-    public static boolean setConnectionInfo(Context context, long inst, BaseRdpBookmark bookmark) {
-        BaseRdpBookmark.ScreenSettings screenSettings = bookmark.getActiveScreenSettings();
-        BaseRdpBookmark.AdvancedSettings advanced = bookmark.getAdvancedSettings();
-        BaseRdpBookmark.DebugSettings debug = bookmark.getDebugSettings();
-
-        String arg;
-        ArrayList<String> args = new ArrayList<String>();
-
-        args.add(TAG);
-        args.add("/gdi:sw");
-
-        final String clientName = ApplicationSettingsActivity.getClientName(context);
-        if (!clientName.isEmpty()) {
-            args.add("/client-hostname:" + clientName);
-        }
-        String certName = "";
-        if (bookmark.getType() != BaseRdpBookmark.TYPE_MANUAL) {
-            return false;
-        }
-
-        int port = bookmark.<RdpBookmark>get().getPort();
-        String hostname = bookmark.<RdpBookmark>get().getHostname();
-
-        args.add("/v:" + hostname);
-        args.add("/port:" + String.valueOf(port));
-
-        arg = bookmark.getUsername();
-        if (!arg.isEmpty()) {
-            args.add("/u:" + arg);
-        }
-        arg = bookmark.getDomain();
-        if (!arg.isEmpty()) {
-            args.add("/d:" + arg);
-        }
-        arg = bookmark.getPassword();
-        if (!arg.isEmpty()) {
-            args.add("/p:" + arg);
-        }
-
-        args.add(String.format(Locale.CANADA, "/size:%dx%d", screenSettings.getWidth(), screenSettings.getHeight()));
-        args.add("/bpp:" + String.valueOf(screenSettings.getColors()));
-
-        if (advanced.getConsoleMode()) {
-            args.add("/admin");
-        }
-
-        switch (advanced.getSecurity()) {
-            case 3: // NLA
-                args.add("/sec-nla");
-                break;
-            case 2: // TLS
-                args.add("/sec-tls");
-                break;
-            case 1: // RDP
-                args.add("/sec-rdp");
-                break;
-            default:
-                break;
-        }
-
-        if (!certName.isEmpty()) {
-            args.add("/cert-name:" + certName);
-        }
-
-        BaseRdpBookmark.PerformanceFlags flags = bookmark.getActivePerformanceFlags();
-        if (flags.getRemoteFX()) {
-            args.add("/rfx");
-        }
-
-        if (flags.getGfx()) {
-            args.add("/gfx");
-        }
-
-        if (flags.getH264() && mHasH264) {
-            args.add("/gfx:AVC444");
-        }
-
-        args.add(addFlag("wallpaper", flags.getWallpaper()));
-        args.add(addFlag("window-drag", flags.getFullWindowDrag()));
-        args.add(addFlag("menu-anims", flags.getMenuAnimations()));
-        args.add(addFlag("themes", flags.getTheme()));
-        args.add(addFlag("fonts", flags.getFontSmoothing()));
-        args.add(addFlag("aero", flags.getDesktopComposition()));
-        args.add(addFlag("glyph-cache", false));
-
-        if (!advanced.getRemoteProgram().isEmpty()) {
-            args.add("/shell:" + advanced.getRemoteProgram());
-        }
-
-        if (!advanced.getWorkDir().isEmpty()) {
-            args.add("/shell-dir:" + advanced.getWorkDir());
-        }
-
-        args.add(addFlag("async-channels", debug.getAsyncChannel()));
-        args.add(addFlag("async-input", debug.getAsyncInput()));
-        args.add(addFlag("async-update", debug.getAsyncUpdate()));
-
-        if (advanced.getRedirectSDCard()) {
-            String path = android.os.Environment.getExternalStorageDirectory().getPath();
-            args.add("/drive:sdcard," + path);
-        }
-
-        args.add("/clipboard");
-
-        // Gateway enabled?
-        if (bookmark.getType() == BaseRdpBookmark.TYPE_MANUAL &&
-                bookmark.<RdpBookmark>get().getEnableGatewaySettings()) {
-            RdpBookmark.GatewaySettings gateway =
-                    bookmark.<RdpBookmark>get().getGatewaySettings();
-
-            args.add(String.format(Locale.getDefault(), "/g:%s:%d", gateway.getHostname(), gateway.getPort()));
-
-            arg = gateway.getUsername();
-            if (!arg.isEmpty()) {
-                args.add("/gu:" + arg);
-            }
-            arg = gateway.getDomain();
-            if (!arg.isEmpty()) {
-                args.add("/gd:" + arg);
-            }
-            arg = gateway.getPassword();
-            if (!arg.isEmpty()) {
-                args.add("/gp:" + arg);
-            }
-        }
-
-		/* 0 ... local
-		   1 ... remote
-		   2 ... disable */
-        args.add("/audio-mode:" + String.valueOf(advanced.getRedirectSound()));
-        if (advanced.getRedirectSound() == 0) {
-            args.add("/sound");
-        }
-
-        if (advanced.getRedirectMicrophone()) {
-            args.add("/microphone");
-        }
-
-        args.add("/cert-ignore");
-        args.add("/log-level:" + debug.getDebugLevel());
-        String[] arrayArgs = args.toArray(new String[args.size()]);
-        return freerdp_parse_arguments(inst, arrayArgs);
+    public static boolean setConnectionInfo(long inst, RdpConfig rdpConfig) {
+        String[] arguments = LibRdpHelper.setConnectionInfo(rdpConfig);
+        LogUtils.e("Rdp 连接参数", arguments);
+        return freerdp_parse_arguments(inst, arguments);
     }
 
-    public static boolean setConnectionInfo(Context context, long inst, Uri openUri) {
-        ArrayList<String> args = new ArrayList<>();
-
-        // Parse URI from query string. Same key overwrite previous one
-        // freerdp://user@ip:port/connect?sound=&rfx=&p=password&clipboard=%2b&themes=-
-
-        // Now we only support Software GDI
-        args.add(TAG);
-        args.add("/gdi:sw");
-
-        final String clientName = ApplicationSettingsActivity.getClientName(context);
-        if (!clientName.isEmpty()) {
-            args.add("/client-hostname:" + clientName);
-        }
-
-        // Parse hostname and port. Set to 'v' argument
-        String hostname = openUri.getHost();
-        int port = openUri.getPort();
-        if (hostname != null) {
-            hostname = hostname + ((port == -1) ? "" : (":" + String.valueOf(port)));
-            args.add("/v:" + hostname);
-        }
-
-        String user = openUri.getUserInfo();
-        if (user != null) {
-            args.add("/u:" + user);
-        }
-
-        for (String key : openUri.getQueryParameterNames()) {
-            String value = openUri.getQueryParameter(key);
-
-            if (value.isEmpty()) {
-                // Query: key=
-                // To freerdp argument: /key
-                args.add("/" + key);
-            } else if (value.equals("-") || value.equals("+")) {
-                // Query: key=- or key=+
-                // To freerdp argument: -key or +key
-                args.add(value + key);
-            } else {
-                // Query: key=value
-                // To freerdp argument: /key:value
-                if (key.equals("drive") && value.equals("sdcard")) {
-                    // Special for sdcard redirect
-                    String path = android.os.Environment.getExternalStorageDirectory().getPath();
-                    value = "sdcard," + path;
-                }
-
-                args.add("/" + key + ":" + value);
-            }
-        }
-
-        String[] arrayArgs = args.toArray(new String[args.size()]);
-        return freerdp_parse_arguments(inst, arrayArgs);
+    public static boolean setConnectionInfo(long inst, Uri openUri) {
+        String[] arguments = LibRdpHelper.setConnectionInfo(openUri);
+        LogUtils.e("Rdp 连接参数", arguments);
+        return freerdp_parse_arguments(inst, arguments);
     }
 
     public static boolean updateGraphics(long inst, Bitmap bitmap, int x, int y, int width,
@@ -417,7 +224,7 @@ public class LibFreeRDP {
     }
 
     private static void OnSettingsChanged(long inst, int width, int height, int bpp) {
-        RdpSessionState s = RdpApp.getSession(inst);
+        RdpSession s = RdpApp.getSession(inst);
         if (s == null) {
             return;
         }
@@ -429,7 +236,7 @@ public class LibFreeRDP {
 
     private static boolean OnAuthenticate(long inst, StringBuilder username, StringBuilder domain,
                                           StringBuilder password) {
-        RdpSessionState s = RdpApp.getSession(inst);
+        RdpSession s = RdpApp.getSession(inst);
         if (s == null) {
             return false;
         }
@@ -442,7 +249,7 @@ public class LibFreeRDP {
 
     private static boolean OnGatewayAuthenticate(long inst, StringBuilder username,
                                                  StringBuilder domain, StringBuilder password) {
-        RdpSessionState session = RdpApp.getSession(inst);
+        RdpSession session = RdpApp.getSession(inst);
         if (session == null) {
             return false;
         }
@@ -455,7 +262,7 @@ public class LibFreeRDP {
 
     private static int OnVerifyCertificate(long inst, String commonName, String subject,
                                            String issuer, String fingerprint, boolean hostMismatch) {
-        RdpSessionState s = RdpApp.getSession(inst);
+        RdpSession s = RdpApp.getSession(inst);
         if (s == null) {
             return 0;
         }
@@ -471,7 +278,7 @@ public class LibFreeRDP {
                                                   String issuer, String fingerprint,
                                                   String oldSubject, String oldIssuer,
                                                   String oldFingerprint) {
-        RdpSessionState s = RdpApp.getSession(inst);
+        RdpSession s = RdpApp.getSession(inst);
         if (s == null) {
             return 0;
         }
@@ -484,7 +291,7 @@ public class LibFreeRDP {
     }
 
     private static void OnGraphicsUpdate(long inst, int x, int y, int width, int height) {
-        RdpSessionState s = RdpApp.getSession(inst);
+        RdpSession s = RdpApp.getSession(inst);
         if (s == null) {
             return;
         }
@@ -495,7 +302,7 @@ public class LibFreeRDP {
     }
 
     private static void OnGraphicsResize(long inst, int width, int height, int bpp) {
-        RdpSessionState s = RdpApp.getSession(inst);
+        RdpSession s = RdpApp.getSession(inst);
         if (s == null) {
             return;
         }
@@ -506,7 +313,7 @@ public class LibFreeRDP {
     }
 
     private static void OnRemoteClipboardChanged(long inst, String data) {
-        RdpSessionState s = RdpApp.getSession(inst);
+        RdpSession s = RdpApp.getSession(inst);
         if (s == null) {
             return;
         }

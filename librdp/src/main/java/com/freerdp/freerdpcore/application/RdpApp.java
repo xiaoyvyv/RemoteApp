@@ -8,15 +8,15 @@ import android.net.Uri;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.NetworkUtils;
-import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
+import com.blankj.utilcode.util.Utils;
+import com.freerdp.freerdpcore.domain.RdpConfig;
+import com.freerdp.freerdpcore.domain.RdpSession;
 import com.freerdp.freerdpcore.presentation.ApplicationSettingsActivity;
-import com.freerdp.freerdpcore.services.BookmarkDB;
-import com.freerdp.freerdpcore.services.HistoryDB;
 import com.freerdp.freerdpcore.services.LibFreeRDP;
-import com.freerdp.freerdpcore.services.ManualBookmarkGateway;
-import com.freerdp.freerdpcore.services.QuickConnectHistoryGateway;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -60,12 +60,7 @@ public class RdpApp implements LibFreeRDP.EventListener {
 
 
     public static boolean ConnectedToMobileWork = false;
-    public static Map<Long, RdpSessionState> sessionMap;
-    public static BookmarkDB bookmarkDB;
-    public static ManualBookmarkGateway manualBookmarkGateway;
-
-    public static HistoryDB historyDB;
-    public static QuickConnectHistoryGateway quickConnectHistoryGateway;
+    public static Map<Long, RdpSession> sessionMap;
 
     // 屏幕关闭后用于断开会话的计时器
     public static Timer disconnectTimer = null;
@@ -95,12 +90,6 @@ public class RdpApp implements LibFreeRDP.EventListener {
 
         LibFreeRDP.setEventListener(this);
 
-        bookmarkDB = new BookmarkDB(application);
-
-        manualBookmarkGateway = new ManualBookmarkGateway(bookmarkDB);
-
-        historyDB = new HistoryDB(application);
-        quickConnectHistoryGateway = new QuickConnectHistoryGateway(historyDB);
 
         ConnectedToMobileWork = NetworkUtils.is5G() || NetworkUtils.is4G();
 
@@ -110,13 +99,6 @@ public class RdpApp implements LibFreeRDP.EventListener {
         application.registerReceiver(new RdpScreenReceiver(), filter);
     }
 
-    public static ManualBookmarkGateway getManualBookmarkGateway() {
-        return manualBookmarkGateway;
-    }
-
-    public static QuickConnectHistoryGateway getQuickConnectHistoryGateway() {
-        return quickConnectHistoryGateway;
-    }
 
     // 断开屏幕开/关事件的处理
     public static void startDisconnectTimer() {
@@ -140,12 +122,12 @@ public class RdpApp implements LibFreeRDP.EventListener {
     /**
      * 创建一个新的会话
      *
-     * @param bookmark 配置参数
-     * @param context  context
-     * @return RdpSessionState
+     * @param rdpConfig 配置参数
+     * @param context   context
+     * @return RdpSession
      */
-    static public RdpSessionState createSession(BaseRdpBookmark bookmark, Context context) {
-        RdpSessionState session = new RdpSessionState(LibFreeRDP.newInstance(context), bookmark);
+    public static RdpSession createSession(RdpConfig rdpConfig, Context context) {
+        RdpSession session = new RdpSession(LibFreeRDP.newInstance(context), rdpConfig);
         sessionMap.put(session.getInstance(), session);
         return session;
     }
@@ -156,24 +138,25 @@ public class RdpApp implements LibFreeRDP.EventListener {
      *
      * @param openUri openUri
      * @param context context
-     * @return RdpSessionState
+     * @return RdpSession
      */
-    static public RdpSessionState createSession(Uri openUri, Context context) {
-        RdpSessionState session = new RdpSessionState(LibFreeRDP.newInstance(context), openUri);
+    public static RdpSession createSession(Uri openUri, Context context) {
+        RdpSession session = new RdpSession(LibFreeRDP.newInstance(context), openUri);
         sessionMap.put(session.getInstance(), session);
         return session;
     }
 
-    static public RdpSessionState getSession(long instance) {
+    @Nullable
+    public static RdpSession getSession(long instance) {
         return sessionMap.get(instance);
     }
 
-    static public Collection<RdpSessionState> getSessions() {
+    public static Collection<RdpSession> getSessions() {
         // 返回会话项的副本
         return new ArrayList<>(sessionMap.values());
     }
 
-    static public void freeSession(long instance) {
+    public static void freeSession(long instance) {
         if (RdpApp.sessionMap.containsKey(instance)) {
             RdpApp.sessionMap.remove(instance);
             LibFreeRDP.freeInstance(instance);
@@ -215,11 +198,11 @@ public class RdpApp implements LibFreeRDP.EventListener {
      * @param type     类型
      * @param instance 实例
      */
-    private void sendRdpNotification(int type, long instance) {
+    public static void sendRdpNotification(int type, long instance) {
         Intent intent = new Intent(ACTION_EVENT_FREERDP);
         intent.putExtra(EVENT_TYPE, type);
         intent.putExtra(EVENT_PARAM, instance);
-        application.sendBroadcast(intent);
+        Utils.getApp().sendBroadcast(intent);
     }
 
 
@@ -230,8 +213,8 @@ public class RdpApp implements LibFreeRDP.EventListener {
             Log.v("DisconnectTask", "Doing action");
 
             // 断开任何正在运行的rdp会话
-            Collection<RdpSessionState> sessions = RdpApp.getSessions();
-            for (RdpSessionState session : sessions) {
+            Collection<RdpSession> sessions = RdpApp.getSessions();
+            for (RdpSession session : sessions) {
                 LibFreeRDP.disconnect(session.getInstance());
             }
         }

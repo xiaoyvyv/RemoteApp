@@ -9,16 +9,17 @@
     <FrameLayout
         android:id="@+id/fl_container"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="@dimen/ui_size_0"
         app:layout_constraintBottom_toTopOf="@+id/bnv_tab"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bnv_tab"
         android:layout_width="match_parent"
-        android:layout_height="@dimen/ui_size_56"
+        android:layout_height="@dimen/ui_size_50"
         android:background="?android:attr/windowBackground"
         app:elevation="@dimen/ui_size_1"
+        app:itemIconSize="@dimen/ui_size_20"
         app:itemTextAppearanceActive="@style/main_bottom_nav_selected"
         app:itemTextAppearanceInactive="@style/main_bottom_nav_normal"
         app:labelVisibilityMode="labeled"

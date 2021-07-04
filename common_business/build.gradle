@@ -1,7 +1,3 @@
-plugins {
-    id 'com.android.library'
-}
-
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
@@ -44,6 +40,15 @@ android {
     // 限定资源前缀
     resourcePrefix "business_"
 }
+// ARouter Kotlin 配置
+kapt {
+    arguments {
+        arg("AROUTER_MODULE_NAME", project.name)
+//        arg("room.schemaLocation", "$projectDir/schemas".toString())
+//        arg("room.incremental", "true")
+//        arg("room.expandProjection", "true")
+    }
+}
 
 dependencies {
     api project(':common_ui')
@@ -62,16 +67,18 @@ dependencies {
     api "net.sourceforge.jexcelapi:jxl:${rootProject.ext.poiVersion}"
 
     // Excel 操作
-    api 'net.sourceforge.jexcelapi:jxl:'+ rootProject.ext.poiVersion
+    api 'net.sourceforge.jexcelapi:jxl:' + rootProject.ext.poiVersion
 
     // 数据库
     implementation "androidx.room:room-runtime:${rootProject.ext.roomVersion}"
     annotationProcessor "androidx.room:room-compiler:${rootProject.ext.roomVersion}"
+    kapt "androidx.room:room-compiler:${rootProject.ext.roomVersion}"
 
     // 调试环境查看数据库
     debugImplementation "com.amitshekhar.android:debug-db:${rootProject.ext.debugDbVersion}"
 
     implementation "androidx.arch.core:core-runtime:2.1.0"
+
 
     // Kotlin
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${rootProject.ext.kotlinVersion}"
@@ -86,6 +93,7 @@ dependencies {
 
     implementation "com.alibaba:arouter-api:${rootProject.ext.arouterVersion}"
     annotationProcessor "com.alibaba:arouter-compiler:${rootProject.ext.arouterVersion}"
+    kapt "com.alibaba:arouter-compiler:${rootProject.ext.arouterVersion}"
 
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.extJunitVersion}"

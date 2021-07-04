@@ -48,17 +48,21 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 
-        <androidx.appcompat.widget.AppCompatButton
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/bt_refresh"
-            android:layout_width="@dimen/ui_size_160"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/ui_size_20"
             android:background="@drawable/ui_shape_btn"
             android:clickable="true"
             android:focusable="true"
+            android:paddingStart="@dimen/ui_size_40"
+            android:paddingTop="@dimen/ui_font_12"
+            android:paddingEnd="@dimen/ui_size_40"
+            android:paddingBottom="@dimen/ui_font_12"
             android:text="@string/ui_view_status_refresh"
             android:textColor="@color/ui_theme_c1"
-            android:textSize="@dimen/ui_font_16"
+            android:textSize="@dimen/ui_font_14"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tv_status" />
