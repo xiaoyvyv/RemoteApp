@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
-import androidx.annotation.RecentlyNonNull;
+import androidx.annotation.NonNull;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.blankj.utilcode.util.ActivityUtils;
@@ -46,7 +46,7 @@ public class AddSshActivity extends BaseActivity {
         intent.putExtra(KEY_SSH_ENTITY, sshEntity);
         ActivityUtils.startActivity(intent);
     }
-    
+
     @Override
     protected View createContentView() {
         binding = SshAddActivitiyBinding.inflate(getLayoutInflater());
@@ -54,7 +54,7 @@ public class AddSshActivity extends BaseActivity {
     }
 
     @Override
-    protected void initIntentData(@RecentlyNonNull Intent intent, @RecentlyNonNull Bundle bundle) {
+    protected void initIntentData(@NonNull Intent intent, @NonNull Bundle bundle) {
         sshEntity = (SshEntity) getIntent().getSerializableExtra(KEY_SSH_ENTITY);
         if (sshEntity == null) {
             sshEntity = new SshEntity();
@@ -63,31 +63,31 @@ public class AddSshActivity extends BaseActivity {
             sshEntity.port = StringUtils.getString(R.string.ssh_add_port_default);
         }
     }
-    
+
     @Override
     protected void initView() {
         binding.asvLabel.setTitle(StringUtils.getString(R.string.ssh_add_label))
                 .setHint(StringUtils.getString(R.string.ssh_add_label_hint))
                 .setMessage(sshEntity.label)
-                .setRequiredText(getString(R.string.ssh_add_label_required));
+                .setMessageHint(getString(R.string.ssh_add_label_required));
         binding.asvGroup.setTitle(StringUtils.getString(R.string.ssh_add_group))
                 .setHint(StringUtils.getString(R.string.ssh_add_group_hint))
                 .setMessage(sshEntity.group)
-                .setRequiredText(null);
+                .setMessageHint(null);
         binding.asvIp.setTitle(StringUtils.getString(R.string.ssh_add_ip))
                 .setHint(getString(R.string.ssh_add_ip_hint))
                 .setMessage(sshEntity.ip)
-                .setRequiredText(getString(R.string.ssh_add_ip_required));
+                .setMessageHint(getString(R.string.ssh_add_ip_required));
 
         binding.asvPort.setTitle(StringUtils.getString(R.string.ssh_add_port))
                 .setInputNumberType(5)
                 .setHint(StringUtils.getString(R.string.ssh_add_port_hint))
                 .setMessage(sshEntity.port)
-                .setRequiredText(null);
+                .setMessageHint(null);
         binding.asvAccount.setTitle(StringUtils.getString(R.string.ssh_add_account))
                 .setHint(StringUtils.getString(R.string.ssh_add_account_hint))
                 .setMessage(sshEntity.account)
-                .setRequiredText(getString(R.string.ssh_add_account_required));
+                .setMessageHint(getString(R.string.ssh_add_account_required));
         binding.asvPassword.setTitle(StringUtils.getString(R.string.ssh_add_password))
                 .setHint(StringUtils.getString(R.string.ssh_add_password_hint))
                 .setMessage(sshEntity.password);

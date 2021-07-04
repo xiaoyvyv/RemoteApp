@@ -11,34 +11,39 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_title"
-        android:layout_width="0dp"
-        android:layout_height="@dimen/ui_size_70"
+        android:layout_width="@dimen/ui_size_0"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/ui_size_6"
         android:gravity="center_vertical"
         android:paddingStart="@dimen/ui_size_20"
+        android:paddingTop="@dimen/ui_size_12"
         android:paddingEnd="@dimen/ui_size_20"
-        android:paddingBottom="@dimen/ui_size_20"
         android:text="@string/ui_view_setting_title"
         android:textColor="@color/ui_text_c1"
-        android:textSize="@dimen/ui_font_16"
+        android:textSize="@dimen/ui_font_14"
         android:textStyle="normal"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tv_desc"
         app:layout_constraintEnd_toStartOf="@+id/sm_switch"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_goneMarginBottom="@dimen/ui_size_12" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_desc"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:background="@color/ui_system_translate"
+        android:enabled="false"
         android:paddingStart="@dimen/ui_size_20"
         android:paddingEnd="@dimen/ui_size_20"
-        android:paddingBottom="@dimen/ui_size_8"
+        android:paddingBottom="@dimen/ui_size_12"
         android:textColor="@color/ui_text_c3"
-        android:textSize="@dimen/ui_font_14"
-        app:layout_constraintBottom_toBottomOf="@+id/tv_title"
+        android:textSize="@dimen/ui_font_12"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/sm_switch"
         app:layout_constraintStart_toStartOf="parent"
-        tools:text="设置内容" />
+        app:layout_constraintTop_toBottomOf="@+id/tv_title"
+        tools:text="设置内容设置内容设置内容" />
 
     <com.google.android.material.switchmaterial.SwitchMaterial
         android:id="@+id/sm_switch"

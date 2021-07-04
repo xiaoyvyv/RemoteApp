@@ -28,20 +28,19 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewConfiguration;
-import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.ZoomControls;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.blankj.utilcode.util.ThreadUtils;
 import com.freerdp.freerdpcore.application.RdpApp;
-import com.freerdp.freerdpcore.application.RdpSessionState;
-import com.freerdp.freerdpcore.domain.BaseRdpBookmark;
-import com.freerdp.freerdpcore.domain.ConnectionReference;
-import com.freerdp.freerdpcore.domain.RdpBookmark;
+import com.freerdp.freerdpcore.domain.RdpConfig;
+import com.freerdp.freerdpcore.domain.RdpSession;
 import com.freerdp.freerdpcore.mapper.RdpKeyboardMapper;
 import com.freerdp.freerdpcore.mapper.RdpMouseMapper;
 import com.freerdp.freerdpcore.services.LibFreeRDP;
@@ -72,7 +71,7 @@ public class SessionActivity extends AppCompatActivity
     private static final int MAX_DISCARDED_MOVE_EVENTS = 3;
     private static final int SEND_MOVE_EVENT_TIMEOUT = 150;
     private Bitmap bitmap;
-    private RdpSessionState session;
+    private RdpSession session;
     private RdpSessionView rdpSessionView;
     private RdpPointerView rdpPointerView;
     private ProgressDialog progressDialog;
@@ -194,15 +193,15 @@ public class SessionActivity extends AppCompatActivity
         // but this is the only way ...
         final View activityRootView = findViewById(R.id.session_root_view);
         activityRootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
-                    screen_width = activityRootView.getWidth();
-                    screen_height = activityRootView.getHeight();
+            screen_width = activityRootView.getWidth();
+            screen_height = activityRootView.getHeight();
 
-                    // start session
-                    if (!sessionRunning && getIntent() != null) {
-                        processIntent(getIntent());
-                        sessionRunning = true;
-                    }
-                });
+            // start session
+            if (!sessionRunning && getIntent() != null) {
+                processIntent(getIntent());
+                sessionRunning = true;
+            }
+        });
 
         rdpSessionView = (RdpSessionView) findViewById(R.id.sessionView);
         rdpSessionView.setScaleGestureDetector(
@@ -231,13 +230,12 @@ public class SessionActivity extends AppCompatActivity
         modifiersKeyboardView.setKeyboard(modifiersKeyboard);
         modifiersKeyboardView.setOnKeyboardActionListener(this);
 
-
-        scrollView = (RdpScrollView) findViewById(R.id.sessionScrollView);
+        scrollView = findViewById(R.id.sessionScrollView);
         scrollView.setScrollViewListener(this);
         uiHandler = new UIHandler();
         libFreeRDPBroadcastReceiver = new LibFreeRDPBroadcastReceiver();
 
-        zoomControls = (ZoomControls) findViewById(R.id.zoomControls);
+        zoomControls = findViewById(R.id.zoomControls);
         zoomControls.hide();
         zoomControls.setOnZoomInClickListener(v -> {
             resetZoomControlsAutoHideTimeout();
@@ -309,8 +307,8 @@ public class SessionActivity extends AppCompatActivity
         RdpApp.cancelDisconnectTimer();
 
         // Disconnect all remaining sessions.
-        Collection<RdpSessionState> sessions = RdpApp.getSessions();
-        for (RdpSessionState session : sessions)
+        Collection<RdpSession> sessions = RdpApp.getSessions();
+        for (RdpSession session : sessions)
             LibFreeRDP.disconnect(session.getInstance());
 
         // unregister freerdp events broadcast receiver
@@ -326,7 +324,7 @@ public class SessionActivity extends AppCompatActivity
     }
 
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
 
         // reload keyboard resources (changed from landscape)
@@ -356,35 +354,17 @@ public class SessionActivity extends AppCompatActivity
             session = RdpApp.getSession(inst);
             bitmap = session.getSurface().getBitmap();
             bindSession();
-        } else if (bundle.containsKey(PARAM_CONNECTION_REFERENCE)) {
-            BaseRdpBookmark bookmark = null;
-            String refStr = bundle.getString(PARAM_CONNECTION_REFERENCE);
-            if (ConnectionReference.isHostnameReference(refStr)) {
-                bookmark = new RdpBookmark();
-                bookmark.<RdpBookmark>get().setHostname(ConnectionReference.getHostname(refStr));
-            } else if (ConnectionReference.isBookmarkReference(refStr)) {
-                if (ConnectionReference.isManualBookmarkReference(refStr))
-                    bookmark = RdpApp.getManualBookmarkGateway().findById(
-                            ConnectionReference.getManualBookmarkId(refStr));
-                else
-                    assert false;
-            }
-
-            if (bookmark != null)
-                connect(bookmark);
-            else
-                closeSessionActivity(RESULT_CANCELED);
         } else {
             // no session found - exit
             closeSessionActivity(RESULT_CANCELED);
         }
     }
 
-    private void connect(BaseRdpBookmark bookmark) {
-        session = RdpApp.createSession(bookmark, getApplicationContext());
+    private void connect(RdpConfig rdpConfig) {
+        session = RdpApp.createSession(rdpConfig, getApplicationContext());
 
-        BaseRdpBookmark.ScreenSettings screenSettings =
-                session.getBookmark().getActiveScreenSettings();
+        RdpConfig.ActiveScreenSettings screenSettings =
+                session.getRdpConfig().getScreenSettings();
         Log.v(TAG, "Screen Resolution: " + screenSettings.getResolutionString());
         if (screenSettings.isAutomatic()) {
             if ((getResources().getConfiguration().screenLayout &
@@ -396,7 +376,7 @@ public class SessionActivity extends AppCompatActivity
                 // small screen device i.e. phone:
                 // Automatic uses the largest side length of the screen and
                 // makes a 16:10 resolution setting out of it
-                int screenMax = (screen_width > screen_height) ? screen_width : screen_height;
+                int screenMax = Math.max(screen_width, screen_height);
                 screenSettings.setHeight(screenMax);
                 screenSettings.setWidth((int) ((float) screenMax * 1.6f));
             }
@@ -406,7 +386,7 @@ public class SessionActivity extends AppCompatActivity
             screenSettings.setWidth(screen_width);
         }
 
-        connectWithTitle(bookmark.getLabel());
+        connectWithTitle(rdpConfig.getLabel());
     }
 
     private void connect(Uri openUri) {
@@ -422,22 +402,15 @@ public class SessionActivity extends AppCompatActivity
         progressDialog.setTitle(title);
         progressDialog.setMessage(getResources().getText(R.string.dlg_msg_connecting));
         progressDialog.setButton(
-                ProgressDialog.BUTTON_NEGATIVE, "Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        connectCancelledByUser = true;
-                        LibFreeRDP.cancelConnection(session.getInstance());
-                    }
+                ProgressDialog.BUTTON_NEGATIVE, "Cancel", (dialog, which) -> {
+                    connectCancelledByUser = true;
+                    LibFreeRDP.cancelConnection(session.getInstance());
                 });
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        Thread thread = new Thread(new Runnable() {
-            public void run() {
-                session.connect(getApplicationContext());
-            }
-        });
-        thread.start();
+
+        ThreadUtils.getCachedPool().submit(() -> session.connect());
     }
 
     /**
@@ -719,7 +692,7 @@ public class SessionActivity extends AppCompatActivity
 
         session.setSurface(new BitmapDrawable(bitmap));
 
-        if (session.getBookmark() == null) {
+        if (session.getRdpConfig() == null) {
             // Return immediately if we launch from URI
             return;
         }
@@ -729,7 +702,7 @@ public class SessionActivity extends AppCompatActivity
         // FIXME: the additional check (settings.getWidth() != width + 1) is for
         // the RDVH bug fix to avoid accidental notifications
         // (refer to android_freerdp.c for more info on this problem)
-        BaseRdpBookmark.ScreenSettings settings = session.getBookmark().getActiveScreenSettings();
+        RdpConfig.ActiveScreenSettings settings = session.getRdpConfig().getScreenSettings();
         if ((settings.getWidth() != width && settings.getWidth() != width + 1) ||
                 settings.getHeight() != height || settings.getColors() != bpp)
             uiHandler.sendMessage(
@@ -1225,23 +1198,6 @@ public class SessionActivity extends AppCompatActivity
             if (progressDialog != null) {
                 progressDialog.dismiss();
                 progressDialog = null;
-            }
-
-            if (session.getBookmark() == null) {
-                // Return immediately if we launch from URI
-                return;
-            }
-
-            // add hostname to history if quick connect was used
-            Bundle bundle = getIntent().getExtras();
-            if (bundle != null && bundle.containsKey(PARAM_CONNECTION_REFERENCE)) {
-                if (ConnectionReference.isHostnameReference(
-                        bundle.getString(PARAM_CONNECTION_REFERENCE))) {
-                    assert session.getBookmark().getType() == BaseRdpBookmark.TYPE_MANUAL;
-                    String item = session.getBookmark().<RdpBookmark>get().getHostname();
-                    if (!RdpApp.getQuickConnectHistoryGateway().historyItemExists(item))
-                        RdpApp.getQuickConnectHistoryGateway().addHistoryItem(item);
-                }
             }
         }
 

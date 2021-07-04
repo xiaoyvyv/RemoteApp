@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <com.xiaoyv.ui.toolbar.AppToolbar
+    <com.xiaoyv.ui.toolbar.UiAppToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
@@ -30,7 +30,7 @@
                 android:paddingBottom="@dimen/ui_size_8"
                 android:text="@string/ssh_add_host"
                 android:textColor="@color/ui_text_c1"
-                android:textSize="@dimen/ui_font_16"
+                android:textSize="@dimen/ui_font_14"
                 android:textStyle="bold" />
 
             <com.xiaoyv.ui.setting.UiSettingView
@@ -65,7 +65,7 @@
                 android:paddingBottom="@dimen/ui_size_8"
                 android:text="@string/ssh_add_credentials"
                 android:textColor="@color/ui_text_c1"
-                android:textSize="@dimen/ui_font_16"
+                android:textSize="@dimen/ui_font_14"
                 android:textStyle="bold" />
 
             <com.xiaoyv.ui.setting.UiSettingView

@@ -15,6 +15,7 @@ import android.view.WindowManager;
 import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -22,6 +23,7 @@ import androidx.appcompat.app.AlertDialog;
 import com.blankj.utilcode.util.ArrayUtils;
 import com.blankj.utilcode.util.ColorUtils;
 import com.blankj.utilcode.util.KeyboardUtils;
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.StringUtils;
@@ -43,7 +45,7 @@ public class UiSettingView extends FrameLayout {
     protected final UiSettingInputBinding inputBinding;
     protected final Context context;
     protected AlertDialog inputDialog;
-    private String requiredText;
+    private String messageHint;
 
     /**
      * XML 可配置的值
@@ -55,6 +57,7 @@ public class UiSettingView extends FrameLayout {
     protected CharSequence[] uiListTitle;
     protected CharSequence[] uiListValue;
     protected boolean uiValueBoolean;
+    protected boolean uiEnableSp;
     protected float uiValueFloat;
     protected int uiValueInteger;
     protected int uiValueList;
@@ -62,7 +65,16 @@ public class UiSettingView extends FrameLayout {
     protected int uiType = UiSettingViewType.TYPE_STRING;
 
     protected CompoundButton.OnCheckedChangeListener checkedChangeListener;
-    private OptionsDialog optionsDialog;
+    protected OptionsDialog optionsDialog;
+    protected OnSettingClickListener onSettingClickListener;
+
+    public interface OnSettingClickListener {
+        boolean onClick();
+    }
+
+    public void setOnSettingClickListener(OnSettingClickListener clickListener) {
+        this.onSettingClickListener = clickListener;
+    }
 
     public UiSettingView(@NonNull Context context, @NonNull String spKey) {
         this(context, null, 0);
@@ -94,6 +106,7 @@ public class UiSettingView extends FrameLayout {
         }
         TypedArray array = context.obtainStyledAttributes(attrs, R.styleable.UiSettingView);
         spKey = array.getString(R.styleable.UiSettingView_ui_key);
+        uiEnableSp = array.getBoolean(R.styleable.UiSettingView_ui_enable_sp, true);
         uiTitle = array.getString(R.styleable.UiSettingView_ui_title);
         uiMessage = array.getString(R.styleable.UiSettingView_ui_message);
         uiValueString = array.getString(R.styleable.UiSettingView_ui_default_string);
@@ -112,10 +125,16 @@ public class UiSettingView extends FrameLayout {
 
         if (StringUtils.isEmpty(spKey)) {
             spKey = "default_key";
+            SPUtils.getInstance(sharePreferenceName).remove(spKey);
             // 若设置了 TYPE 为非字符串类型，但没有设置 SP_KEY，则抛异常
             if (uiType != UiSettingViewType.TYPE_STRING) {
                 throw new RuntimeException("非字符串类型，请先设置：SP_KEY");
             }
+        }
+
+        // string 类型若设置了默认 message 则保存
+        if (uiType == UiSettingViewType.TYPE_STRING && !StringUtils.isEmpty(uiMessage)) {
+            SPUtils.getInstance(sharePreferenceName).put(spKey, uiMessage);
         }
     }
 
@@ -136,7 +155,9 @@ public class UiSettingView extends FrameLayout {
         });
 
         // 输入框
-        inputDialog = new AlertDialog.Builder(context).setView(inputBinding.getRoot()).create();
+        inputDialog = new AlertDialog.Builder(context)
+                .setView(inputBinding.getRoot())
+                .create();
         inputDialog.setCanceledOnTouchOutside(false);
         setInputLine(1);
         inputBinding.tvClear.setOnClickListener(v -> {
@@ -146,6 +167,14 @@ public class UiSettingView extends FrameLayout {
 
         // 点击事件
         binding.clRoot.setOnClickListener(v -> {
+            // 若配置的监听器消费了事件，则不执行了
+            if (onSettingClickListener != null) {
+                boolean consume = onSettingClickListener.onClick();
+                if (consume) {
+                    return;
+                }
+            }
+
             // 布尔类型不显示弹框
             if (uiType == UiSettingViewType.TYPE_BOOLEAN) {
                 binding.smSwitch.setChecked(!binding.smSwitch.isChecked());
@@ -184,6 +213,7 @@ public class UiSettingView extends FrameLayout {
         initType();
         refreshUi();
     }
+
 
     private void setDefaultValue() {
         // 第一次则保存默认属性
@@ -378,15 +408,14 @@ public class UiSettingView extends FrameLayout {
     }
 
     public UiSettingView setMessage(@Nullable String message) {
-        if (StringUtils.isEmpty(message) && !StringUtils.isEmpty(requiredText)) {
+        CharSequence descHint = binding.tvDesc.getHint();
+        if (StringUtils.isEmpty(message) && descHint == null) {
+            binding.tvDesc.setVisibility(GONE);
+        } else {
             binding.tvDesc.setVisibility(VISIBLE);
-            binding.tvDesc.setText(requiredText);
-            binding.tvDesc.setTextColor(ColorUtils.getColor(R.color.ui_system_error));
-            return this;
+            binding.tvDesc.setText(message);
+            binding.tvDesc.setTextColor(ColorUtils.getColor(R.color.ui_text_c3));
         }
-        binding.tvDesc.setVisibility(StringUtils.isEmpty(message) ? GONE : VISIBLE);
-        binding.tvDesc.setText(message);
-        binding.tvDesc.setTextColor(ColorUtils.getColor(R.color.ui_text_c3));
         return this;
     }
 
@@ -420,13 +449,19 @@ public class UiSettingView extends FrameLayout {
         return this;
     }
 
-    public UiSettingView setRequiredText(String tips) {
-        this.requiredText = StringUtils.isEmpty(tips) ? StringUtils.getString(R.string.ui_view_setting_empty) : tips;
-        if (StringUtils.isEmpty(binding.tvDesc.getText())) {
-            binding.tvDesc.setVisibility(VISIBLE);
-            binding.tvDesc.setText(this.requiredText);
-            binding.tvDesc.setTextColor(ColorUtils.getColor(R.color.ui_system_error));
-        }
+    public UiSettingView setMessageHint() {
+        return setMessageHint(null);
+    }
+
+    public UiSettingView setMessageHint(@Nullable String hint) {
+        return setMessageHint(hint, ColorUtils.getColor(R.color.ui_system_error));
+    }
+
+    public UiSettingView setMessageHint(@Nullable String hint, @ColorInt int textColor) {
+        messageHint = StringUtils.isEmpty(hint) ? StringUtils.getString(R.string.ui_view_setting_empty) : hint;
+        binding.tvDesc.setVisibility(VISIBLE);
+        binding.tvDesc.setHint(messageHint);
+        binding.tvDesc.setHintTextColor(textColor);
         return this;
     }
 
@@ -454,7 +489,7 @@ public class UiSettingView extends FrameLayout {
 
     public String getMessage() {
         String message = String.valueOf(binding.tvDesc.getText());
-        if (StringUtils.equals(requiredText, message) || StringUtils.equals(StringUtils.getString(R.string.ui_view_setting_empty), message)) {
+        if (StringUtils.equals(messageHint, message) || StringUtils.equals(StringUtils.getString(R.string.ui_view_setting_empty), message)) {
             return null;
         }
         return message;

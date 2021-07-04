@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <com.xiaoyv.ui.toolbar.AppToolbar
+    <com.xiaoyv.ui.toolbar.UiAppToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

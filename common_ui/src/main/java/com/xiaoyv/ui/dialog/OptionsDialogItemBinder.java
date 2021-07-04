@@ -32,7 +32,7 @@ public class OptionsDialogItemBinder extends ItemViewBinder<String, OptionsDialo
     private Typeface textStyle;
 
     public OptionsDialogItemBinder() {
-        textSize = 16;
+        textSize = 14;
         textStyle = Typeface.DEFAULT;
         textColor = ColorUtils.getColor(R.color.ui_text_c1);
         lastTextColor = ColorUtils.getColor(R.color.ui_text_c1);

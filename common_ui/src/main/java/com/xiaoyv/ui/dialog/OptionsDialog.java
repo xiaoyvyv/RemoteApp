@@ -11,12 +11,15 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
 import com.blankj.utilcode.util.ScreenUtils;
+import com.blankj.utilcode.util.Utils;
 import com.drakeet.multitype.MultiTypeAdapter;
 import com.xiaoyv.ui.databinding.UiDialogOptionsBinding;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import me.jessyan.autosize.utils.AutoSizeUtils;
 
 /**
  * OptionsDialog
@@ -124,7 +127,7 @@ public class OptionsDialog extends AlertDialog {
         if (window != null) {
             window.setBackgroundDrawableResource(android.R.color.transparent);
             WindowManager.LayoutParams attributes = window.getAttributes();
-            attributes.width = ScreenUtils.getAppScreenWidth() - 120;
+            attributes.width = ScreenUtils.getAppScreenWidth() - AutoSizeUtils.dp2px(Utils.getApp(),100);
             window.setAttributes(attributes);
         }
     }

@@ -5,7 +5,7 @@ import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
 
-import androidx.annotation.RecentlyNonNull;
+import androidx.annotation.NonNull;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.ColorUtils;
@@ -61,7 +61,7 @@ public class TerminalActivity extends BaseMvpActivity<TerminalContract.View, Ter
     }
 
     @Override
-    protected void initIntentData(@RecentlyNonNull Intent intent, @RecentlyNonNull Bundle bundle) {
+    protected void initIntentData(@NonNull Intent intent, @NonNull Bundle bundle) {
         sshEntity = (SshEntity) intent.getSerializableExtra(KEY_TERMINAL_ENTITY);
         if (ObjectUtils.isEmpty(sshEntity)) {
             onBackPressed();

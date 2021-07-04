@@ -152,6 +152,7 @@
     <string name="dlg_title_verify_certificate">证书验证</string>
     <string name="dlg_msg_verify_certificate">未能验证远程主机证书的安全性，是否连接？</string>
     <string name="dlg_title_credentials">请输入您的证书</string>
+    <string name="dlg_title_credentials_gateway">请输入您的网关证书</string>
     <string name="dlg_title_create_shortcut">创建快捷方式</string>
     <string name="dlg_msg_create_shortcut">快捷方式名称：</string>
     <string name="dlg_msg_connecting">连接中 &#8230;</string>

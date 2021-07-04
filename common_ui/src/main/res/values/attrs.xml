@@ -6,10 +6,32 @@
         <attr name="ui_sp" format="string" />
     </declare-styleable>
 
+    <!--设置抽取配置-->
+    <attr name="ui_key" format="string" />
+    <attr name="ui_title" format="string" />
+    <attr name="ui_value" format="string" />
+    <attr name="ui_value_color" format="color" />
+    <attr name="ui_hint" format="string" />
+    <attr name="ui_hint_color" format="color" />
+    <attr name="ui_divider_enable" format="boolean" />
+    <attr name="ui_divider_margin" format="dimension" />
+
+    <declare-styleable name="UiSettingTextView">
+        <attr name="ui_key" />
+        <attr name="ui_title" />
+        <attr name="ui_value" />
+        <attr name="ui_value_color" />
+        <attr name="ui_hint" />
+        <attr name="ui_hint_color" />
+        <attr name="ui_divider_enable" />
+        <attr name="ui_divider_margin" />
+    </declare-styleable>
+
     <!-- 设置控件属性 -->
     <declare-styleable name="UiSettingView">
-        <attr name="ui_key" format="string" />
-        <attr name="ui_title" format="string" />
+        <attr name="ui_key" />
+        <attr name="ui_title" />
+        <attr name="ui_enable_sp" format="boolean" />
         <attr name="ui_message" format="string" />
         <attr name="ui_default_string" format="string" />
         <attr name="ui_default_boolean" format="boolean" />

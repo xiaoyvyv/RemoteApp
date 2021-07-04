@@ -7,8 +7,7 @@ import com.blankj.utilcode.util.GsonUtils;
 import com.blankj.utilcode.util.ObjectUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ThreadUtils;
-import com.freerdp.freerdpcore.application.RdpApp;
-import com.freerdp.freerdpcore.domain.RdpBookmark;
+import com.freerdp.freerdpcore.domain.RdpConfig;
 import com.xiaoyv.busines.base.BaseSubscriber;
 import com.xiaoyv.busines.base.ImplBasePresenter;
 import com.xiaoyv.busines.config.NavigationPath;
@@ -115,9 +114,8 @@ public class RdpListPresenter extends ImplBasePresenter<RdpListContract.View> im
             @Override
             public Boolean doInBackground() {
                 // 清除RDP配置数据库当前条目
-                RdpBookmark rdpBookmark = GsonUtils.fromJson(dataBean.bookmark, RdpBookmark.class);
+                RdpConfig rdpBookmark = GsonUtils.fromJson(dataBean.configStr, RdpConfig.class);
 
-                RdpApp.getManualBookmarkGateway().delete(rdpBookmark.getId());
                 // 清除 RdpEntity 当前条目
                 DateBaseManger.get().getRdpDao().delete(dataBean);
                 return true;
