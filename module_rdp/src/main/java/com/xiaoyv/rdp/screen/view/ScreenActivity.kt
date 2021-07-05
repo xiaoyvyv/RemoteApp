@@ -7,14 +7,12 @@ import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
-import android.os.Message
 import android.view.ScaleGestureDetector
 import android.view.View
 import com.blankj.utilcode.util.*
 import com.freerdp.freerdpcore.application.RdpApp
 import com.freerdp.freerdpcore.domain.RdpConfig
 import com.freerdp.freerdpcore.domain.RdpSession
-import com.freerdp.freerdpcore.presentation.SessionActivity
 import com.freerdp.freerdpcore.services.LibFreeRDP
 import com.freerdp.freerdpcore.view.RdpSessionView
 import com.xiaoyv.busines.base.BaseMvpActivity
@@ -40,7 +38,6 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     FreeScrollView.ScrollView2DListener {
     private lateinit var binding: RdpActivityScreenBinding
     private lateinit var userBinding: RdpActivityScreenCredentialsBinding
-    private lateinit var dlgVerifyCertificate: NormalDialog
     private lateinit var dlgUserCredentials: NormalDialog
     private val dlgVerifyCertificateLock = Object()
     private val dlgUserCredentialsLock = Object()
@@ -161,29 +158,6 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
 
 
     override fun vCreateDialog() {
-        // 构建验证证书对话框
-        dlgVerifyCertificate = NormalDialog(this).apply {
-            title = StringUtils.getString(R.string.dlg_title_verify_certificate)
-            cancelText = StringUtils.getString(R.string.ui_common_no)
-            doneText = StringUtils.getString(R.string.ui_common_yes)
-            cancelClickListener = {
-                callbackDialogResult = false
-                connectCancelledByUser = true
-                synchronized(dlgVerifyCertificateLock) {
-                    dlgVerifyCertificateLock.notify()
-                }
-                true
-            }
-            doneClickListener = {
-                callbackDialogResult = true
-                synchronized(dlgVerifyCertificateLock) {
-                    dlgVerifyCertificateLock.notify()
-                }
-                true
-            }
-            setCancelable(false)
-        }
-
         // 构建用户凭证验证对话框
         userBinding = RdpActivityScreenCredentialsBinding.inflate(layoutInflater)
         dlgUserCredentials = NormalDialog(this).apply {
@@ -303,9 +277,41 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     override fun onVerifiyCertificate(
         commonName: String, subject: String, issuer: String, fingerprint: String, mismatch: Boolean
     ): Int {
-        ToastUtils.showShort("onVerifiyCertificate")
+        // 重置
+        callbackDialogResult = false
 
-        return 0
+        val message =
+            String.format("名称：%s\n主题：%s\n发行：%s", commonName, subject, issuer)
+
+        // 证书验证
+        ThreadUtils.runOnUiThread {
+            ScreenCertificateFragment.Builder()
+                .setCertName(message)
+                .setFinger(String.format("指纹：\n%s", fingerprint))
+                .setCancel {
+                    callbackDialogResult = false
+                    connectCancelledByUser = true
+                    synchronized(dlgVerifyCertificateLock) {
+                        dlgVerifyCertificateLock.notify()
+                    }
+                }
+                .setDone {
+                    callbackDialogResult = true
+                    synchronized(dlgVerifyCertificateLock) {
+                        dlgVerifyCertificateLock.notify()
+                    }
+                }.build().show(supportFragmentManager)
+        }
+
+        // 等待验证结果
+        try {
+            synchronized(dlgVerifyCertificateLock) {
+                dlgVerifyCertificateLock.wait()
+            }
+        } catch (e: InterruptedException) {
+        }
+
+        return if (callbackDialogResult) 1 else 0
     }
 
     override fun onVerifyChangedCertificate(
@@ -317,6 +323,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         oldIssuer: String,
         oldFingerprint: String
     ): Int {
+        LogUtils.e("onVerifyChangedCertificate")
         ToastUtils.showShort("onVerifyChangedCertificate")
         return 0
     }

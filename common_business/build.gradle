@@ -44,9 +44,9 @@ android {
 kapt {
     arguments {
         arg("AROUTER_MODULE_NAME", project.name)
-//        arg("room.schemaLocation", "$projectDir/schemas".toString())
-//        arg("room.incremental", "true")
-//        arg("room.expandProjection", "true")
+        arg("room.schemaLocation", "$projectDir/schemas".toString())
+        arg("room.incremental", "true")
+        arg("room.expandProjection", "true")
     }
 }
 
@@ -82,7 +82,6 @@ dependencies {
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"
     implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
     implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
-    implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"
 
     implementation "com.alibaba:arouter-api:${rootProject.ext.arouterVersion}"
     annotationProcessor "com.alibaba:arouter-compiler:${rootProject.ext.arouterVersion}"

@@ -18,9 +18,9 @@ class RdpConfig : Serializable {
 
     var enableGatewaySettings: Boolean = false
     var clientName: String = "客户端"
-    var hostname: String = "192.168.31.202"
+    var hostname: String = "101.132.108.0"
     var port: Int = 3389
-    var certName: String = ""
+    var certName: String = "DESKTOP-J409075"
     var username: String = "Administrator"
     var domain: String = ""
     var password: String = ""

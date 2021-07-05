@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "a1c514d852e7dce4652c17e970b0c26d",
+    "identityHash": "fff780e737765070dadfbe27b8f21ea5",
     "entities": [
       {
         "tableName": "rdp",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lastTime` INTEGER NOT NULL, `label` TEXT, `group` TEXT, `ip` TEXT, `port` TEXT, `account` TEXT, `password` TEXT, `domain` TEXT, `rdpConfigStr` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lastTime` INTEGER NOT NULL, `label` TEXT, `group` TEXT, `ip` TEXT, `port` TEXT, `account` TEXT, `password` TEXT, `domain` TEXT, `configStr` TEXT)",
         "fields": [
           {
             "fieldPath": "id",
@@ -63,8 +63,8 @@
             "notNull": false
           },
           {
-            "fieldPath": "rdpConfigStr",
-            "columnName": "rdpConfigStr",
+            "fieldPath": "configStr",
+            "columnName": "configStr",
             "affinity": "TEXT",
             "notNull": false
           }
@@ -263,7 +263,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a1c514d852e7dce4652c17e970b0c26d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fff780e737765070dadfbe27b8f21ea5')"
     ]
   }
 }

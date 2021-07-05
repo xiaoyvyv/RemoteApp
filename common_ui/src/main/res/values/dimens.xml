@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--FONT 尺寸-->
+    <dimen name="ui_layout_elevation">2dp</dimen>
+
     <dimen name="ui_font_8">8sp</dimen>
     <dimen name="ui_font_10">10sp</dimen>
     <dimen name="ui_font_12">12sp</dimen>

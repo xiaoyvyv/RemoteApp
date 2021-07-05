@@ -157,7 +157,8 @@ object LibRdpHelper {
         if (advancedSettings.redirectMicrophone) {
             arguments.add("/microphone")
         }
-        arguments.add("/cert-ignore")
+//        arguments.add("/cert-ignore")
+
         arguments.add("/log-level:" + debugSettings.debugLevel)
         return arguments.toTypedArray()
     }
