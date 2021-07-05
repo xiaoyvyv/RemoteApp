@@ -44,6 +44,7 @@ import com.freerdp.freerdpcore.domain.RdpSession;
 import com.freerdp.freerdpcore.mapper.RdpKeyboardMapper;
 import com.freerdp.freerdpcore.mapper.RdpMouseMapper;
 import com.freerdp.freerdpcore.services.LibFreeRDP;
+import com.freerdp.freerdpcore.services.UiEventListener;
 import com.freerdp.freerdpcore.utils.ClipboardManagerProxy;
 import com.freerdp.freerdpcore.view.RdpPointerView;
 import com.freerdp.freerdpcore.view.RdpScrollView;
@@ -54,7 +55,7 @@ import java.util.Collection;
 import java.util.List;
 
 public class SessionActivity extends AppCompatActivity
-        implements LibFreeRDP.UiEventListener, KeyboardView.OnKeyboardActionListener,
+        implements UiEventListener, KeyboardView.OnKeyboardActionListener,
         RdpScrollView.ScrollView2DListener, RdpKeyboardMapper.KeyProcessingListener,
         RdpSessionView.SessionViewListener, RdpPointerView.TouchPointerListener,
         ClipboardManagerProxy.OnClipboardChangedListener {
@@ -816,9 +817,9 @@ public class SessionActivity extends AppCompatActivity
         return callbackDialogResult;
     }
 
+
     @Override
-    public int onVerifiyCertificate(String commonName, String subject, String issuer,
-                                    String fingerprint, boolean mismatch) {
+    public int onVerifyCertificateEx(@NonNull String host, int port, @NonNull String commonName, @NonNull String subject, @NonNull String issuer, @NonNull String fingerprint, long flags) {
         // see if global settings says accept all
         if (ApplicationSettingsActivity.getAcceptAllCertificates(this))
             return 0;
@@ -847,9 +848,16 @@ public class SessionActivity extends AppCompatActivity
     }
 
     @Override
-    public int onVerifyChangedCertificate(String commonName, String subject, String issuer,
-                                          String fingerprint, String oldSubject, String oldIssuer,
-                                          String oldFingerprint) {
+    public int onVerifyChangedCertificateEx(@NonNull String host,
+                                            long port,
+                                            @NonNull String commonName,
+                                            @NonNull String subject,
+                                            @NonNull String issuer,
+                                            @NonNull String fingerprint,
+                                            @NonNull String oldSubject,
+                                            @NonNull String oldIssuer,
+                                            @NonNull String oldFingerprint,
+                                            long flags) {
         // see if global settings says accept all
         if (ApplicationSettingsActivity.getAcceptAllCertificates(this))
             return 0;

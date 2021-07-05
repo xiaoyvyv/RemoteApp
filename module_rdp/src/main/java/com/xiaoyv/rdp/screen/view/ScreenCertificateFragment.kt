@@ -39,6 +39,8 @@ class ScreenCertificateFragment : DialogFragment() {
             (arguments?.getSerializable(NavigationKey.KEY_SERIALIZABLE) as? Builder) ?: return
         binding.tvNameValue.text = builder.certName
         binding.tvFinger.text = builder.finger
+        binding.tvTitle.text = builder.title
+
         binding.ivClose.setOnClickListener {
             dismiss()
             builder.cancel.invoke()
@@ -72,10 +74,16 @@ class ScreenCertificateFragment : DialogFragment() {
     }
 
     class Builder : Serializable {
+        internal var title: String = "远程桌面连接"
         internal var finger: String = "--"
         internal var certName: String = "--"
         internal var cancel: () -> Unit = {}
         internal var done: () -> Unit = {}
+
+        fun setTitle(title: String): Builder {
+            this.title = title
+            return this
+        }
 
         fun setCertName(certName: String): Builder {
             this.certName = certName

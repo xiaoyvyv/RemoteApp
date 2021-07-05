@@ -15,3 +15,6 @@ class KotlinExt {
 
 fun Float?.dp() = AutoSizeUtils.dp2px(Utils.getApp(), this ?: 0f)
 fun Int?.dp() = AutoSizeUtils.dp2px(Utils.getApp(), this?.toFloat() ?: 0f)
+
+fun Long?.orEmpty() = this ?: 0L
+fun Int?.orEmpty() = this ?: 0

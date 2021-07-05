@@ -1,144 +1,128 @@
-package com.freerdp.freerdpcore.services;
+@file:Suppress("unused", "FunctionName")
 
-import android.content.Context;
-import android.graphics.Bitmap;
-import android.net.Uri;
-import android.util.Log;
+package com.freerdp.freerdpcore.services
 
-import androidx.collection.LongSparseArray;
+import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
+import android.util.Log
+import androidx.collection.LongSparseArray
+import com.blankj.utilcode.util.FileIOUtils
+import com.blankj.utilcode.util.FileUtils
+import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.PathUtils
+import com.freerdp.freerdpcore.application.RdpApp
+import com.freerdp.freerdpcore.domain.RdpConfig
+import com.freerdp.freerdpcore.utils.orEmpty
 
-import com.blankj.utilcode.util.LogUtils;
-import com.freerdp.freerdpcore.application.RdpApp;
-import com.freerdp.freerdpcore.domain.RdpConfig;
-import com.freerdp.freerdpcore.domain.RdpSession;
+object LibFreeRDP {
+    const val TAG = "LibFreeRDP"
 
-public class LibFreeRDP {
-    public static final String TAG = "LibFreeRDP";
-    public static boolean mHasH264 = true;
-    private static EventListener listener;
+    const val VERIFY_CERT_FLAG_NONE: Long = 0x00
+    const val VERIFY_CERT_FLAG_LEGACY: Long = 0x02
+    const val VERIFY_CERT_FLAG_REDIRECT: Long = 0x10
+    const val VERIFY_CERT_FLAG_GATEWAY: Long = 0x20
+    const val VERIFY_CERT_FLAG_CHANGED: Long = 0x40
+    const val VERIFY_CERT_FLAG_MISMATCH: Long = 0x80
+    const val VERIFY_CERT_FLAG_MATCH_LEGACY_SHA1: Long = 0x100
+    const val VERIFY_CERT_FLAG_FP_IS_PEM: Long = 0x200
 
-    private static final LongSparseArray<Boolean> mInstanceState = new LongSparseArray<>();
+    @JvmStatic
+    var mHasH264 = true
 
-    static {
-        final String h264 = "openh264";
-        final String[] libraries = {h264,
-                "freerdp-openssl",
-                "ssl",
-                "crypto",
-                "jpeg",
-                "winpr3",
-                "freerdp3",
-                "freerdp-client3",
-                "freerdp-android3"};
-        final String LD_PATH = System.getProperty("java.library.path");
+    @JvmStatic
+    private var listener: EventListener? = null
 
-        for (String lib : libraries) {
-            try {
-                Log.v(TAG, "Trying to load library " + lib + " from LD_PATH: " + LD_PATH);
-                System.loadLibrary(lib);
-            } catch (UnsatisfiedLinkError e) {
-                Log.e(TAG, "Failed to load library " + lib + ": " + e.toString());
-                if (lib.equals(h264)) {
-                    mHasH264 = false;
-                }
+    @JvmStatic
+    private val mInstanceState = LongSparseArray<Boolean>()
+
+    @JvmStatic
+    private val lock = Object()
+
+    @JvmStatic
+    fun hasH264Support(): Boolean {
+        return mHasH264
+    }
+
+    private external fun freerdp_get_jni_version(): String?
+    private external fun freerdp_get_version(): String?
+    private external fun freerdp_get_build_date(): String?
+    private external fun freerdp_get_build_revision(): String?
+    private external fun freerdp_get_build_config(): String?
+    private external fun freerdp_new(context: Context): Long
+    private external fun freerdp_free(inst: Long)
+    private external fun freerdp_parse_arguments(inst: Long, args: Array<String>): Boolean
+    private external fun freerdp_connect(inst: Long): Boolean
+    private external fun freerdp_disconnect(inst: Long): Boolean
+    private external fun freerdp_update_graphics(
+        inst: Long, bitmap: Bitmap, x: Int, y: Int, width: Int, height: Int
+    ): Boolean
+
+    private external fun freerdp_send_cursor_event(inst: Long, x: Int, y: Int, flags: Int): Boolean
+    private external fun freerdp_send_key_event(inst: Long, keycode: Int, down: Boolean): Boolean
+    private external fun freerdp_send_unicodekey_event(
+        inst: Long, keycode: Int, down: Boolean
+    ): Boolean
+
+    private external fun freerdp_send_clipboard_data(inst: Long, data: String): Boolean
+    private external fun freerdp_get_last_error_string(inst: Long): String?
+
+    @JvmStatic
+    fun setEventListener(eventListener: EventListener?) {
+        listener = eventListener
+    }
+
+    @JvmStatic
+    fun newInstance(context: Context): Long = freerdp_new(context)
+
+    @JvmStatic
+    fun freeInstance(inst: Long) {
+        synchronized(lock) {
+            if (mInstanceState[inst, false]) {
+                freerdp_disconnect(inst)
             }
-        }
-    }
-
-    public static boolean hasH264Support() {
-        return mHasH264;
-    }
-
-    private static native String freerdp_get_jni_version();
-
-    private static native String freerdp_get_version();
-
-    private static native String freerdp_get_build_date();
-
-    private static native String freerdp_get_build_revision();
-
-    private static native String freerdp_get_build_config();
-
-    private static native long freerdp_new(Context context);
-
-    private static native void freerdp_free(long inst);
-
-    private static native boolean freerdp_parse_arguments(long inst, String[] args);
-
-    private static native boolean freerdp_connect(long inst);
-
-    private static native boolean freerdp_disconnect(long inst);
-
-    private static native boolean freerdp_update_graphics(long inst, Bitmap bitmap, int x, int y,
-                                                          int width, int height);
-
-    private static native boolean freerdp_send_cursor_event(long inst, int x, int y, int flags);
-
-    private static native boolean freerdp_send_key_event(long inst, int keycode, boolean down);
-
-    private static native boolean freerdp_send_unicodekey_event(long inst, int keycode,
-                                                                boolean down);
-
-    private static native boolean freerdp_send_clipboard_data(long inst, String data);
-
-    private static native String freerdp_get_last_error_string(long inst);
-
-    public static void setEventListener(EventListener l) {
-        listener = l;
-    }
-
-    public static long newInstance(Context context) {
-        return freerdp_new(context);
-    }
-
-    public static void freeInstance(long inst) {
-        synchronized (mInstanceState) {
-            if (mInstanceState.get(inst, false)) {
-                freerdp_disconnect(inst);
-            }
-            while (mInstanceState.get(inst, false)) {
+            while (mInstanceState[inst, false]) {
                 try {
-                    mInstanceState.wait();
-                } catch (InterruptedException e) {
-                    throw new RuntimeException();
+                    lock.wait()
+                } catch (e: InterruptedException) {
+                    throw RuntimeException()
                 }
             }
         }
-        freerdp_free(inst);
+        freerdp_free(inst)
     }
 
-    public static boolean connect(long inst) {
-        synchronized (mInstanceState) {
-            if (mInstanceState.get(inst, false)) {
-                throw new RuntimeException("instance already connected");
+    @JvmStatic
+    fun connect(inst: Long): Boolean {
+        synchronized(lock) {
+            if (mInstanceState[inst, false]) {
+                throw RuntimeException("instance already connected")
             }
         }
-        return freerdp_connect(inst);
+        return freerdp_connect(inst)
     }
 
-    public static boolean disconnect(long inst) {
-        synchronized (mInstanceState) {
-            if (mInstanceState.get(inst, false)) {
-                return freerdp_disconnect(inst);
-            }
-            return true;
+    @JvmStatic
+    fun disconnect(inst: Long): Boolean {
+        synchronized(lock) {
+            return if (mInstanceState[inst, false]) {
+                freerdp_disconnect(inst)
+            } else true
         }
     }
 
-    public static boolean cancelConnection(long inst) {
-        synchronized (mInstanceState) {
-            if (mInstanceState.get(inst, false)) {
-                return freerdp_disconnect(inst);
-            }
-            return true;
+    @JvmStatic
+    fun cancelConnection(inst: Long): Boolean {
+        synchronized(lock) {
+            return if (mInstanceState[inst, false]) {
+                freerdp_disconnect(inst)
+            } else true
         }
     }
 
-    public static String addFlag(String name, boolean enabled) {
-        if (enabled) {
-            return "+" + name;
-        }
-        return "-" + name;
+    @JvmStatic
+    fun addFlag(name: String, enabled: Boolean): String {
+        return if (enabled) "+$name" else "-$name"
     }
 
     /**
@@ -148,223 +132,203 @@ public class LibFreeRDP {
      * @param rdpConfig bookmark
      * @return 是否成功
      */
-    public static boolean setConnectionInfo(long inst, RdpConfig rdpConfig) {
-        String[] arguments = LibRdpHelper.setConnectionInfo(rdpConfig);
-        LogUtils.e("Rdp 连接参数", arguments);
-        return freerdp_parse_arguments(inst, arguments);
+    @JvmStatic
+    fun setConnectionInfo(inst: Long, rdpConfig: RdpConfig): Boolean {
+        val arguments = LibRdpHelper.setConnectionInfo(rdpConfig)
+        LogUtils.e("Rdp 连接参数", arguments)
+        return freerdp_parse_arguments(inst, arguments)
     }
 
-    public static boolean setConnectionInfo(long inst, Uri openUri) {
-        String[] arguments = LibRdpHelper.setConnectionInfo(openUri);
-        LogUtils.e("Rdp 连接参数", arguments);
-        return freerdp_parse_arguments(inst, arguments);
+    @JvmStatic
+    fun setConnectionInfo(inst: Long, openUri: Uri): Boolean {
+        val arguments = LibRdpHelper.setConnectionInfo(openUri)
+        LogUtils.e("Rdp 连接参数", arguments)
+        return freerdp_parse_arguments(inst, arguments)
     }
 
-    public static boolean updateGraphics(long inst, Bitmap bitmap, int x, int y, int width,
-                                         int height) {
-        return freerdp_update_graphics(inst, bitmap, x, y, width, height);
+    @JvmStatic
+    fun updateGraphics(
+        inst: Long, bitmap: Bitmap, x: Int, y: Int, width: Int,
+        height: Int
+    ): Boolean {
+        return freerdp_update_graphics(inst, bitmap, x, y, width, height)
     }
 
-    public static boolean sendCursorEvent(long inst, int x, int y, int flags) {
-        return freerdp_send_cursor_event(inst, x, y, flags);
+    @JvmStatic
+    fun sendCursorEvent(inst: Long, x: Int, y: Int, flags: Int): Boolean {
+        return freerdp_send_cursor_event(inst, x, y, flags)
     }
 
-    public static boolean sendKeyEvent(long inst, int keycode, boolean down) {
-        return freerdp_send_key_event(inst, keycode, down);
+    @JvmStatic
+    fun sendKeyEvent(inst: Long, keycode: Int, down: Boolean): Boolean {
+        return freerdp_send_key_event(inst, keycode, down)
     }
 
-    public static boolean sendUnicodeKeyEvent(long inst, int keycode, boolean down) {
-        return freerdp_send_unicodekey_event(inst, keycode, down);
+    @JvmStatic
+    fun sendUnicodeKeyEvent(inst: Long, keycode: Int, down: Boolean): Boolean {
+        return freerdp_send_unicodekey_event(inst, keycode, down)
     }
 
-    public static boolean sendClipboardData(long inst, String data) {
-        return freerdp_send_clipboard_data(inst, data);
+    @JvmStatic
+    fun sendClipboardData(inst: Long, data: String): Boolean {
+        return freerdp_send_clipboard_data(inst, data)
     }
 
-    private static void OnConnectionSuccess(long inst) {
-        if (listener != null) {
-            listener.onConnectionSuccess(inst);
-        }
-        synchronized (mInstanceState) {
-            mInstanceState.append(inst, true);
-            mInstanceState.notifyAll();
-        }
-    }
-
-    private static void OnConnectionFailure(long inst) {
-        if (listener != null) {
-            listener.onConnectionFailure(inst);
-        }
-        synchronized (mInstanceState) {
-            mInstanceState.remove(inst);
-            mInstanceState.notifyAll();
-        }
-    }
-
-    private static void OnPreConnect(long inst) {
-        if (listener != null) {
-            listener.onPreConnect(inst);
+    @JvmStatic
+    private fun OnConnectionSuccess(inst: Long) {
+        listener?.onConnectionSuccess(inst)
+        synchronized(lock) {
+            mInstanceState.append(inst, true)
+            lock.notifyAll()
         }
     }
 
-    private static void OnDisconnecting(long inst) {
-        if (listener != null) {
-            listener.onDisconnecting(inst);
+    @JvmStatic
+    private fun OnConnectionFailure(inst: Long) {
+        listener?.onConnectionFailure(inst)
+        synchronized(lock) {
+            mInstanceState.remove(inst)
+            lock.notifyAll()
         }
     }
 
-    private static void OnDisconnected(long inst) {
-        if (listener != null) {
-            listener.onDisconnected(inst);
-        }
-        synchronized (mInstanceState) {
-            mInstanceState.remove(inst);
-            mInstanceState.notifyAll();
+    @JvmStatic
+    private fun OnPreConnect(inst: Long) {
+        listener?.onPreConnect(inst)
+    }
+
+    @JvmStatic
+    private fun OnDisconnecting(inst: Long) {
+        listener?.onDisconnecting(inst)
+    }
+
+    @JvmStatic
+    private fun OnDisconnected(inst: Long) {
+        listener?.onDisconnected(inst)
+
+        synchronized(lock) {
+            mInstanceState.remove(inst)
+            lock.notifyAll()
         }
     }
 
-    private static void OnSettingsChanged(long inst, int width, int height, int bpp) {
-        RdpSession s = RdpApp.getSession(inst);
-        if (s == null) {
-            return;
-        }
-        UiEventListener uiEventListener = s.getUiEventListener();
-        if (uiEventListener != null) {
-            uiEventListener.onSettingsChanged(width, height, bpp);
-        }
+    @JvmStatic
+    private fun OnSettingsChanged(inst: Long, width: Int, height: Int, bpp: Int) {
+        RdpApp.getSession(inst)?.uiEventListener?.onSettingsChanged(width, height, bpp)
     }
 
-    private static boolean OnAuthenticate(long inst, StringBuilder username, StringBuilder domain,
-                                          StringBuilder password) {
-        RdpSession s = RdpApp.getSession(inst);
-        if (s == null) {
-            return false;
-        }
-        UiEventListener uiEventListener = s.getUiEventListener();
-        if (uiEventListener != null) {
-            return uiEventListener.onAuthenticate(username, domain, password);
-        }
-        return false;
+    @JvmStatic
+    private fun OnAuthenticate(
+        inst: Long, username: StringBuilder, domain: StringBuilder,
+        password: StringBuilder
+    ): Boolean {
+        return RdpApp.getSession(inst)
+            ?.uiEventListener
+            ?.onAuthenticate(username, domain, password)
+            ?: false
     }
 
-    private static boolean OnGatewayAuthenticate(long inst, StringBuilder username,
-                                                 StringBuilder domain, StringBuilder password) {
-        RdpSession session = RdpApp.getSession(inst);
-        if (session == null) {
-            return false;
-        }
-        UiEventListener uiEventListener = session.getUiEventListener();
-        if (uiEventListener != null) {
-            return uiEventListener.onGatewayAuthenticate(username, domain, password);
-        }
-        return false;
+    @JvmStatic
+    private fun OnGatewayAuthenticate(
+        inst: Long, username: StringBuilder,
+        domain: StringBuilder, password: StringBuilder
+    ): Boolean {
+        return RdpApp.getSession(inst)
+            ?.uiEventListener
+            ?.onGatewayAuthenticate(username, domain, password)
+            ?: false
     }
 
-    private static int OnVerifyCertificate(long inst, String commonName, String subject,
-                                           String issuer, String fingerprint, boolean hostMismatch) {
-        RdpSession s = RdpApp.getSession(inst);
-        if (s == null) {
-            return 0;
-        }
-        UiEventListener uiEventListener = s.getUiEventListener();
-        if (uiEventListener != null) {
-            return uiEventListener.onVerifiyCertificate(commonName, subject, issuer, fingerprint,
-                    hostMismatch);
-        }
-        return 0;
+    @JvmStatic
+    private fun OnVerifyCertificateEx(
+        inst: Long,
+        host: String?,
+        port: Int,
+        commonName: String?,
+        subject: String?,
+        issuer: String?,
+        fingerprint: String?,
+        flags: Long
+    ): Int = RdpApp.getSession(inst.orEmpty())
+        ?.uiEventListener
+        ?.onVerifyCertificateEx(
+            host.orEmpty(), port.orEmpty(), commonName.orEmpty(),
+            subject.orEmpty(), issuer.orEmpty(), fingerprint.orEmpty(), flags.orEmpty()
+        ) ?: 0
+
+
+    @JvmStatic
+    private fun OnVerifyChangedCertificateEx(
+        inst: Long,
+        host: String?,
+        port: Long,
+        commonName: String?,
+        subject: String?,
+        issuer: String?,
+        fingerprint: String?,
+        oldSubject: String?,
+        oldIssuer: String?,
+        oldFingerprint: String?,
+        flags: Long
+    ): Int = RdpApp.getSession(inst)
+        ?.uiEventListener
+        ?.onVerifyChangedCertificateEx(
+            host.orEmpty(), port.orEmpty(), commonName.orEmpty(), subject.orEmpty(),
+            issuer.orEmpty(), fingerprint.orEmpty(), oldSubject.orEmpty(), oldIssuer.orEmpty(),
+            oldFingerprint.orEmpty(), flags.orEmpty()
+        ) ?: 0
+
+
+    @JvmStatic
+    private fun OnGraphicsUpdate(inst: Long, x: Int, y: Int, width: Int, height: Int) {
+        RdpApp.getSession(inst)?.uiEventListener?.onGraphicsUpdate(x, y, width, height)
     }
 
-    private static int OnVerifyChangedCertificate(long inst, String commonName, String subject,
-                                                  String issuer, String fingerprint,
-                                                  String oldSubject, String oldIssuer,
-                                                  String oldFingerprint) {
-        RdpSession s = RdpApp.getSession(inst);
-        if (s == null) {
-            return 0;
-        }
-        UiEventListener uiEventListener = s.getUiEventListener();
-        if (uiEventListener != null) {
-            return uiEventListener.onVerifyChangedCertificate(
-                    commonName, subject, issuer, fingerprint, oldSubject, oldIssuer, oldFingerprint);
-        }
-        return 0;
+    @JvmStatic
+    private fun OnGraphicsResize(inst: Long, width: Int, height: Int, bpp: Int) {
+        RdpApp.getSession(inst)?.uiEventListener?.onGraphicsResize(width, height, bpp)
     }
 
-    private static void OnGraphicsUpdate(long inst, int x, int y, int width, int height) {
-        RdpSession s = RdpApp.getSession(inst);
-        if (s == null) {
-            return;
-        }
-        UiEventListener uiEventListener = s.getUiEventListener();
-        if (uiEventListener != null) {
-            uiEventListener.onGraphicsUpdate(x, y, width, height);
-        }
+    @JvmStatic
+    private fun OnRemoteClipboardChanged(inst: Long, data: String?) {
+        RdpApp.getSession(inst)?.uiEventListener?.onRemoteClipboardChanged(data.orEmpty())
     }
 
-    private static void OnGraphicsResize(long inst, int width, int height, int bpp) {
-        RdpSession s = RdpApp.getSession(inst);
-        if (s == null) {
-            return;
+    @JvmStatic
+    fun version() = freerdp_get_version().orEmpty()
+
+
+    init {
+        val h264 = "openh264"
+        val libraries = arrayOf(
+            h264,
+            "freerdp-openssl",
+            "ssl",
+            "crypto",
+            "jpeg",
+            "winpr3",
+            "freerdp3",
+            "freerdp-client3",
+            "freerdp-android3"
+        )
+        val libraryPath = System.getProperty("java.library.path")
+        libraries.forEach { lib ->
+            try {
+                System.loadLibrary(lib)
+                Log.v(TAG, "尝试从路径: $libraryPath 加载库 $lib 成功")
+            } catch (e: UnsatisfiedLinkError) {
+                Log.e(TAG, "尝试从路径: $libraryPath 加载库 $lib 失败 ${e.message}")
+                if (lib == h264) {
+                    mHasH264 = false
+                }
+            }
         }
-        UiEventListener uiEventListener = s.getUiEventListener();
-        if (uiEventListener != null) {
-            uiEventListener.onGraphicsResize(width, height, bpp);
+
+        FileUtils.listFilesInDir(PathUtils.getInternalAppFilesPath(), true).forEach {
+            if (it.isFile) {
+                val cert = FileIOUtils.readFile2String(it)
+                Log.e(TAG, it.absolutePath + "  " + cert)
+            }
         }
-    }
-
-    private static void OnRemoteClipboardChanged(long inst, String data) {
-        RdpSession s = RdpApp.getSession(inst);
-        if (s == null) {
-            return;
-        }
-        UiEventListener uiEventListener = s.getUiEventListener();
-        if (uiEventListener != null) {
-            uiEventListener.onRemoteClipboardChanged(data);
-        }
-    }
-
-    public static String getVersion() {
-        return freerdp_get_version();
-    }
-
-    /**
-     * EventListener
-     */
-    public interface EventListener {
-        void onPreConnect(long instance);
-
-        void onConnectionSuccess(long instance);
-
-        void onConnectionFailure(long instance);
-
-        void onDisconnecting(long instance);
-
-        void onDisconnected(long instance);
-    }
-
-    /**
-     * UiEventListener
-     */
-    public interface UiEventListener {
-        void onSettingsChanged(int width, int height, int bpp);
-
-        boolean onAuthenticate(StringBuilder username, StringBuilder domain,
-                               StringBuilder password);
-
-        boolean onGatewayAuthenticate(StringBuilder username, StringBuilder domain,
-                                      StringBuilder password);
-
-        int onVerifiyCertificate(String commonName, String subject, String issuer,
-                                 String fingerprint, boolean mismatch);
-
-        int onVerifyChangedCertificate(String commonName, String subject, String issuer,
-                                       String fingerprint, String oldSubject, String oldIssuer,
-                                       String oldFingerprint);
-
-        void onGraphicsUpdate(int x, int y, int width, int height);
-
-        void onGraphicsResize(int width, int height, int bpp);
-
-        void onRemoteClipboardChanged(String data);
     }
 }

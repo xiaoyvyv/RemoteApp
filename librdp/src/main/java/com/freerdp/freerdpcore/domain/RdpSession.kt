@@ -3,7 +3,7 @@ package com.freerdp.freerdpcore.domain
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import com.freerdp.freerdpcore.services.LibFreeRDP
-import com.freerdp.freerdpcore.services.LibFreeRDP.UiEventListener
+import com.freerdp.freerdpcore.services.UiEventListener
 
 /**
  * RdpSession
@@ -30,9 +30,9 @@ class RdpSession {
 
     fun connect() {
         if (rdpUri != null) {
-            LibFreeRDP.setConnectionInfo(instance, rdpUri)
+            LibFreeRDP.setConnectionInfo(instance, rdpUri!!)
         } else {
-            LibFreeRDP.setConnectionInfo(instance, rdpConfig)
+            LibFreeRDP.setConnectionInfo(instance, rdpConfig!!)
         }
         LibFreeRDP.connect(instance)
     }

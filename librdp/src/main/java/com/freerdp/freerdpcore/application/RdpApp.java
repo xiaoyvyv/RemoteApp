@@ -16,6 +16,7 @@ import com.blankj.utilcode.util.Utils;
 import com.freerdp.freerdpcore.domain.RdpConfig;
 import com.freerdp.freerdpcore.domain.RdpSession;
 import com.freerdp.freerdpcore.presentation.ApplicationSettingsActivity;
+import com.freerdp.freerdpcore.services.EventListener;
 import com.freerdp.freerdpcore.services.LibFreeRDP;
 
 import java.util.ArrayList;
@@ -26,9 +27,8 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class RdpApp implements LibFreeRDP.EventListener {
+public class RdpApp implements EventListener {
     private static volatile RdpApp globalApp;
-    private static final String TAG = "GlobalApp";
 
     /**
      * Rdp广播通知定义
@@ -60,6 +60,7 @@ public class RdpApp implements LibFreeRDP.EventListener {
 
 
     public static boolean ConnectedToMobileWork = false;
+
     public static Map<Long, RdpSession> sessionMap;
 
     // 屏幕关闭后用于断开会话的计时器

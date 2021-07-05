@@ -1,5 +1,6 @@
 package com.xiaoyv.rdp.screen.view
 
+import android.R.attr
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
@@ -14,6 +15,7 @@ import com.freerdp.freerdpcore.application.RdpApp
 import com.freerdp.freerdpcore.domain.RdpConfig
 import com.freerdp.freerdpcore.domain.RdpSession
 import com.freerdp.freerdpcore.services.LibFreeRDP
+import com.freerdp.freerdpcore.services.UiEventListener
 import com.freerdp.freerdpcore.view.RdpSessionView
 import com.xiaoyv.busines.base.BaseMvpActivity
 import com.xiaoyv.busines.room.entity.RdpEntity
@@ -27,6 +29,7 @@ import com.xiaoyv.rdp.screen.presenter.ScreenPresenter
 import com.xiaoyv.ui.dialog.normal.NormalDialog
 import com.xiaoyv.ui.scroll.FreeScrollView
 
+
 /**
  * ScreenView
  *
@@ -34,7 +37,7 @@ import com.xiaoyv.ui.scroll.FreeScrollView
  * @since 2020/12/02
  */
 class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
-    ScreenContract.View, LibFreeRDP.UiEventListener, RdpSessionView.SessionViewListener,
+    ScreenContract.View, UiEventListener, RdpSessionView.SessionViewListener,
     FreeScrollView.ScrollView2DListener {
     private lateinit var binding: RdpActivityScreenBinding
     private lateinit var userBinding: RdpActivityScreenCredentialsBinding
@@ -242,7 +245,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         // 重置
         callbackDialogResult = false
 
-        // 显示凭证验证对话框
+        // 显示登录凭证验证对话框
         ThreadUtils.runOnUiThread {
             // 设置值
             userBinding.editTextUsername.setText(username)
@@ -274,11 +277,30 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         return callbackDialogResult
     }
 
-    override fun onVerifiyCertificate(
-        commonName: String, subject: String, issuer: String, fingerprint: String, mismatch: Boolean
+    override fun onVerifyCertificateEx(
+        host: String,
+        port: Int,
+        commonName: String,
+        subject: String,
+        issuer: String,
+        fingerprint: String,
+        flags: Long
     ): Int {
         // 重置
         callbackDialogResult = false
+
+        // 证书验证来自类型
+        val type = when {
+            flags and LibFreeRDP.VERIFY_CERT_FLAG_GATEWAY != 0L -> "RDP-Gateway"
+            flags and LibFreeRDP.VERIFY_CERT_FLAG_REDIRECT != 0L -> "RDP-Redirect"
+            else -> "RDP-Server Port: $port"
+        }
+
+        val finger = if (flags and LibFreeRDP.VERIFY_CERT_FLAG_FP_IS_PEM != 0L) {
+            String.format("证书：\n%s", fingerprint)
+        } else {
+            String.format("指纹：\n%s", fingerprint)
+        }
 
         val message =
             String.format("名称：%s\n主题：%s\n发行：%s", commonName, subject, issuer)
@@ -286,8 +308,9 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         // 证书验证
         ThreadUtils.runOnUiThread {
             ScreenCertificateFragment.Builder()
+                .setTitle(type)
                 .setCertName(message)
-                .setFinger(String.format("指纹：\n%s", fingerprint))
+                .setFinger(finger)
                 .setCancel {
                     callbackDialogResult = false
                     connectCancelledByUser = true
@@ -314,14 +337,17 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         return if (callbackDialogResult) 1 else 0
     }
 
-    override fun onVerifyChangedCertificate(
+    override fun onVerifyChangedCertificateEx(
+        host: String,
+        port: Long,
         commonName: String,
         subject: String,
         issuer: String,
         fingerprint: String,
         oldSubject: String,
         oldIssuer: String,
-        oldFingerprint: String
+        oldFingerprint: String,
+        flags: Long
     ): Int {
         LogUtils.e("onVerifyChangedCertificate")
         ToastUtils.showShort("onVerifyChangedCertificate")
@@ -330,7 +356,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
 
     override fun onGraphicsUpdate(x: Int, y: Int, width: Int, height: Int) {
         presenter.v2pGetSession { session ->
-            LibFreeRDP.updateGraphics(session.instance, bitmap, x, y, width, height)
+            LibFreeRDP.updateGraphics(session.instance, bitmap!!, x, y, width, height)
 
             binding.rsvSession.addInvalidRegion(Rect(x, y, x + width, y + height))
 

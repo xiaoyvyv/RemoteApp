@@ -176,7 +176,7 @@ class RdpConfig : Serializable {
      * 调试设置
      */
     class DebugSettings {
-        var debugLevel = "INFO"
+        var debugLevel = "TRACE"
             get() {
                 for (level in levels) {
                     if (level.equals(field, ignoreCase = true)) {
