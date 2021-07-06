@@ -20,7 +20,7 @@ class RdpConfig : Serializable {
     var clientName: String = "客户端"
     var hostname: String = "101.132.108.0"
     var port: Int = 3389
-    var certName: String = "DESKTOP-J409075"
+    var certName: String = ""
     var username: String = "Administrator"
     var domain: String = ""
     var password: String = ""
@@ -30,7 +30,7 @@ class RdpConfig : Serializable {
      * 视频设置
      */
     class ActiveScreenSettings {
-        private var resolution = AUTOMATIC
+        private var resolution = FITSCREEN
             get() {
                 when (field) {
                     FITSCREEN, AUTOMATIC, CUSTOM, PREDEFINED -> {
@@ -202,15 +202,15 @@ class RdpConfig : Serializable {
      * 性能设置
      */
     class PerformanceSettings {
-        var remoteFx = false
-        var gfx = false
-        var h264 = false
-        var wallpaper = false
-        var theme = false
-        var fullWindowDrag = false
-        var menuAnimations = false
-        var fontSmoothing = false
-        var desktopComposition = false
+        var remoteFx = true
+        var gfx = true
+        var h264 = true
+        var wallpaper = true
+        var theme = true
+        var fullWindowDrag = true
+        var menuAnimations = true
+        var fontSmoothing = true
+        var desktopComposition = true
     }
 
     /**

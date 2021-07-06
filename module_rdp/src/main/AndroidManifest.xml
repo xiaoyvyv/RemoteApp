@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".add.AddRdpActivity" />
-        <activity android:name=".setting.AppSettingActivity"/>
-        <activity android:name=".setting.BookmarkSettingActivity"/>
+        <activity android:name=".setting.AppSettingActivity" />
+        <activity android:name=".setting.BookmarkSettingActivity" />
     </application>
 </manifest>

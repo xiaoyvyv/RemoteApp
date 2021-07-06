@@ -819,7 +819,7 @@ public class SessionActivity extends AppCompatActivity
 
 
     @Override
-    public int onVerifyCertificateEx(@NonNull String host, int port, @NonNull String commonName, @NonNull String subject, @NonNull String issuer, @NonNull String fingerprint, long flags) {
+    public int onVerifyCertificateEx(@NonNull String host, long port, @NonNull String commonName, @NonNull String subject, @NonNull String issuer, @NonNull String fingerprint, long flags) {
         // see if global settings says accept all
         if (ApplicationSettingsActivity.getAcceptAllCertificates(this))
             return 0;

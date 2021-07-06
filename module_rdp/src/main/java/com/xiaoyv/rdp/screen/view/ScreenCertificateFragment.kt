@@ -1,6 +1,8 @@
 package com.xiaoyv.rdp.screen.view
 
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -67,18 +69,24 @@ class ScreenCertificateFragment : DialogFragment() {
                 window.setBackgroundDrawableResource(R.color.ui_system_translate)
                 window.attributes = window.attributes.apply {
                     dimAmount = 0.2f
-                    width = ScreenUtils.getScreenWidth() - 60.dp()
+                    width = ScreenUtils.getAppScreenWidth() - 60.dp()
                 }
             }
         }
     }
 
-    class Builder : Serializable {
+    class Builder() : Serializable, Parcelable {
         internal var title: String = "远程桌面连接"
         internal var finger: String = "--"
         internal var certName: String = "--"
         internal var cancel: () -> Unit = {}
         internal var done: () -> Unit = {}
+
+        constructor(parcel: Parcel) : this() {
+            title = parcel.readString().toString()
+            finger = parcel.readString().toString()
+            certName = parcel.readString().toString()
+        }
 
         fun setTitle(title: String): Builder {
             this.title = title
@@ -108,6 +116,26 @@ class ScreenCertificateFragment : DialogFragment() {
         fun build() = ScreenCertificateFragment().also {
             it.arguments = Bundle().apply {
                 putSerializable(NavigationKey.KEY_SERIALIZABLE, this@Builder)
+            }
+        }
+
+        override fun writeToParcel(parcel: Parcel, flags: Int) {
+            parcel.writeString(title)
+            parcel.writeString(finger)
+            parcel.writeString(certName)
+        }
+
+        override fun describeContents(): Int {
+            return 0
+        }
+
+        companion object CREATOR : Parcelable.Creator<Builder> {
+            override fun createFromParcel(parcel: Parcel): Builder {
+                return Builder(parcel)
+            }
+
+            override fun newArray(size: Int): Array<Builder?> {
+                return arrayOfNulls(size)
             }
         }
     }

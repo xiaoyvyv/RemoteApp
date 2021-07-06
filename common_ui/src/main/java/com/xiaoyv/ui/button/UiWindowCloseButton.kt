@@ -31,19 +31,15 @@ class UiWindowCloseButton @JvmOverloads constructor(
             MotionEvent.ACTION_DOWN -> {
                 setBackgroundResource(R.color.ui_status_error)
                 setImageResource(R.drawable.ui_shape_window_close_pressed)
-                return true
             }
-            MotionEvent.ACTION_CANCEL -> {
-                setBackgroundResource(R.color.ui_system_translate)
-                setImageResource(R.drawable.ui_shape_window_close_normal)
-            }
+            MotionEvent.ACTION_CANCEL,
             MotionEvent.ACTION_UP -> {
                 l?.onClick(this)
                 setBackgroundResource(R.color.ui_system_translate)
                 setImageResource(R.drawable.ui_shape_window_close_normal)
             }
         }
-        return super.onTouchEvent(event)
+        return true
     }
 
     override fun setOnClickListener(l: OnClickListener?) {

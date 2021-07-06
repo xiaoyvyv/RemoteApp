@@ -20,7 +20,7 @@ interface UiEventListener {
 
     fun onVerifyCertificateEx(
         host: String,
-        port: Int,
+        port: Long,
         commonName: String,
         subject: String,
         issuer: String,

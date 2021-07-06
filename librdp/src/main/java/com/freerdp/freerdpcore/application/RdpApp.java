@@ -63,7 +63,9 @@ public class RdpApp implements EventListener {
 
     public static Map<Long, RdpSession> sessionMap;
 
-    // 屏幕关闭后用于断开会话的计时器
+    /**
+     * 屏幕关闭后用于断开会话的计时器
+     */
     public static Timer disconnectTimer = null;
     public static Application application;
 
@@ -170,26 +172,31 @@ public class RdpApp implements EventListener {
      */
     @Override
     public void onPreConnect(long instance) {
+        LogUtils.i("LibFreeRDP-" + instance + "：准备连接");
         sendRdpNotification(FREERDP_EVENT_PREPARE_CONNECT, instance);
     }
 
     @Override
     public void onConnectionSuccess(long instance) {
+        LogUtils.i("LibFreeRDP-" + instance + "：连接成功");
         sendRdpNotification(FREERDP_EVENT_CONNECTION_SUCCESS, instance);
     }
 
     @Override
     public void onConnectionFailure(long instance) {
+        LogUtils.i("LibFreeRDP-" + instance + "：连接错误");
         sendRdpNotification(FREERDP_EVENT_CONNECTION_FAILURE, instance);
     }
 
     @Override
     public void onDisconnecting(long instance) {
+        LogUtils.i("LibFreeRDP-" + instance + "：连接异常断开");
         sendRdpNotification(FREERDP_EVENT_DISCONNECTING, instance);
     }
 
     @Override
     public void onDisconnected(long instance) {
+        LogUtils.i("LibFreeRDP-" + instance + "：正常退出");
         sendRdpNotification(FREERDP_EVENT_DISCONNECTED, instance);
     }
 
@@ -207,7 +214,9 @@ public class RdpApp implements EventListener {
     }
 
 
-    // TimerTask用于在屏幕关闭后断开会话
+    /**
+     * TimerTask用于在屏幕关闭后断开会话
+     */
     private static class DisconnectTask extends TimerTask {
         @Override
         public void run() {

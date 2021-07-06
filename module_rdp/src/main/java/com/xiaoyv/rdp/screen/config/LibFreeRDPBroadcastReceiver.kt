@@ -3,13 +3,14 @@ package com.xiaoyv.rdp.screen.config
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.freerdp.freerdpcore.application.RdpApp
 
 /**
  * @author Admin
  */
 class LibFreeRDPBroadcastReceiver : BroadcastReceiver() {
-    var onPrepareConnect: (context: Context,) -> Unit = {}
+    var onPrepareConnect: (context: Context) -> Unit = {}
     var onConnectionSuccess: (context: Context) -> Unit = {}
     var onConnectionFailure: (context: Context) -> Unit = {}
     var onDisconnecting: (context: Context) -> Unit = {}

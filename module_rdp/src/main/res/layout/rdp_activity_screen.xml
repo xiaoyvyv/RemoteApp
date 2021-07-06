@@ -20,6 +20,7 @@
             android:id="@+id/rsv_session"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:clickable="true"
             android:drawingCacheQuality="low"
             android:focusable="true"
             android:focusableInTouchMode="true" />

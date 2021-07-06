@@ -272,10 +272,13 @@ public class DoubleGestureDetector {
             case MotionEvent.ACTION_CANCEL:
                 cancel();
                 break;
+            default:
+                break;
         }
 
-        if ((action == MotionEvent.ACTION_MOVE) && !handled)
+        if ((action == MotionEvent.ACTION_MOVE) && !handled) {
             handled = true;
+        }
 
         return handled;
     }

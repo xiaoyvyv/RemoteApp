@@ -87,6 +87,7 @@ object LibRdpHelper {
             }
         }
 
+        // 性能配置
         if (performanceSettings.remoteFx) {
             arguments.add("/rfx")
         }

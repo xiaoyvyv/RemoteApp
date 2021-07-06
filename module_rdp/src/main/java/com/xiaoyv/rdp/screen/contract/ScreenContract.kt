@@ -27,8 +27,12 @@ interface ScreenContract {
         fun v2pConnectWithConfig(rdpConfig: RdpConfig)
         fun v2pConnectWithUri(rdpUri: Uri)
         fun v2pStartConnect(rdpSession: RdpSession, resumeConnect: Boolean)
-        fun v2pGetSession(callback: (RdpSession) -> Unit)
+        fun v2pGetSession(empty: () -> Unit = {}, callback: (RdpSession) -> Unit)
+        fun v2pSendDelayedMoveEvent(x: Int, y: Int)
+        fun v2pCancelDelayedMoveEvent()
     }
 
-    interface Model : IBaseModel
+    interface Model : IBaseModel {
+        fun p2mApplyConfig(rdpConfig: RdpConfig)
+    }
 }

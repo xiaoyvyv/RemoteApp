@@ -1,6 +1,8 @@
 package com.xiaoyv.rdp.screen.config
 
 import android.view.ScaleGestureDetector
+import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.freerdp.freerdpcore.view.RdpSessionView
 import com.xiaoyv.ui.scroll.FreeScrollView
 import kotlin.math.max
@@ -14,6 +16,7 @@ class PinchZoomListener(
     private val rsvSession: RdpSessionView
 ) : ScaleGestureDetector.SimpleOnScaleGestureListener() {
     private var scaleFactor = 1.0f
+
     override fun onScaleBegin(detector: ScaleGestureDetector): Boolean {
         rsvScroll.setScrollEnabled(false)
         return true

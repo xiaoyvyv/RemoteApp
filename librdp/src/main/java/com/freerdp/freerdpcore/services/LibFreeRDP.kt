@@ -219,8 +219,7 @@ object LibFreeRDP {
 
     @JvmStatic
     private fun OnAuthenticate(
-        inst: Long, username: StringBuilder, domain: StringBuilder,
-        password: StringBuilder
+        inst: Long, username: StringBuilder, domain: StringBuilder, password: StringBuilder
     ): Boolean {
         return RdpApp.getSession(inst)
             ?.uiEventListener
@@ -230,8 +229,7 @@ object LibFreeRDP {
 
     @JvmStatic
     private fun OnGatewayAuthenticate(
-        inst: Long, username: StringBuilder,
-        domain: StringBuilder, password: StringBuilder
+        inst: Long, username: StringBuilder, domain: StringBuilder, password: StringBuilder
     ): Boolean {
         return RdpApp.getSession(inst)
             ?.uiEventListener
@@ -243,7 +241,7 @@ object LibFreeRDP {
     private fun OnVerifyCertificateEx(
         inst: Long,
         host: String?,
-        port: Int,
+        port: Long,
         commonName: String?,
         subject: String?,
         issuer: String?,

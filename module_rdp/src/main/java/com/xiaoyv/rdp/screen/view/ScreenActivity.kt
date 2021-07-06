@@ -1,6 +1,5 @@
 package com.xiaoyv.rdp.screen.view
 
-import android.R.attr
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
@@ -8,6 +7,7 @@ import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
 import com.blankj.utilcode.util.*
@@ -16,6 +16,7 @@ import com.freerdp.freerdpcore.domain.RdpConfig
 import com.freerdp.freerdpcore.domain.RdpSession
 import com.freerdp.freerdpcore.services.LibFreeRDP
 import com.freerdp.freerdpcore.services.UiEventListener
+import com.freerdp.freerdpcore.utils.Mouse
 import com.freerdp.freerdpcore.view.RdpSessionView
 import com.xiaoyv.busines.base.BaseMvpActivity
 import com.xiaoyv.busines.room.entity.RdpEntity
@@ -44,12 +45,15 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     private lateinit var dlgUserCredentials: NormalDialog
     private val dlgVerifyCertificateLock = Object()
     private val dlgUserCredentialsLock = Object()
+    private var rdpEntity: RdpEntity? = null
+
     private var callbackDialogResult = false
     private var connectCancelledByUser = false
-    private var rdpEntity: RdpEntity? = null
+    private var toggleMouseButtons = false
 
     private var rdpUri: Uri? = null
     private var rdpInstance: Long = -1
+
 
     private var bitmap: Bitmap? = null
 
@@ -57,27 +61,30 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
      * Rdp 事件监听
      */
     private val rdpEventReceiver = LibFreeRDPBroadcastReceiver().apply {
-        onPrepareConnect = {
-            LogUtils.e("准备连接")
-
-        }
+        /**
+         * 连接成功
+         */
         onConnectionSuccess = {
-            LogUtils.e("连接成功")
-            // 连接成功，开始绑定画面
             presenter.v2pGetSession { session ->
                 p2vBindSession(session)
             }
         }
+        /**
+         * 连接异常
+         */
         onConnectionFailure = {
-            LogUtils.e("连接失败")
-
+            presenter.v2pCancelDelayedMoveEvent()
+            vSessionClose(RESULT_CANCELED)
         }
-        onDisconnecting = {
-            LogUtils.e("连接断开中")
-
-        }
+        /**
+         * 连接正常退出
+         */
         onDisconnected = {
-            LogUtils.e("连接已经断开")
+            presenter.v2pCancelDelayedMoveEvent()
+            presenter.v2pGetSession { session ->
+                session.uiEventListener = null
+            }
+            vSessionClose(RESULT_OK)
         }
     }
 
@@ -86,6 +93,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     }
 
     override fun createContentView(): View {
+        ScreenUtils.setLandscape(this)
         binding = RdpActivityScreenBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -151,12 +159,9 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
 
     override fun p2vBindSession(rdpSession: RdpSession) {
         binding.rsvSession.onSurfaceChange(rdpSession)
+        binding.rsvSession.requestFocus()
         binding.rsvScroll.requestLayout()
 //        rdpKeyboardMapper.reset(this)
-    }
-
-    override fun vSessionClose(result: Int) {
-
     }
 
 
@@ -191,7 +196,6 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     override fun onScrollChanged(
         scrollView: FreeScrollView, x: Int, y: Int, oldx: Int, oldy: Int
     ) {
-
 
     }
 
@@ -279,7 +283,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
 
     override fun onVerifyCertificateEx(
         host: String,
-        port: Int,
+        port: Long,
         commonName: String,
         subject: String,
         issuer: String,
@@ -293,7 +297,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         val type = when {
             flags and LibFreeRDP.VERIFY_CERT_FLAG_GATEWAY != 0L -> "RDP-Gateway"
             flags and LibFreeRDP.VERIFY_CERT_FLAG_REDIRECT != 0L -> "RDP-Redirect"
-            else -> "RDP-Server Port: $port"
+            else -> "RDP-Server $host:$port"
         }
 
         val finger = if (flags and LibFreeRDP.VERIFY_CERT_FLAG_FP_IS_PEM != 0L) {
@@ -379,6 +383,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
             // UI线程更新画面
             ThreadUtils.runOnUiThread {
                 binding.rsvSession.onSurfaceChange(session)
+                binding.rsvSession.requestFocus()
                 binding.rsvScroll.requestLayout()
             }
         }
@@ -413,27 +418,80 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
      * SessionView 回调 ============================================================================
      */
     override fun onSessionViewBeginTouch() {
-
+        binding.rsvScroll.setScrollEnabled(false)
     }
 
     override fun onSessionViewEndTouch() {
-
+        binding.rsvScroll.setScrollEnabled(true)
     }
 
     override fun onSessionViewLeftTouch(x: Int, y: Int, down: Boolean) {
+        if (!down) presenter.v2pCancelDelayedMoveEvent()
 
+        presenter.v2pGetSession { session ->
+            LibFreeRDP.sendCursorEvent(
+                session.instance, x, y,
+                if (toggleMouseButtons) Mouse.getRightButtonEvent(this, down)
+                else Mouse.getLeftButtonEvent(this, down)
+            )
+        }
+
+        if (!down) toggleMouseButtons = false
     }
 
-    override fun onSessionViewRightTouch(x: Int, y: Int, down: Boolean) {
 
+    override fun onSessionViewRightTouch(x: Int, y: Int, down: Boolean) {
+        if (!down) toggleMouseButtons = !toggleMouseButtons
     }
 
     override fun onSessionViewMove(x: Int, y: Int) {
-
+        presenter.v2pSendDelayedMoveEvent(x, y)
     }
 
     override fun onSessionViewScroll(down: Boolean) {
+        presenter.v2pGetSession { session ->
+            LibFreeRDP.sendCursorEvent(session.instance, 0, 0, Mouse.getScrollEvent(this, down))
+        }
+    }
 
+    override fun onGenericMotionEvent(e: MotionEvent): Boolean {
+        super.onGenericMotionEvent(e)
+        when (e.action) {
+            MotionEvent.ACTION_SCROLL -> {
+                val vScroll = e.getAxisValue(MotionEvent.AXIS_VSCROLL)
+                presenter.v2pGetSession { session ->
+                    if (vScroll < 0) {
+                        LibFreeRDP.sendCursorEvent(
+                            session.instance, 0, 0,
+                            Mouse.getScrollEvent(this, false)
+                        )
+                    }
+                    if (vScroll > 0) {
+                        LibFreeRDP.sendCursorEvent(
+                            session.instance, 0, 0,
+                            Mouse.getScrollEvent(this, true)
+                        )
+                    }
+                }
+            }
+        }
+        return true
+    }
+
+    /**
+     * 各种原因导致连接关闭
+     */
+    override fun vSessionClose(result: Int) {
+        setResult(result, intent)
+        super.onBackPressed()
+    }
+
+    override fun onBackPressed() {
+        presenter.v2pGetSession(empty = {
+            super.onBackPressed()
+        }, callback = { session ->
+            LibFreeRDP.disconnect(session.instance)
+        })
     }
 
     override fun onDestroy() {

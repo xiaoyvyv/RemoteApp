@@ -1,10 +1,15 @@
 package com.xiaoyv.rdp.screen.view
 
-import android.app.Dialog
 import android.os.Handler
+import android.os.Looper
 import android.os.Message
+import com.freerdp.freerdpcore.domain.RdpSession
+import com.freerdp.freerdpcore.services.LibFreeRDP.sendCursorEvent
+import com.freerdp.freerdpcore.utils.Mouse
 
-class UIHandler internal constructor() : Handler() {
+class UIHandler : Handler(Looper.getMainLooper()) {
+    var session: RdpSession? = null
+
     override fun handleMessage(msg: Message) {
         when (msg.what) {
             GRAPHICS_CHANGED -> {
@@ -15,11 +20,11 @@ class UIHandler internal constructor() : Handler() {
             }
             HIDE_ZOOMCONTROLS -> {
             }
+            // 光标移动
             SEND_MOVE_EVENT -> {
-            }
-            SHOW_DIALOG -> {
-                // 创建并显示对话框
-                (msg.obj as Dialog).show()
+                session?.let { it ->
+                    sendCursorEvent(it.instance, msg.arg1, msg.arg2, Mouse.getMoveEvent())
+                }
             }
             SCROLLING_REQUESTED -> {
             }
@@ -31,7 +36,6 @@ class UIHandler internal constructor() : Handler() {
         const val DISPLAY_TOAST = 2
         const val HIDE_ZOOMCONTROLS = 3
         const val SEND_MOVE_EVENT = 4
-        const val SHOW_DIALOG = 5
         const val GRAPHICS_CHANGED = 6
         const val SCROLLING_REQUESTED = 7
     }
