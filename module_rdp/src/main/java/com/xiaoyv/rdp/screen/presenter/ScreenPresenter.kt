@@ -25,7 +25,6 @@ class ScreenPresenter : ImplBasePresenter<ScreenContract.View>(), ScreenContract
     private val model = ScreenModel()
     private val uiHandler = UIHandler()
 
-
     /**
      * 丢弃的移动事件
      */

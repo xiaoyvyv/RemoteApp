@@ -1,5 +1,4 @@
 package com.freerdp.freerdpcore.services
-
 /**
  * EventListener
  */

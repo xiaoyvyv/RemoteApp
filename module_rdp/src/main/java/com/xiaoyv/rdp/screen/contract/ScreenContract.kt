@@ -17,7 +17,6 @@ import com.xiaoyv.busines.room.entity.RdpEntity
 interface ScreenContract {
     interface View : IBaseView {
         fun vProcessArgument()
-        fun vCreateDialog()
         fun p2vStartConnect(rdpSession: RdpSession): RdpSession
         fun vSessionClose(result: Int)
         fun p2vBindSession(rdpSession: RdpSession)

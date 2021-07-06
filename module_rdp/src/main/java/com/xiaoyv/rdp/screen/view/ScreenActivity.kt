@@ -22,12 +22,10 @@ import com.xiaoyv.busines.base.BaseMvpActivity
 import com.xiaoyv.busines.room.entity.RdpEntity
 import com.xiaoyv.rdp.R
 import com.xiaoyv.rdp.databinding.RdpActivityScreenBinding
-import com.xiaoyv.rdp.databinding.RdpActivityScreenCredentialsBinding
 import com.xiaoyv.rdp.screen.config.LibFreeRDPBroadcastReceiver
 import com.xiaoyv.rdp.screen.config.PinchZoomListener
 import com.xiaoyv.rdp.screen.contract.ScreenContract
 import com.xiaoyv.rdp.screen.presenter.ScreenPresenter
-import com.xiaoyv.ui.dialog.normal.NormalDialog
 import com.xiaoyv.ui.scroll.FreeScrollView
 
 
@@ -41,11 +39,10 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     ScreenContract.View, UiEventListener, RdpSessionView.SessionViewListener,
     FreeScrollView.ScrollView2DListener {
     private lateinit var binding: RdpActivityScreenBinding
-    private lateinit var userBinding: RdpActivityScreenCredentialsBinding
-    private lateinit var dlgUserCredentials: NormalDialog
     private val dlgVerifyCertificateLock = Object()
     private val dlgUserCredentialsLock = Object()
     private var rdpEntity: RdpEntity? = null
+    private var rdpConfig: RdpConfig? = null
 
     private var callbackDialogResult = false
     private var connectCancelledByUser = false
@@ -113,8 +110,6 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
 
         binding.rsvScroll.setScrollViewListener(this)
 
-        // 验证相关对话框
-        vCreateDialog()
     }
 
 
@@ -139,8 +134,9 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
                 } ?: vSessionClose(RESULT_CANCELED)
             }
             rdpEntity != null -> {
-                val rdpConfig = RdpConfig()
-                presenter.v2pConnectWithConfig(rdpConfig)
+                rdpConfig = RdpConfig().also {
+                    presenter.v2pConnectWithConfig(it)
+                }
             }
             else -> {
                 // 其他则结束对话
@@ -164,35 +160,6 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
 //        rdpKeyboardMapper.reset(this)
     }
 
-
-    override fun vCreateDialog() {
-        // 构建用户凭证验证对话框
-        userBinding = RdpActivityScreenCredentialsBinding.inflate(layoutInflater)
-        dlgUserCredentials = NormalDialog(this).apply {
-            title = StringUtils.getString(R.string.dlg_title_credentials)
-            customView = userBinding.root
-            cancelText = StringUtils.getString(R.string.ui_common_no)
-            doneText = StringUtils.getString(R.string.ui_common_yes)
-            cancelClickListener = {
-                callbackDialogResult = false
-                connectCancelledByUser = true
-                synchronized(dlgUserCredentialsLock) {
-                    dlgUserCredentialsLock.notify()
-                }
-                true
-            }
-            doneClickListener = {
-                callbackDialogResult = true
-                synchronized(dlgUserCredentialsLock) {
-                    dlgUserCredentialsLock.notify()
-                }
-                true
-            }
-            setCancelable(false)
-        }
-    }
-
-
     override fun onScrollChanged(
         scrollView: FreeScrollView, x: Int, y: Int, oldx: Int, oldy: Int
     ) {
@@ -210,15 +177,35 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
 
         // 显示凭证验证对话框
         ThreadUtils.runOnUiThread {
-            // 设置值
-            userBinding.editTextUsername.setText(username)
-            userBinding.editTextDomain.setText(domain)
-            userBinding.editTextPassword.setText(password)
-            // 显示
-            dlgUserCredentials.title = StringUtils.getString(R.string.dlg_title_credentials)
-            dlgUserCredentials.show()
-        }
+            ScreenCredentialsFragment.Builder()
+                .setTitle("远程桌面连接-登录凭证验证")
+                .setSubtitle("请输入您的登录凭据")
+                .setCredentials("这些凭据将用于连接：" + rdpConfig?.hostname)
+                .setData(username.toString(), password.toString(), domain.toString())
+                .setCancel {
+                    callbackDialogResult = false
+                    connectCancelledByUser = true
+                    synchronized(dlgUserCredentialsLock) {
+                        dlgUserCredentialsLock.notify()
+                    }
+                }
+                .setDone { u, p, d ->
+                    // 清空
+                    username.setLength(0)
+                    domain.setLength(0)
+                    password.setLength(0)
 
+                    // 读取用户操作后的凭据
+                    username.append(u)
+                    domain.append(p)
+                    password.append(d)
+
+                    callbackDialogResult = true
+                    synchronized(dlgUserCredentialsLock) {
+                        dlgUserCredentialsLock.notify()
+                    }
+                }.build().show(supportFragmentManager)
+        }
         // 等待验证结果
         try {
             synchronized(dlgUserCredentialsLock) {
@@ -226,16 +213,6 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
             }
         } catch (e: InterruptedException) {
         }
-
-        // 清空
-        username.setLength(0)
-        domain.setLength(0)
-        password.setLength(0)
-
-        // 读取用户操作后的凭据
-        username.append(userBinding.editTextUsername.text.toString())
-        domain.append(userBinding.editTextDomain.text.toString())
-        password.append(userBinding.editTextPassword.text.toString())
 
         return callbackDialogResult
     }
@@ -249,17 +226,37 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         // 重置
         callbackDialogResult = false
 
-        // 显示登录凭证验证对话框
+        // 显示凭证验证对话框
         ThreadUtils.runOnUiThread {
-            // 设置值
-            userBinding.editTextUsername.setText(username)
-            userBinding.editTextDomain.setText(domain)
-            userBinding.editTextPassword.setText(password)
-            // 显示
-            dlgUserCredentials.title = StringUtils.getString(R.string.dlg_title_credentials_gateway)
-            dlgUserCredentials.show()
-        }
+            ScreenCredentialsFragment.Builder()
+                .setTitle("远程桌面连接-网关凭证验证")
+                .setSubtitle("请输入您的网关凭据")
+                .setCredentials("这些凭据将用于连接：" + rdpConfig?.gatewaySettings?.hostname)
+                .setData(username.toString(), password.toString(), domain.toString())
+                .setCancel {
+                    callbackDialogResult = false
+                    connectCancelledByUser = true
+                    synchronized(dlgUserCredentialsLock) {
+                        dlgUserCredentialsLock.notify()
+                    }
+                }
+                .setDone { u, p, d ->
+                    // 清空
+                    username.setLength(0)
+                    domain.setLength(0)
+                    password.setLength(0)
 
+                    // 读取用户操作后的凭据
+                    username.append(u)
+                    domain.append(p)
+                    password.append(d)
+
+                    callbackDialogResult = true
+                    synchronized(dlgUserCredentialsLock) {
+                        dlgUserCredentialsLock.notify()
+                    }
+                }.build().show(supportFragmentManager)
+        }
         // 等待验证结果
         try {
             synchronized(dlgUserCredentialsLock) {
@@ -267,16 +264,6 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
             }
         } catch (e: InterruptedException) {
         }
-
-        // 清空
-        username.setLength(0)
-        domain.setLength(0)
-        password.setLength(0)
-
-        // 读取用户操作后的凭据
-        username.append(userBinding.editTextUsername.text.toString())
-        domain.append(userBinding.editTextDomain.text.toString())
-        password.append(userBinding.editTextPassword.text.toString())
 
         return callbackDialogResult
     }

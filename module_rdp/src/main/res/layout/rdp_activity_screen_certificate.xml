@@ -17,10 +17,10 @@
 
         <androidx.appcompat.widget.AppCompatImageView
             android:id="@+id/iv_icon"
-            android:layout_width="@dimen/ui_size_24"
-            android:layout_height="@dimen/ui_size_24"
-            android:layout_marginStart="@dimen/ui_size_4"
-            android:padding="@dimen/ui_size_4"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/ui_size_0"
+            android:paddingStart="@dimen/ui_size_6"
+            android:paddingEnd="@dimen/ui_size_6"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -30,11 +30,13 @@
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_title"
             android:layout_width="@dimen/ui_size_0"
-            android:layout_height="@dimen/ui_size_16"
-            android:layout_marginStart="@dimen/ui_size_6"
-            android:layout_marginEnd="@dimen/ui_size_6"
+            android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
+            android:paddingStart="@dimen/ui_size_6"
+            android:paddingTop="@dimen/ui_size_6"
+            android:paddingEnd="@dimen/ui_size_6"
+            android:paddingBottom="@dimen/ui_size_6"
             android:text="远程桌面连接"
             android:textColor="@color/ui_text_c1"
             android:textSize="@dimen/ui_font_12"
@@ -45,9 +47,10 @@
 
         <com.xiaoyv.ui.button.UiWindowCloseButton
             android:id="@+id/iv_close"
-            android:layout_width="@dimen/ui_size_24"
-            android:layout_height="@dimen/ui_size_24"
-            android:padding="@dimen/ui_size_4"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/ui_size_0"
+            android:paddingStart="@dimen/ui_size_6"
+            android:paddingEnd="@dimen/ui_size_6"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -55,8 +58,10 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/sv_scroll"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/ui_size_0"
+        android:layout_weight="1"
         android:fillViewport="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -245,50 +250,60 @@
                 android:id="@+id/tv_ignore"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="@dimen/ui_size_12"
+                android:layout_marginTop="@dimen/ui_size_6"
+                android:layout_marginEnd="@dimen/ui_size_12"
                 android:drawablePadding="@dimen/ui_size_12"
                 android:gravity="center_vertical"
-                android:paddingStart="@dimen/ui_size_12"
-                android:paddingTop="@dimen/ui_size_12"
-                android:paddingEnd="@dimen/ui_size_12"
-                android:paddingBottom="@dimen/ui_size_12"
+                android:paddingTop="@dimen/ui_size_6"
+                android:paddingBottom="@dimen/ui_size_6"
                 android:text="你想要连接到远程桌面而忽略这些证书错误吗？"
                 android:textColor="@color/ui_text_c1"
                 android:textSize="@dimen/ui_font_12"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/cl_error" />
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/bt_no"
-                android:layout_width="@dimen/ui_size_60"
-                android:layout_height="@dimen/ui_size_26"
-                android:layout_marginStart="@dimen/ui_size_12"
-                android:layout_marginEnd="@dimen/ui_size_12"
-                android:layout_marginBottom="@dimen/ui_size_12"
-                android:background="@drawable/ui_shape_window_button"
-                android:gravity="center"
-                android:stateListAnimator="@null"
-                android:text="@string/ui_common_no"
-                android:textColor="@color/ui_text_c1"
-                android:textSize="@dimen/ui_font_12"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/bt_yes"
-                app:layout_constraintTop_toBottomOf="@+id/tv_ignore" />
-
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/bt_yes"
-                android:layout_width="@dimen/ui_size_60"
-                android:layout_height="@dimen/ui_size_26"
-                android:layout_marginStart="@dimen/ui_size_12"
-                android:layout_marginEnd="@dimen/ui_size_12"
-                android:layout_marginBottom="@dimen/ui_size_12"
-                android:background="@drawable/ui_shape_window_button"
-                android:gravity="center"
-                android:stateListAnimator="@null"
-                android:text="@string/ui_common_yes"
-                android:textColor="@color/ui_text_c1"
-                android:textSize="@dimen/ui_font_12"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/tv_ignore" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/bt_no"
+            android:layout_width="@dimen/ui_size_60"
+            android:layout_height="@dimen/ui_size_26"
+            android:layout_marginStart="@dimen/ui_size_12"
+            android:layout_marginTop="@dimen/ui_size_12"
+            android:layout_marginEnd="@dimen/ui_size_12"
+            android:layout_marginBottom="@dimen/ui_size_12"
+            android:background="@drawable/ui_shape_window_button"
+            android:gravity="center"
+            android:stateListAnimator="@null"
+            android:text="@string/ui_common_no"
+            android:textColor="@color/ui_text_c1"
+            android:textSize="@dimen/ui_font_12"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/bt_yes"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/bt_yes"
+            android:layout_width="@dimen/ui_size_60"
+            android:layout_height="@dimen/ui_size_26"
+            android:layout_marginStart="@dimen/ui_size_12"
+            android:layout_marginTop="@dimen/ui_size_12"
+            android:layout_marginEnd="@dimen/ui_size_12"
+            android:layout_marginBottom="@dimen/ui_size_12"
+            android:background="@drawable/ui_shape_window_button"
+            android:gravity="center"
+            android:stateListAnimator="@null"
+            android:text="@string/ui_common_yes"
+            android:textColor="@color/ui_text_c1"
+            android:textSize="@dimen/ui_font_12"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.appcompat.widget.LinearLayoutCompat>
