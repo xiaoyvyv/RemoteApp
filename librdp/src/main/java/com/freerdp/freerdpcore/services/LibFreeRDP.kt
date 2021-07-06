@@ -295,6 +295,8 @@ object LibFreeRDP {
     @JvmStatic
     fun version() = freerdp_get_version().orEmpty()
 
+    @JvmStatic
+    fun lastError(inst: Long) = freerdp_get_last_error_string(inst).orEmpty()
 
     init {
         val h264 = "openh264"

@@ -125,7 +125,7 @@ class ScreenCredentialsFragment : DialogFragment() {
             return this
         }
 
-        fun build() = ScreenCertificateFragment().also {
+        fun build() = ScreenCredentialsFragment().also {
             it.arguments = Bundle().apply {
                 putSerializable(NavigationKey.KEY_SERIALIZABLE, this@Builder)
             }

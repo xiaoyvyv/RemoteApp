@@ -90,7 +90,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     }
 
     override fun createContentView(): View {
-        ScreenUtils.setLandscape(this)
+//        ScreenUtils.setLandscape(this)
         binding = RdpActivityScreenBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -325,6 +325,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         } catch (e: InterruptedException) {
         }
 
+        LogUtils.e("Rdp结果：" + callbackDialogResult)
         return if (callbackDialogResult) 1 else 0
     }
 
@@ -470,12 +471,15 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
      */
     override fun vSessionClose(result: Int) {
         setResult(result, intent)
-        super.onBackPressed()
+        presenter.v2pGetSession {
+            ToastUtils.showShort(LibFreeRDP.lastError(it.instance))
+        }
+        finish()
     }
 
     override fun onBackPressed() {
         presenter.v2pGetSession(empty = {
-            super.onBackPressed()
+            finish()
         }, callback = { session ->
             LibFreeRDP.disconnect(session.instance)
         })
