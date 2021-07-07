@@ -7,7 +7,6 @@ import com.blankj.utilcode.util.Utils
 import com.freerdp.freerdpcore.application.RdpApp
 import com.freerdp.freerdpcore.domain.RdpConfig
 import com.freerdp.freerdpcore.domain.RdpSession
-import com.freerdp.freerdpcore.presentation.SessionActivity
 import com.freerdp.freerdpcore.services.LibFreeRDP
 import com.freerdp.freerdpcore.utils.Mouse
 import com.xiaoyv.busines.base.ImplBasePresenter
@@ -34,7 +33,7 @@ class ScreenPresenter : ImplBasePresenter<ScreenContract.View>(), ScreenContract
 
     override fun v2pConnectWithConfig(rdpConfig: RdpConfig) {
         // 配置信息
-        model.p2mApplyConfig(rdpConfig)
+        model.p2mApplyConfig(rdpConfig,view.p2vScreenLandscape())
         // 创建一个会话信息
         val rdpSession = RdpApp.createSession(rdpConfig, Utils.getApp())
         v2pStartConnect(rdpSession, false)

@@ -1,6 +1,8 @@
 package com.xiaoyv.rdp.screen.view
 
 import android.os.Bundle
+import android.os.Parcel
+import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -83,7 +85,7 @@ class ScreenCredentialsFragment : DialogFragment() {
         }
     }
 
-    class Builder : Serializable {
+    class Builder() : Serializable, Parcelable {
         internal var title: String = "--"
         internal var subtitle: String = "--"
         internal var credentials: String = "--"
@@ -92,6 +94,15 @@ class ScreenCredentialsFragment : DialogFragment() {
         internal var domain = ""
         internal var cancel: () -> Unit = {}
         internal var done: (String, String, String) -> Unit = { _, _, _ -> }
+
+        constructor(parcel: Parcel) : this() {
+            title = parcel.readString().toString()
+            subtitle = parcel.readString().toString()
+            credentials = parcel.readString().toString()
+            username = parcel.readString().toString()
+            password = parcel.readString().toString()
+            domain = parcel.readString().toString()
+        }
 
         fun setTitle(title: String): Builder {
             this.title = title
@@ -128,6 +139,29 @@ class ScreenCredentialsFragment : DialogFragment() {
         fun build() = ScreenCredentialsFragment().also {
             it.arguments = Bundle().apply {
                 putSerializable(NavigationKey.KEY_SERIALIZABLE, this@Builder)
+            }
+        }
+
+        override fun writeToParcel(parcel: Parcel, flags: Int) {
+            parcel.writeString(title)
+            parcel.writeString(subtitle)
+            parcel.writeString(credentials)
+            parcel.writeString(username)
+            parcel.writeString(password)
+            parcel.writeString(domain)
+        }
+
+        override fun describeContents(): Int {
+            return 0
+        }
+
+        companion object CREATOR : Parcelable.Creator<Builder> {
+            override fun createFromParcel(parcel: Parcel): Builder {
+                return Builder(parcel)
+            }
+
+            override fun newArray(size: Int): Array<Builder?> {
+                return arrayOfNulls(size)
             }
         }
     }

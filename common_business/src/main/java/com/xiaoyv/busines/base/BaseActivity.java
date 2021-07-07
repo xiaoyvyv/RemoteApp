@@ -31,9 +31,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseVie
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ScreenUtils.setPortrait(this);
-        BarUtils.transparentStatusBar(this);
-        BarUtils.setStatusBarLightMode(this, true);
+        initBar();
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             initIntentData(getIntent(), bundle);
@@ -45,6 +43,12 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseVie
         initEvent();
     }
 
+    protected void initBar() {
+        ScreenUtils.setPortrait(this);
+        BarUtils.transparentStatusBar(this);
+        BarUtils.setStatusBarLightMode(this, true);
+    }
+
     /**
      * 导入视图
      *
@@ -52,7 +56,7 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseVie
      */
     protected abstract View createContentView();
 
-    protected void initIntentData(@NonNull Intent intent,@NonNull  Bundle bundle) {
+    protected void initIntentData(@NonNull Intent intent, @NonNull Bundle bundle) {
     }
 
     /**

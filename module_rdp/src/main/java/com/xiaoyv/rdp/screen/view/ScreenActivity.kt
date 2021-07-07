@@ -2,11 +2,14 @@ package com.xiaoyv.rdp.screen.view
 
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.res.Configuration
+import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Bundle
+import android.os.Looper
 import android.view.MotionEvent
 import android.view.ScaleGestureDetector
 import android.view.View
@@ -20,13 +23,15 @@ import com.freerdp.freerdpcore.utils.Mouse
 import com.freerdp.freerdpcore.view.RdpSessionView
 import com.xiaoyv.busines.base.BaseMvpActivity
 import com.xiaoyv.busines.room.entity.RdpEntity
-import com.xiaoyv.rdp.R
 import com.xiaoyv.rdp.databinding.RdpActivityScreenBinding
 import com.xiaoyv.rdp.screen.config.LibFreeRDPBroadcastReceiver
 import com.xiaoyv.rdp.screen.config.PinchZoomListener
 import com.xiaoyv.rdp.screen.contract.ScreenContract
 import com.xiaoyv.rdp.screen.presenter.ScreenPresenter
 import com.xiaoyv.ui.scroll.FreeScrollView
+import me.jessyan.autosize.AutoSize
+import me.jessyan.autosize.AutoSizeCompat
+import me.jessyan.autosize.AutoSizeConfig
 
 
 /**
@@ -47,10 +52,10 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     private var callbackDialogResult = false
     private var connectCancelledByUser = false
     private var toggleMouseButtons = false
+    private var screenLandscape = false
 
     private var rdpUri: Uri? = null
     private var rdpInstance: Long = -1
-
 
     private var bitmap: Bitmap? = null
 
@@ -90,9 +95,12 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     }
 
     override fun createContentView(): View {
-//        ScreenUtils.setLandscape(this)
         binding = RdpActivityScreenBinding.inflate(layoutInflater)
         return binding.root
+    }
+
+    override fun initBar() {
+        vSetLandscapeScreen(true)
     }
 
     override fun initIntentData(intent: Intent, bundle: Bundle) {
@@ -117,7 +125,10 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         // 注册 Rdp 事件广播接收器
         registerReceiver(rdpEventReceiver, IntentFilter(RdpApp.ACTION_EVENT_FREERDP))
 
-        vProcessArgument()
+        // 在 UI 绘制完才开始准备连接，否则屏幕宽度高度信息不准确
+        binding.root.post {
+            vProcessArgument()
+        }
     }
 
     override fun vProcessArgument() {
@@ -145,6 +156,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         }
     }
 
+    override fun p2vScreenLandscape() = screenLandscape
 
     override fun p2vStartConnect(rdpSession: RdpSession): RdpSession {
         rdpSession.uiEventListener = this
@@ -164,6 +176,35 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         scrollView: FreeScrollView, x: Int, y: Int, oldx: Int, oldy: Int
     ) {
 
+    }
+
+    /**
+     * 设置横屏或竖屏
+     */
+    override fun vSetLandscapeScreen(landscape: Boolean) {
+        screenLandscape = if (landscape) {
+            ScreenUtils.setLandscape(this)
+            true
+        } else {
+            ScreenUtils.setPortrait(this)
+            false
+        }
+    }
+
+    override fun getResources(): Resources {
+        if (Looper.getMainLooper().thread == Thread.currentThread()) AutoSizeCompat.autoConvertDensity(
+            super.getResources(), 640f, AutoSizeConfig.getInstance().screenWidth > AutoSizeConfig.getInstance().screenHeight
+        )
+        return super.getResources()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        screenLandscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE
+        if (screenLandscape) {
+            AutoSize.autoConvertDensity(this, 640f, true)
+        } else {
+        }
     }
 
     /**
@@ -379,20 +420,25 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
 
     override fun onSettingsChanged(width: Int, height: Int, bpp: Int) {
         presenter.v2pGetSession { session ->
-            // 设置画面位图
+            // 设置 Bitmap 色彩深度
             bitmap = if (bpp > 16) Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
             else Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
 
             // 配置画面
             session.surface = BitmapDrawable(resources, bitmap)
 
-            // 检测PC是否支持我们设置的分辨率，不一样则弹出提示自动调整的分辨率
+            // 判断远程自己是否自动调整了分辨率和色彩配置
             val settings = session.rdpConfig?.screenSettings ?: return@v2pGetSession
-            if (settings.width != width && settings.width != width + 1
-                || settings.height != height
-                || settings.colors != bpp
-            ) {
-                ToastUtils.showShort(R.string.info_capabilities_changed)
+            when {
+                settings.width != width && settings.width != width + 1 -> {
+                    ToastUtils.showShort(String.format("远程主机不支持你配置的分辨率，已调整为 %sx%s", width, height))
+                }
+                settings.height != height -> {
+                    ToastUtils.showShort(String.format("远程主机不支持你配置的分辨率，已调整为 %sx%s", width, height))
+                }
+                settings.colors != bpp -> {
+                    ToastUtils.showShort(String.format("远程主机不支持你配置的色彩深度，已调整为 %s bit", bpp))
+                }
             }
         }
     }

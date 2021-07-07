@@ -21,6 +21,13 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="UiApp.NoActionBar.RdpScreen" parent="UiApp.NoActionBar">
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowBackground">@color/ui_system_black</item>
+    </style>
+
     <style name="UiApp.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="UiApp.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

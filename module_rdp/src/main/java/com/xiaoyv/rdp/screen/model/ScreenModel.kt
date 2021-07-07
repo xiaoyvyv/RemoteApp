@@ -3,6 +3,7 @@ package com.xiaoyv.rdp.screen.model
 import android.content.res.Configuration
 import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.ScreenUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.blankj.utilcode.util.Utils
 import com.freerdp.freerdpcore.domain.RdpConfig
 import com.xiaoyv.rdp.screen.contract.ScreenContract
@@ -16,29 +17,49 @@ import kotlin.math.max
  */
 class ScreenModel : ScreenContract.Model {
 
-    override fun p2mApplyConfig(rdpConfig: RdpConfig) {
-        val screenSettings = rdpConfig.screenSettings
-        LogUtils.e("屏幕分辨率设置：", screenSettings.getResolutionString())
+    override fun p2mApplyConfig(rdpConfig: RdpConfig, landscape: Boolean) {
+        val screenWidth = ScreenUtils.getAppScreenWidth()
+        val screenHeight = ScreenUtils.getAppScreenHeight()
 
-        if (screenSettings.isAutomatic()) {
-            if (Utils.getApp().resources.configuration.screenLayout and
-                Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE
-            ) {
-                // 大屏幕设备，即平板电脑：只需使用屏幕信息
-                screenSettings.height = ScreenUtils.getAppScreenHeight()
-                screenSettings.width = ScreenUtils.getAppScreenWidth()
-            } else {
-                // 小屏幕设备，即电话：自动使用屏幕的最大边长，并将其设置为 16:10 分辨率
-                val screenMax: Int =
-                    max(ScreenUtils.getAppScreenWidth(), ScreenUtils.getAppScreenHeight())
-                screenSettings.height = screenMax
-                screenSettings.width = (screenMax.toFloat() * 1.6f).toInt()
+        val screenSettings = rdpConfig.screenSettings
+        when {
+            screenSettings.isAutomatic() -> {
+                when {
+                    // 大屏幕设备
+                    Utils.getApp().resources.configuration.screenLayout and
+                            Configuration.SCREENLAYOUT_SIZE_MASK >= Configuration.SCREENLAYOUT_SIZE_LARGE -> {
+                        screenSettings.width = screenWidth
+                        screenSettings.height = screenHeight
+                    }
+                    // 小屏幕设备
+                    else -> {
+                        // 横屏直接用屏幕宽高
+                        if (landscape) {
+                            screenSettings.width = screenWidth
+                            screenSettings.height = screenHeight
+                        }
+                        // 竖屏用长边作为高，然后 长:宽 = 16:10
+                        else {
+                            ToastUtils.showShort("16:10")
+                            val screenMax: Int = max(screenWidth, screenHeight)
+                            screenSettings.width = (screenMax.toFloat() * 1.6f).toInt()
+                            screenSettings.height = screenMax
+                        }
+                    }
+                }
+            }
+            screenSettings.isFitScreen() -> {
+                screenSettings.width = screenWidth
+                screenSettings.height = screenHeight
             }
         }
-        // 适配屏幕大小
-        if (screenSettings.isFitScreen()) {
-            screenSettings.height = ScreenUtils.getAppScreenHeight()
-            screenSettings.width = ScreenUtils.getAppScreenWidth()
-        }
+
+        // 异形屏幕适配，如大圆角屏幕边缘点击不到
+
+        LogUtils.i(
+            "屏幕分辨率信息",
+            "宽度：$screenWidth", "高度：$screenHeight",
+            "RDP 宽度：${screenSettings.width}", "RDP 高度：${screenSettings.height}"
+        )
     }
 }

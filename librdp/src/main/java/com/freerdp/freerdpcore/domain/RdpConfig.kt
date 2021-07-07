@@ -30,7 +30,7 @@ class RdpConfig : Serializable {
      * 视频设置
      */
     class ActiveScreenSettings {
-        private var resolution = FITSCREEN
+        private var resolution = AUTOMATIC
             get() {
                 when (field) {
                     FITSCREEN, AUTOMATIC, CUSTOM, PREDEFINED -> {
@@ -40,7 +40,7 @@ class RdpConfig : Serializable {
                 return field
             }
 
-        var colors: Int = 16
+        var colors: Int = 32
             get() {
                 when (field) {
                     32, 24, 16, 15, 8 -> {
@@ -87,14 +87,16 @@ class RdpConfig : Serializable {
                     this.height = height
                     this.resolution = CUSTOM
                 }
+                // 连接时定义
                 resolution.equals("fitscreen", ignoreCase = true) -> {
                     this.height = 0
-                    this.width = this.height
+                    this.width = 0
                     this.resolution = FITSCREEN
                 }
+                // 连接时定义
                 else -> {
                     this.height = 0
-                    this.width = this.height
+                    this.width = 0
                     this.resolution = AUTOMATIC
                 }
             }
@@ -161,7 +163,7 @@ class RdpConfig : Serializable {
                 return field
             }
 
-        var security: Int = 0
+        var security: Int = 3
             get() {
                 when (field) {
                     0, 1, 2, 3 -> {
@@ -205,12 +207,12 @@ class RdpConfig : Serializable {
         var remoteFx = true
         var gfx = true
         var h264 = true
-        var wallpaper = true
+        var wallpaper = false
         var theme = true
-        var fullWindowDrag = true
-        var menuAnimations = true
-        var fontSmoothing = true
-        var desktopComposition = true
+        var fullWindowDrag = false
+        var menuAnimations = false
+        var fontSmoothing = false
+        var desktopComposition = false
     }
 
     /**

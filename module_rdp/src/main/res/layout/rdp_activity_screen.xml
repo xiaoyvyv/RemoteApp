@@ -9,6 +9,7 @@
         android:id="@+id/rsv_scroll"
         android:layout_width="match_parent"
         android:layout_height="@dimen/ui_size_0"
+        android:background="@color/ui_system_black"
         android:drawingCacheQuality="low"
         android:fillViewport="true"
         android:isScrollContainer="true"

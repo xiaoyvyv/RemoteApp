@@ -6,7 +6,6 @@ import com.freerdp.freerdpcore.domain.RdpSession
 import com.xiaoyv.busines.base.IBaseModel
 import com.xiaoyv.busines.base.IBasePresenter
 import com.xiaoyv.busines.base.IBaseView
-import com.xiaoyv.busines.room.entity.RdpEntity
 
 /**
  * RdpListContract
@@ -20,6 +19,8 @@ interface ScreenContract {
         fun p2vStartConnect(rdpSession: RdpSession): RdpSession
         fun vSessionClose(result: Int)
         fun p2vBindSession(rdpSession: RdpSession)
+        fun p2vScreenLandscape(): Boolean
+        fun vSetLandscapeScreen(landscape: Boolean)
     }
 
     interface Presenter : IBasePresenter {
@@ -32,6 +33,6 @@ interface ScreenContract {
     }
 
     interface Model : IBaseModel {
-        fun p2mApplyConfig(rdpConfig: RdpConfig)
+        fun p2mApplyConfig(rdpConfig: RdpConfig, landscape: Boolean)
     }
 }
