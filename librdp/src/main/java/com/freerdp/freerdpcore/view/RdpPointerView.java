@@ -9,10 +9,12 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatImageView;
 
+import com.blankj.utilcode.util.ToastUtils;
 import com.freerdp.freerdpcore.utils.GestureDetector;
 import com.xiaoyv.librdp.R;
 
@@ -123,14 +125,21 @@ public class RdpPointerView extends AppCompatImageView {
         float[] curPos = new float[2];
         translationMatrix.mapPoints(curPos);
 
-        if (curPos[0] > (screen_width - pointerRect.width()))
+        if (curPos[0] > (screen_width - pointerRect.width())) {
             curPos[0] = screen_width - pointerRect.width();
-        if (curPos[0] < 0)
+        }
+        if (curPos[0] < 0) {
+
             curPos[0] = 0;
-        if (curPos[1] > (screen_height - pointerRect.height()))
+        }
+        if (curPos[1] > (screen_height - pointerRect.height())) {
+
             curPos[1] = screen_height - pointerRect.height();
-        if (curPos[1] < 0)
+        }
+        if (curPos[1] < 0) {
+
             curPos[1] = 0;
+        }
 
         translationMatrix.setTranslate(curPos[0], curPos[1]);
         setImageMatrix(translationMatrix);
@@ -179,6 +188,7 @@ public class RdpPointerView extends AppCompatImageView {
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
         // 确保触摸指针可见
         if (changed) {
+            ToastUtils.showShort(String.valueOf(right - left) + ": " + (bottom - top));
             ensureVisibility(right - left, bottom - top);
         }
     }
@@ -218,6 +228,7 @@ public class RdpPointerView extends AppCompatImageView {
 
         private MotionEvent prevEvent = null;
 
+        @Override
         public boolean onDown(MotionEvent e) {
             if (pointerAreaTouched(e, POINTER_ACTION_MOVE)) {
                 prevEvent = MotionEvent.obtain(e);
@@ -231,20 +242,23 @@ public class RdpPointerView extends AppCompatImageView {
             return true;
         }
 
+        @Override
         public boolean onUp(MotionEvent e) {
             if (prevEvent != null) {
                 prevEvent.recycle();
                 prevEvent = null;
             }
 
-            if (pointerScrolling)
+            if (pointerScrolling) {
                 setPointerImage(R.drawable.touch_pointer_default);
+            }
 
             pointerMoving = false;
             pointerScrolling = false;
             return true;
         }
 
+        @Override
         public void onLongPress(MotionEvent e) {
             if (pointerAreaTouched(e, POINTER_ACTION_LCLICK)) {
                 setPointerImage(R.drawable.touch_pointer_active);
@@ -254,6 +268,7 @@ public class RdpPointerView extends AppCompatImageView {
             }
         }
 
+        @Override
         public void onLongPressUp(MotionEvent e) {
             if (pointerMoving) {
                 setPointerImage(R.drawable.touch_pointer_default);
@@ -263,6 +278,7 @@ public class RdpPointerView extends AppCompatImageView {
             }
         }
 
+        @Override
         public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
             if (pointerMoving) {
                 // 移动指针图形
@@ -292,11 +308,12 @@ public class RdpPointerView extends AppCompatImageView {
             return false;
         }
 
+        @Override
         public boolean onSingleTapUp(MotionEvent e) {
             // 看什么地方被触摸，并采取相应的行动
-            if (pointerAreaTouched(e, POINTER_ACTION_CLOSE))
+            if (pointerAreaTouched(e, POINTER_ACTION_CLOSE)) {
                 listener.onTouchPointerClose();
-            else if (pointerAreaTouched(e, POINTER_ACTION_LCLICK)) {
+            } else if (pointerAreaTouched(e, POINTER_ACTION_LCLICK)) {
                 displayPointerImageAction(R.drawable.touch_pointer_lclick);
                 RectF rect = getCurrentPointerArea(POINTER_ACTION_CURSOR);
                 listener.onTouchPointerLeftClick((int) rect.centerX(), (int) rect.centerY(), true);
@@ -320,6 +337,7 @@ public class RdpPointerView extends AppCompatImageView {
             return true;
         }
 
+        @Override
         public boolean onDoubleTap(MotionEvent e) {
             // 如果在中心象限中执行，则发出双击通知
             if (pointerAreaTouched(e, POINTER_ACTION_LCLICK)) {

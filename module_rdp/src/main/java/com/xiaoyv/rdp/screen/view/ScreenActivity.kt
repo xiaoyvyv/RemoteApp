@@ -3,16 +3,16 @@ package com.xiaoyv.rdp.screen.view
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
-import android.content.res.Resources
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.os.Looper
-import android.view.MotionEvent
-import android.view.ScaleGestureDetector
-import android.view.View
+import android.view.*
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.blankj.utilcode.util.*
 import com.freerdp.freerdpcore.application.RdpApp
 import com.freerdp.freerdpcore.domain.RdpConfig
@@ -20,8 +20,10 @@ import com.freerdp.freerdpcore.domain.RdpSession
 import com.freerdp.freerdpcore.services.LibFreeRDP
 import com.freerdp.freerdpcore.services.UiEventListener
 import com.freerdp.freerdpcore.utils.Mouse
+import com.freerdp.freerdpcore.view.RdpPointerView
 import com.freerdp.freerdpcore.view.RdpSessionView
 import com.xiaoyv.busines.base.BaseMvpActivity
+import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.busines.room.entity.RdpEntity
 import com.xiaoyv.rdp.databinding.RdpActivityScreenBinding
 import com.xiaoyv.rdp.screen.config.LibFreeRDPBroadcastReceiver
@@ -29,9 +31,6 @@ import com.xiaoyv.rdp.screen.config.PinchZoomListener
 import com.xiaoyv.rdp.screen.contract.ScreenContract
 import com.xiaoyv.rdp.screen.presenter.ScreenPresenter
 import com.xiaoyv.ui.scroll.FreeScrollView
-import me.jessyan.autosize.AutoSize
-import me.jessyan.autosize.AutoSizeCompat
-import me.jessyan.autosize.AutoSizeConfig
 
 
 /**
@@ -42,22 +41,23 @@ import me.jessyan.autosize.AutoSizeConfig
  */
 class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     ScreenContract.View, UiEventListener, RdpSessionView.SessionViewListener,
-    FreeScrollView.ScrollView2DListener {
+    FreeScrollView.ScrollView2DListener, RdpPointerView.TouchPointerListener {
     private lateinit var binding: RdpActivityScreenBinding
     private val dlgVerifyCertificateLock = Object()
     private val dlgUserCredentialsLock = Object()
     private var rdpEntity: RdpEntity? = null
     private var rdpConfig: RdpConfig? = null
-
     private var callbackDialogResult = false
+
     private var connectCancelledByUser = false
     private var toggleMouseButtons = false
     private var screenLandscape = false
-
     private var rdpUri: Uri? = null
-    private var rdpInstance: Long = -1
 
+    private var rdpInstance: Long = -1
     private var bitmap: Bitmap? = null
+
+    private lateinit var loading: ScreenLoadingFragment
 
     /**
      * Rdp 事件监听
@@ -70,12 +70,15 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
             presenter.v2pGetSession { session ->
                 p2vBindSession(session)
             }
+            p2vHideLoading()
         }
         /**
          * 连接异常
          */
         onConnectionFailure = {
             presenter.v2pCancelDelayedMoveEvent()
+
+            p2vHideLoading()
             vSessionClose(RESULT_CANCELED)
         }
         /**
@@ -86,6 +89,8 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
             presenter.v2pGetSession { session ->
                 session.uiEventListener = null
             }
+
+            p2vHideLoading()
             vSessionClose(RESULT_OK)
         }
     }
@@ -99,9 +104,6 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         return binding.root
     }
 
-    override fun initBar() {
-        vSetLandscapeScreen(true)
-    }
 
     override fun initIntentData(intent: Intent, bundle: Bundle) {
         rdpEntity = intent.getSerializableExtra(KEY_RDP_ENTITY) as? RdpEntity
@@ -110,6 +112,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     }
 
     override fun initView() {
+
         binding.rsvSession.setScaleGestureDetector(
             ScaleGestureDetector(this, PinchZoomListener(binding.rsvScroll, binding.rsvSession))
         )
@@ -117,17 +120,55 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         binding.rsvSession.requestFocus()
 
         binding.rsvScroll.setScrollViewListener(this)
-
+        binding.tpvPointer.setTouchPointerListener(this)
     }
 
+    override fun initBar() {
+        vSetLandscapeScreen(true)
+    }
+
+    /**
+     * 设置横屏或竖屏
+     */
+    override fun vSetLandscapeScreen(landscape: Boolean) {
+        screenLandscape = if (landscape) {
+            ScreenUtils.setLandscape(this)
+            true
+        } else {
+            ScreenUtils.setPortrait(this)
+            false
+        }
+        hideSystemUi()
+    }
 
     override fun initData() {
         // 注册 Rdp 事件广播接收器
         registerReceiver(rdpEventReceiver, IntentFilter(RdpApp.ACTION_EVENT_FREERDP))
 
-        // 在 UI 绘制完才开始准备连接，否则屏幕宽度高度信息不准确
+    }
+
+    /**
+     * P层初始化完成，在这使用Presenter进行数据请求
+     */
+    override fun onPresenterCreated() {
         binding.root.post {
+            // 在 UI 绘制完才开始准备连接，否则屏幕宽度高度信息不准确
             vProcessArgument()
+
+            // 加载中对话框
+            loading = ScreenLoadingFragment.Builder()
+                .setTitle("远程桌面连接")
+                .setLoadingTitle(String.format("正在连接到：\n%s",rdpConfig?.hostname))
+                .setLoadingMessage("正在连接远程主机...")
+                .setCancel {
+                    callbackDialogResult = false
+                    connectCancelledByUser = true
+                    presenter.v2pGetSession { session ->
+                        LibFreeRDP.cancelConnection(session.instance)
+                    }
+                }
+                .build()
+            p2vShowLoading()
         }
     }
 
@@ -170,6 +211,8 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         binding.rsvSession.requestFocus()
         binding.rsvScroll.requestLayout()
 //        rdpKeyboardMapper.reset(this)
+
+        hideSystemUi()
     }
 
     override fun onScrollChanged(
@@ -178,34 +221,33 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
 
     }
 
-    /**
-     * 设置横屏或竖屏
-     */
-    override fun vSetLandscapeScreen(landscape: Boolean) {
-        screenLandscape = if (landscape) {
-            ScreenUtils.setLandscape(this)
-            true
-        } else {
-            ScreenUtils.setPortrait(this)
-            false
-        }
-    }
-
-    override fun getResources(): Resources {
-        if (Looper.getMainLooper().thread == Thread.currentThread()) AutoSizeCompat.autoConvertDensity(
-            super.getResources(), 640f, AutoSizeConfig.getInstance().screenWidth > AutoSizeConfig.getInstance().screenHeight
-        )
-        return super.getResources()
-    }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         screenLandscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE
         if (screenLandscape) {
-            AutoSize.autoConvertDensity(this, 640f, true)
+
         } else {
         }
+
+        hideSystemUi()
     }
+
+    private fun hideSystemUi() {
+        val controller = ViewCompat.getWindowInsetsController(window.decorView)
+        controller?.hide(WindowInsetsCompat.Type.statusBars())
+        controller?.hide(WindowInsetsCompat.Type.navigationBars())
+        // 导航栏隐藏时手势操作
+        controller?.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
+        // 刘海屏幕适配，允许使用刘海屏区进行绘制
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            window.attributes.layoutInDisplayCutoutMode =
+                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+        }
+    }
+
 
     /**
      * UiEventListener 回调 ========================================================================
@@ -218,6 +260,8 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
 
         // 显示凭证验证对话框
         ThreadUtils.runOnUiThread {
+            p2vHideLoading()
+
             ScreenCredentialsFragment.Builder()
                 .setTitle("远程桌面连接-登录凭证验证")
                 .setSubtitle("请输入您的登录凭据")
@@ -240,6 +284,8 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
                     username.append(u)
                     domain.append(p)
                     password.append(d)
+
+                    p2vShowLoading("正在配置远程会话...")
 
                     callbackDialogResult = true
                     synchronized(dlgUserCredentialsLock) {
@@ -269,6 +315,8 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
 
         // 显示凭证验证对话框
         ThreadUtils.runOnUiThread {
+            p2vHideLoading()
+
             ScreenCredentialsFragment.Builder()
                 .setTitle("远程桌面连接-网关凭证验证")
                 .setSubtitle("请输入您的网关凭据")
@@ -291,6 +339,8 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
                     username.append(u)
                     domain.append(p)
                     password.append(d)
+
+                    p2vShowLoading("正在配置远程会话...")
 
                     callbackDialogResult = true
                     synchronized(dlgUserCredentialsLock) {
@@ -339,6 +389,8 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
 
         // 证书验证
         ThreadUtils.runOnUiThread {
+            p2vHideLoading()
+
             ScreenCertificateFragment.Builder()
                 .setTitle(type)
                 .setCertName(message)
@@ -351,6 +403,8 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
                     }
                 }
                 .setDone {
+                    p2vShowLoading("正在验证登录凭证...")
+
                     callbackDialogResult = true
                     synchronized(dlgVerifyCertificateLock) {
                         dlgVerifyCertificateLock.notify()
@@ -366,7 +420,6 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         } catch (e: InterruptedException) {
         }
 
-        LogUtils.e("Rdp结果：" + callbackDialogResult)
         return if (callbackDialogResult) 1 else 0
     }
 
@@ -382,9 +435,59 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         oldFingerprint: String,
         flags: Long
     ): Int {
-        LogUtils.e("onVerifyChangedCertificate")
-        ToastUtils.showShort("onVerifyChangedCertificate")
-        return 0
+        // 重置
+        callbackDialogResult = false
+
+        // 证书验证来自类型
+        val type = when {
+            flags and LibFreeRDP.VERIFY_CERT_FLAG_GATEWAY != 0L -> "RDP-Gateway"
+            flags and LibFreeRDP.VERIFY_CERT_FLAG_REDIRECT != 0L -> "RDP-Redirect"
+            else -> "RDP-Server $host:$port"
+        }
+
+        val finger = if (flags and LibFreeRDP.VERIFY_CERT_FLAG_FP_IS_PEM != 0L) {
+            String.format("证书：\n%s", fingerprint)
+        } else {
+            String.format("指纹：\n%s", fingerprint)
+        }
+
+        val message =
+            String.format("证书变更名称：%s\n主题：%s\n发行：%s", commonName, subject, issuer)
+
+        // 证书验证
+        ThreadUtils.runOnUiThread {
+            p2vHideLoading()
+
+            ScreenCertificateFragment.Builder()
+                .setTitle(type)
+                .setCertName(message)
+                .setFinger(finger)
+                .setCancel {
+                    callbackDialogResult = false
+                    connectCancelledByUser = true
+                    synchronized(dlgVerifyCertificateLock) {
+                        dlgVerifyCertificateLock.notify()
+                    }
+                }
+                .setDone {
+                    p2vShowLoading()
+
+                    callbackDialogResult = true
+                    synchronized(dlgVerifyCertificateLock) {
+                        dlgVerifyCertificateLock.notify()
+                    }
+                }.build().show(supportFragmentManager)
+        }
+
+        // 等待验证结果
+        try {
+            synchronized(dlgVerifyCertificateLock) {
+                dlgVerifyCertificateLock.wait()
+            }
+        } catch (e: InterruptedException) {
+        }
+
+        return if (callbackDialogResult) 1 else 0
     }
 
     override fun onGraphicsUpdate(x: Int, y: Int, width: Int, height: Int) {
@@ -513,6 +616,60 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     }
 
     /**
+     * TouchPointerView 回调 ============================================================================
+     */
+    override fun onTouchPointerClose() {
+
+    }
+
+    override fun onTouchPointerLeftClick(x: Int, y: Int, down: Boolean) {
+
+    }
+
+    override fun onTouchPointerRightClick(x: Int, y: Int, down: Boolean) {
+
+    }
+
+    override fun onTouchPointerMove(x: Int, y: Int) {
+
+    }
+
+    override fun onTouchPointerScroll(down: Boolean) {
+
+    }
+
+    override fun onTouchPointerToggleKeyboard() {
+
+    }
+
+    override fun onTouchPointerToggleExtKeyboard() {
+
+    }
+
+    override fun onTouchPointerResetScrollZoom() {
+
+    }
+
+
+    override fun p2vShowLoading() {
+        loading.show(supportFragmentManager)
+    }
+
+    override fun p2vShowLoading(msg: String) {
+        loading.arguments = loading.arguments?.also {
+            val builder =
+                it.getSerializable(NavigationKey.KEY_SERIALIZABLE) as? ScreenLoadingFragment.Builder
+            builder?.loadingMessage = msg
+            it.putSerializable(NavigationKey.KEY_SERIALIZABLE, builder)
+        }
+        loading.show(supportFragmentManager)
+    }
+
+    override fun p2vHideLoading() {
+        loading.dismiss()
+    }
+
+    /**
      * 各种原因导致连接关闭
      */
     override fun vSessionClose(result: Int) {
@@ -522,6 +679,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         }
         finish()
     }
+
 
     override fun onBackPressed() {
         presenter.v2pGetSession(empty = {
@@ -533,6 +691,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
 
     override fun onDestroy() {
         unregisterReceiver(rdpEventReceiver)
+        presenter.v2pFreeSession()
         super.onDestroy()
     }
 
@@ -547,4 +706,5 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
             })
         }
     }
+
 }

@@ -9,35 +9,31 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.blankj.utilcode.util.ScreenUtils
-import com.blankj.utilcode.util.ThreadUtils
-import com.xiaoyv.busines.BaseApp
 import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.rdp.R
-import com.xiaoyv.rdp.databinding.RdpActivityScreenCredentialsBinding
+import com.xiaoyv.rdp.databinding.RdpActivityScreenLoadingBinding
 import com.xiaoyv.ui.kotlin.dp
-import me.jessyan.autosize.AutoSize
-import me.jessyan.autosize.AutoSizeCompat
 import java.io.Serializable
 
 /**
- * ScreenCredentialsFragment
+ * ScreenLoadingFragment
  *
  * @author why
  * @since 2021/07/06
  **/
-class ScreenCredentialsFragment : DialogFragment() {
+class ScreenLoadingFragment : DialogFragment() {
+    var binding: RdpActivityScreenLoadingBinding? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        return RdpActivityScreenCredentialsBinding.inflate(inflater, container, false).root
+        return RdpActivityScreenLoadingBinding.inflate(inflater, container, false).root
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val binding = RdpActivityScreenCredentialsBinding.bind(view)
+        val binding = RdpActivityScreenLoadingBinding.bind(view)
         isCancelable = false
 
         binding.ivClose.setOnClickListener { dismiss() }
@@ -45,12 +41,8 @@ class ScreenCredentialsFragment : DialogFragment() {
         val builder =
             (arguments?.getSerializable(NavigationKey.KEY_SERIALIZABLE) as? Builder) ?: return
         binding.tvTitle.text = builder.title
-        binding.tvSubtitle.text = builder.subtitle
-        binding.tvCredentials.text = builder.credentials
-
-        binding.editTextUsername.setText(builder.username)
-        binding.editTextPassword.setText(builder.password)
-        binding.editTextDomain.setText(builder.domain)
+        binding.tvLoadingTitle.text = builder.loadingTitle
+        binding.tvLoadingMessage.text = builder.loadingMessage
 
         binding.ivClose.setOnClickListener {
             dismiss()
@@ -60,16 +52,9 @@ class ScreenCredentialsFragment : DialogFragment() {
             dismiss()
             builder.cancel.invoke()
         }
-        binding.btYes.setOnClickListener {
-            dismiss()
-            builder.done.invoke(
-                binding.editTextUsername.text.toString(),
-                binding.editTextPassword.text.toString(),
-                binding.editTextDomain.text.toString()
-            )
-        }
-    }
 
+        this.binding=binding
+    }
 
     fun show(fragmentManager: FragmentManager) {
         show(fragmentManager, javaClass.simpleName)
@@ -91,21 +76,15 @@ class ScreenCredentialsFragment : DialogFragment() {
 
     class Builder() : Serializable, Parcelable {
         internal var title: String = "--"
-        internal var subtitle: String = "--"
-        internal var credentials: String = "--"
-        internal var username = ""
-        internal var password = ""
-        internal var domain = ""
+        internal var loadingTitle: String = "--"
+        internal var loadingMessage: String = "--"
+
         internal var cancel: () -> Unit = {}
-        internal var done: (String, String, String) -> Unit = { _, _, _ -> }
 
         constructor(parcel: Parcel) : this() {
             title = parcel.readString().toString()
-            subtitle = parcel.readString().toString()
-            credentials = parcel.readString().toString()
-            username = parcel.readString().toString()
-            password = parcel.readString().toString()
-            domain = parcel.readString().toString()
+            loadingTitle = parcel.readString().toString()
+            loadingMessage = parcel.readString().toString()
         }
 
         fun setTitle(title: String): Builder {
@@ -113,20 +92,13 @@ class ScreenCredentialsFragment : DialogFragment() {
             return this
         }
 
-        fun setSubtitle(subtitle: String): Builder {
-            this.subtitle = subtitle
+        fun setLoadingTitle(loadingTitle: String): Builder {
+            this.loadingTitle = loadingTitle
             return this
         }
 
-        fun setCredentials(credentials: String): Builder {
-            this.credentials = credentials
-            return this
-        }
-
-        fun setData(username: String, password: String, domain: String): Builder {
-            this.username = username
-            this.password = password
-            this.domain = domain
+        fun setLoadingMessage(loadingMessage: String): Builder {
+            this.loadingMessage = loadingMessage
             return this
         }
 
@@ -135,12 +107,7 @@ class ScreenCredentialsFragment : DialogFragment() {
             return this
         }
 
-        fun setDone(done: (String, String, String) -> Unit = { _, _, _ -> }): Builder {
-            this.done = done
-            return this
-        }
-
-        fun build() = ScreenCredentialsFragment().also {
+        fun build() = ScreenLoadingFragment().also {
             it.arguments = Bundle().apply {
                 putSerializable(NavigationKey.KEY_SERIALIZABLE, this@Builder)
             }
@@ -148,11 +115,8 @@ class ScreenCredentialsFragment : DialogFragment() {
 
         override fun writeToParcel(parcel: Parcel, flags: Int) {
             parcel.writeString(title)
-            parcel.writeString(subtitle)
-            parcel.writeString(credentials)
-            parcel.writeString(username)
-            parcel.writeString(password)
-            parcel.writeString(domain)
+            parcel.writeString(loadingTitle)
+            parcel.writeString(loadingMessage)
         }
 
         override fun describeContents(): Int {

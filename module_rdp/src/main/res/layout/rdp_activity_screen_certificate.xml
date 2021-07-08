@@ -24,8 +24,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:srcCompat="@drawable/ui_sharp_cert"
-            app:tint="@color/ui_theme_c1" />
+            app:srcCompat="@drawable/ui_icon_computer" />
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/tv_title"
@@ -272,12 +271,12 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/bt_no"
-            android:layout_width="@dimen/ui_size_60"
+            android:layout_width="@dimen/ui_size_80"
             android:layout_height="@dimen/ui_size_26"
             android:layout_marginStart="@dimen/ui_size_12"
             android:layout_marginTop="@dimen/ui_size_12"
             android:layout_marginEnd="@dimen/ui_size_12"
-            android:layout_marginBottom="@dimen/ui_size_12"
+            android:layout_marginBottom="@dimen/ui_size_20"
             android:background="@drawable/ui_shape_window_button"
             android:gravity="center"
             android:stateListAnimator="@null"
@@ -290,12 +289,12 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/bt_yes"
-            android:layout_width="@dimen/ui_size_60"
+            android:layout_width="@dimen/ui_size_80"
             android:layout_height="@dimen/ui_size_26"
             android:layout_marginStart="@dimen/ui_size_12"
             android:layout_marginTop="@dimen/ui_size_12"
             android:layout_marginEnd="@dimen/ui_size_12"
-            android:layout_marginBottom="@dimen/ui_size_12"
+            android:layout_marginBottom="@dimen/ui_size_20"
             android:background="@drawable/ui_shape_window_button"
             android:gravity="center"
             android:stateListAnimator="@null"

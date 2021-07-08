@@ -1,6 +1,7 @@
 package com.xiaoyv.busines.base;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.view.View;
 
@@ -14,10 +15,13 @@ import com.blankj.utilcode.util.FragmentUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.SnackbarUtils;
+import com.xiaoyv.busines.BaseApp;
 import com.xiaoyv.business.databinding.BusinessActivityRootBinding;
 import com.xiaoyv.ui.status.ContentStatusView;
 
 import java.util.List;
+
+import me.jessyan.autosize.AutoSizeCompat;
 
 /**
  * BaseActivity
@@ -76,6 +80,14 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseVie
 
     protected void initListener() {
 
+    }
+
+    @Override
+    public Resources getResources() {
+        Resources resources = super.getResources();
+        // 解决 AutoSize 横屏时对话框显示状态，切后台再切回前台导致的适配失效问题
+        runOnUiThread(() -> AutoSizeCompat.autoConvertDensity(resources, BaseApp.MAX_WIDTH_DP, !ScreenUtils.isLandscape()));
+        return super.getResources();
     }
 
     @Override

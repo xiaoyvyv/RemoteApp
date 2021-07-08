@@ -33,7 +33,7 @@ class ScreenPresenter : ImplBasePresenter<ScreenContract.View>(), ScreenContract
 
     override fun v2pConnectWithConfig(rdpConfig: RdpConfig) {
         // 配置信息
-        model.p2mApplyConfig(rdpConfig,view.p2vScreenLandscape())
+        model.p2mApplyConfig(rdpConfig, view.p2vScreenLandscape())
         // 创建一个会话信息
         val rdpSession = RdpApp.createSession(rdpConfig, Utils.getApp())
         v2pStartConnect(rdpSession, false)
@@ -53,13 +53,26 @@ class ScreenPresenter : ImplBasePresenter<ScreenContract.View>(), ScreenContract
             // 若存在实例，且不需要恢复则先取消再连接
             LibFreeRDP.cancelConnection(session.instance)
             // 连接
-            ThreadUtils.getCachedPool()
-                .submit {
-                    session.connect()
-                }
+            ThreadUtils.getCachedPool().submit {
+                session.connect()
+            }
         }
         currentSession = session
         uiHandler.session = session
+    }
+
+    override fun v2pFreeSession() {
+        // 取消运行断开计时器
+        RdpApp.cancelDisconnectTimer()
+
+        // 断开所有剩余会话的连接
+        val sessions: Collection<RdpSession> = RdpApp.getSessions()
+        for (session in sessions) {
+            LibFreeRDP.disconnect(session.instance)
+        }
+
+        RdpApp.freeSession(currentSession?.instance ?: return)
+        currentSession = null
     }
 
     override fun v2pGetSession(empty: () -> Unit, callback: (RdpSession) -> Unit) {
@@ -92,6 +105,7 @@ class ScreenPresenter : ImplBasePresenter<ScreenContract.View>(), ScreenContract
         uiHandler.removeMessages(UIHandler.SEND_MOVE_EVENT)
     }
 
+
     companion object {
         /**
          * 最大丢弃光标移动事件数
@@ -103,5 +117,4 @@ class ScreenPresenter : ImplBasePresenter<ScreenContract.View>(), ScreenContract
          */
         private const val SEND_MOVE_EVENT_TIMEOUT: Long = 150
     }
-
 }

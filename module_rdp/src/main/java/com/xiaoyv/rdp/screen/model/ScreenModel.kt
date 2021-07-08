@@ -1,10 +1,7 @@
 package com.xiaoyv.rdp.screen.model
 
 import android.content.res.Configuration
-import com.blankj.utilcode.util.LogUtils
-import com.blankj.utilcode.util.ScreenUtils
-import com.blankj.utilcode.util.ToastUtils
-import com.blankj.utilcode.util.Utils
+import com.blankj.utilcode.util.*
 import com.freerdp.freerdpcore.domain.RdpConfig
 import com.xiaoyv.rdp.screen.contract.ScreenContract
 import kotlin.math.max
@@ -18,8 +15,9 @@ import kotlin.math.max
 class ScreenModel : ScreenContract.Model {
 
     override fun p2mApplyConfig(rdpConfig: RdpConfig, landscape: Boolean) {
-        val screenWidth = ScreenUtils.getAppScreenWidth()
-        val screenHeight = ScreenUtils.getAppScreenHeight()
+        BarUtils.isSupportNavBar()
+        val screenWidth = ScreenUtils.getScreenWidth()
+        val screenHeight = ScreenUtils.getScreenHeight()
 
         val screenSettings = rdpConfig.screenSettings
         when {

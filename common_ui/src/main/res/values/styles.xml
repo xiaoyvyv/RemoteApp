@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- 基础主题 -->
-    <style name="UiApp" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="UiApp" parent="Theme.AppCompat.DayNight.DarkActionBar">
         <!-- 主色 -->
         <item name="colorPrimary">@color/ui_theme_c1</item>
         <item name="colorPrimaryVariant">@color/ui_theme_c1</item>
@@ -22,9 +22,9 @@
     </style>
 
     <style name="UiApp.NoActionBar.RdpScreen" parent="UiApp.NoActionBar">
+        <item name="android:fitsSystemWindows">false</item>
         <item name="android:windowTranslucentStatus">true</item>
-        <item name="android:windowTranslucentNavigation">false</item>
-        <item name="android:windowFullscreen">true</item>
+        <item name="android:windowTranslucentNavigation">true</item>
         <item name="android:windowBackground">@color/ui_system_black</item>
     </style>
 

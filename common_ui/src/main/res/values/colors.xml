@@ -35,7 +35,7 @@
     <color name="ui_text_c5">@color/ui_system_c5</color>
 
     <!-- 状态颜色 -->
-    <color name="ui_status_success">#26d1e0</color>
+    <color name="ui_status_success">#08EA31</color>
     <color name="ui_status_warning">#f6bc67</color>
     <color name="ui_status_error">#c74444</color>
     <color name="ui_status_highlight">#26d1e0</color>

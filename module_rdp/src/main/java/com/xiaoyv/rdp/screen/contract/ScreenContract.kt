@@ -30,6 +30,7 @@ interface ScreenContract {
         fun v2pGetSession(empty: () -> Unit = {}, callback: (RdpSession) -> Unit)
         fun v2pSendDelayedMoveEvent(x: Int, y: Int)
         fun v2pCancelDelayedMoveEvent()
+         fun v2pFreeSession()
     }
 
     interface Model : IBaseModel {
