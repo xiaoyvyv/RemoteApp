@@ -38,14 +38,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.blankj.utilcode.util.ThreadUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.freerdp.freerdpcore.application.RdpApp;
 import com.freerdp.freerdpcore.domain.RdpConfig;
 import com.freerdp.freerdpcore.domain.RdpSession;
 import com.freerdp.freerdpcore.mapper.RdpKeyboardMapper;
-import com.freerdp.freerdpcore.mapper.RdpMouseMapper;
 import com.freerdp.freerdpcore.services.LibFreeRDP;
 import com.freerdp.freerdpcore.services.UiEventListener;
 import com.freerdp.freerdpcore.utils.ClipboardManagerProxy;
+import com.freerdp.freerdpcore.utils.Mouse;
 import com.freerdp.freerdpcore.view.RdpPointerView;
 import com.freerdp.freerdpcore.view.RdpScrollView;
 import com.freerdp.freerdpcore.view.RdpSessionView;
@@ -344,7 +345,7 @@ public class SessionActivity extends AppCompatActivity
 
     private void processIntent(Intent intent) {
         // get either session instance or create one from a bookmark/uri
-        Bundle bundle = intent.getExtras();
+        Bundle bundle = Bundle.EMPTY;
         Uri openUri = intent.getData();
         if (openUri != null) {
             // Launched from URI, e.g:
@@ -357,7 +358,8 @@ public class SessionActivity extends AppCompatActivity
             bindSession();
         } else {
             // no session found - exit
-            closeSessionActivity(RESULT_CANCELED);
+//            closeSessionActivity(RESULT_CANCELED);
+            connect(new RdpConfig());
         }
     }
 
@@ -521,7 +523,7 @@ public class SessionActivity extends AppCompatActivity
             discardedMoveEvents = 0;
 
         if (discardedMoveEvents > MAX_DISCARDED_MOVE_EVENTS) {
-            LibFreeRDP.sendCursorEvent(session.getInstance(), x, y, RdpMouseMapper.getMoveEvent());
+            LibFreeRDP.sendCursorEvent(session.getInstance(), x, y, Mouse.getMoveEvent());
         } else {
             uiHandler.sendMessageDelayed(Message.obtain(null, UIHandler.SEND_MOVE_EVENT, x, y),
                     SEND_MOVE_EVENT_TIMEOUT);
@@ -593,6 +595,7 @@ public class SessionActivity extends AppCompatActivity
     // combinations (like Win + E to open the explorer).
     @Override
     public boolean onKeyDown(int keycode, KeyEvent event) {
+        ToastUtils.showShort(keycode);
         return rdpKeyboardMapper.processAndroidKeyEvent(event);
     }
 
@@ -888,7 +891,7 @@ public class SessionActivity extends AppCompatActivity
     @Override
     public void onRemoteClipboardChanged(String data) {
         Log.v(TAG, "OnRemoteClipboardChanged: " + data);
-        mClipboardManager.setClipboardData(data);
+        mClipboardManager.setLocalClipboardData(data);
     }
 
     // ****************************************************************************
@@ -928,8 +931,8 @@ public class SessionActivity extends AppCompatActivity
         }
 
         LibFreeRDP.sendCursorEvent(session.getInstance(), x, y,
-                toggleMouseButtons ? RdpMouseMapper.getRightButtonEvent(this, down)
-                        : RdpMouseMapper.getLeftButtonEvent(this, down));
+                toggleMouseButtons ? Mouse.getRightButtonEvent(down)
+                        : Mouse.getLeftButtonEvent(down));
 
         if (!down) {
             toggleMouseButtons = false;
@@ -950,7 +953,7 @@ public class SessionActivity extends AppCompatActivity
 
     @Override
     public void onSessionViewScroll(boolean down) {
-        LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0, RdpMouseMapper.getScrollEvent(this, down));
+        LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0, Mouse.getScrollEvent(down));
     }
 
     // ****************************************************************************
@@ -975,20 +978,20 @@ public class SessionActivity extends AppCompatActivity
     public void onTouchPointerLeftClick(int x, int y, boolean down) {
         Point p = mapScreenCoordToSessionCoord(x, y);
         LibFreeRDP.sendCursorEvent(session.getInstance(), p.x, p.y,
-                RdpMouseMapper.getLeftButtonEvent(this, down));
+                Mouse.getLeftButtonEvent(down));
     }
 
     @Override
     public void onTouchPointerRightClick(int x, int y, boolean down) {
         Point p = mapScreenCoordToSessionCoord(x, y);
         LibFreeRDP.sendCursorEvent(session.getInstance(), p.x, p.y,
-                RdpMouseMapper.getRightButtonEvent(this, down));
+                Mouse.getRightButtonEvent(down));
     }
 
     @Override
     public void onTouchPointerMove(int x, int y) {
         Point p = mapScreenCoordToSessionCoord(x, y);
-        LibFreeRDP.sendCursorEvent(session.getInstance(), p.x, p.y, RdpMouseMapper.getMoveEvent());
+        LibFreeRDP.sendCursorEvent(session.getInstance(), p.x, p.y, Mouse.getMoveEvent());
 
         if (ApplicationSettingsActivity.getAutoScrollTouchPointer(this) &&
                 !uiHandler.hasMessages(UIHandler.SCROLLING_REQUESTED)) {
@@ -999,7 +1002,7 @@ public class SessionActivity extends AppCompatActivity
 
     @Override
     public void onTouchPointerScroll(boolean down) {
-        LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0, RdpMouseMapper.getScrollEvent(this, down));
+        LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0, Mouse.getScrollEvent(down));
     }
 
     @Override
@@ -1026,11 +1029,11 @@ public class SessionActivity extends AppCompatActivity
                 final float vScroll = e.getAxisValue(MotionEvent.AXIS_VSCROLL);
                 if (vScroll < 0) {
                     LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0,
-                            RdpMouseMapper.getScrollEvent(this, false));
+                            Mouse.getScrollEvent(false));
                 }
                 if (vScroll > 0) {
                     LibFreeRDP.sendCursorEvent(session.getInstance(), 0, 0,
-                            RdpMouseMapper.getScrollEvent(this, true));
+                            Mouse.getScrollEvent(true));
                 }
                 break;
         }
@@ -1040,7 +1043,7 @@ public class SessionActivity extends AppCompatActivity
     // ****************************************************************************
     // ClipboardManagerProxy.OnClipboardChangedListener
     @Override
-    public void onClipboardChanged(String data) {
+    public void onLocalClipboardChanged(String data) {
         Log.v(TAG, "onClipboardChanged: " + data);
         LibFreeRDP.sendClipboardData(session.getInstance(), data);
     }
@@ -1083,7 +1086,7 @@ public class SessionActivity extends AppCompatActivity
                 }
                 case SEND_MOVE_EVENT: {
                     LibFreeRDP.sendCursorEvent(session.getInstance(), msg.arg1, msg.arg2,
-                            RdpMouseMapper.getMoveEvent());
+                            Mouse.getMoveEvent());
                     break;
                 }
                 case SHOW_DIALOG: {

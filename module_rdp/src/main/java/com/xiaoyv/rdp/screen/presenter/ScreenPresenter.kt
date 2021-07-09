@@ -1,5 +1,8 @@
 package com.xiaoyv.rdp.screen.presenter
 
+import android.graphics.Bitmap
+import android.graphics.Point
+import android.graphics.Rect
 import android.net.Uri
 import android.os.Message
 import com.blankj.utilcode.util.ThreadUtils
@@ -9,10 +12,13 @@ import com.freerdp.freerdpcore.domain.RdpConfig
 import com.freerdp.freerdpcore.domain.RdpSession
 import com.freerdp.freerdpcore.services.LibFreeRDP
 import com.freerdp.freerdpcore.utils.Mouse
+import com.freerdp.freerdpcore.view.RdpPointerView
+import com.freerdp.freerdpcore.view.RdpSessionView
 import com.xiaoyv.busines.base.ImplBasePresenter
 import com.xiaoyv.rdp.screen.contract.ScreenContract
 import com.xiaoyv.rdp.screen.model.ScreenModel
 import com.xiaoyv.rdp.screen.view.UIHandler
+import com.xiaoyv.ui.scroll.FreeScrollView
 
 /**
  * Presenter
@@ -83,38 +89,148 @@ class ScreenPresenter : ImplBasePresenter<ScreenContract.View>(), ScreenContract
      * 发送光标移动事件
      */
     override fun v2pSendDelayedMoveEvent(x: Int, y: Int) {
-        if (uiHandler.hasMessages(UIHandler.SEND_MOVE_EVENT)) {
-            uiHandler.removeMessages(UIHandler.SEND_MOVE_EVENT)
+        if (uiHandler.hasMessages(UIHandler.HANDLER_EVENT_CURSOR_MOVING)) {
+            uiHandler.removeMessages(UIHandler.HANDLER_EVENT_CURSOR_MOVING)
             discardedMoveEvents++
         } else discardedMoveEvents = 0
 
         // 超过最大丢弃数则发送事件，负责继续延迟
-        if (discardedMoveEvents > MAX_DISCARDED_MOVE_EVENTS) {
+        if (discardedMoveEvents > UIHandler.HANDLER_EVENT_CURSOR_MOVING_MAX_COUNT) {
             currentSession?.let { session ->
                 LibFreeRDP.sendCursorEvent(session.instance, x, y, Mouse.getMoveEvent())
             }
         } else uiHandler.sendMessageDelayed(
-            Message.obtain(null, UIHandler.SEND_MOVE_EVENT, x, y), SEND_MOVE_EVENT_TIMEOUT
+            Message.obtain(null, UIHandler.HANDLER_EVENT_CURSOR_MOVING, x, y),
+            UIHandler.HANDLER_EVENT_CURSOR_MOVING_TIMEOUT
         )
+    }
+
+    override fun v2pProcessVirtualKey(virtualKeyCode: Int, down: Boolean) {
+        LibFreeRDP.sendKeyEvent(currentSession?.instance ?: return, virtualKeyCode, down)
+    }
+
+    override fun v2pProcessUnicodeKey(unicodeKey: Int) {
+        LibFreeRDP.sendUnicodeKeyEvent(currentSession?.instance ?: return, unicodeKey, true)
+        LibFreeRDP.sendUnicodeKeyEvent(currentSession?.instance ?: return, unicodeKey, true)
     }
 
     /**
      * 移除光标移动事件
      */
     override fun v2pCancelDelayedMoveEvent() {
-        uiHandler.removeMessages(UIHandler.SEND_MOVE_EVENT)
+        uiHandler.removeMessages(UIHandler.HANDLER_EVENT_CURSOR_MOVING)
     }
 
+    override fun v2pTouchPointerLeftClick(point: Point, down: Boolean) {
+        LibFreeRDP.sendCursorEvent(
+            currentSession?.instance ?: return,
+            point.x, point.y,
+            Mouse.getLeftButtonEvent(down)
+        )
+    }
 
-    companion object {
-        /**
-         * 最大丢弃光标移动事件数
-         */
-        private const val MAX_DISCARDED_MOVE_EVENTS: Long = 3
+    override fun v2pTouchPointerScroll(down: Boolean) {
+        LibFreeRDP.sendCursorEvent(
+            currentSession?.instance ?: return, 0, 0, Mouse.getScrollEvent(down)
+        )
+    }
 
-        /**
-         * 光标移动事件发送间隔
-         */
-        private const val SEND_MOVE_EVENT_TIMEOUT: Long = 150
+    override fun v2pGenericMotionScroll(vScroll: Float) {
+        if (vScroll < 0) {
+            LibFreeRDP.sendCursorEvent(
+                currentSession?.instance ?: return, 0, 0, Mouse.getScrollEvent(false)
+            )
+        }
+        if (vScroll > 0) {
+            LibFreeRDP.sendCursorEvent(
+                currentSession?.instance ?: return, 0, 0, Mouse.getScrollEvent(true)
+            )
+        }
+    }
+
+    override fun v2pSessionViewScroll(down: Boolean) {
+        LibFreeRDP.sendCursorEvent(
+            currentSession?.instance ?: return,
+            0, 0, Mouse.getScrollEvent(down)
+        )
+    }
+
+    override fun v2pSessionViewLeftTouch(
+        x: Int,
+        y: Int,
+        down: Boolean,
+        toggleMouseButtons: Boolean
+    ) {
+        LibFreeRDP.sendCursorEvent(
+            currentSession?.instance ?: return, x, y,
+            if (toggleMouseButtons) Mouse.getRightButtonEvent(down)
+            else Mouse.getLeftButtonEvent(down)
+        )
+    }
+
+    override fun v2pGraphicsUpdate(
+        sessionView: RdpSessionView,
+        bitmap: Bitmap,
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int
+    ) {
+        LibFreeRDP.updateGraphics(
+            currentSession?.instance ?: return, bitmap, x, y, width, height
+        )
+        sessionView.addInvalidRegion(Rect(x, y, x + width, y + height))
+
+        // 刷新 SessionView
+        ThreadUtils.runOnUiThread {
+            sessionView.invalidateRegion()
+        }
+    }
+
+    /**
+     * 将本地复制内容放到远程主机的剪切板上
+     */
+    override fun v2pSendClipboardData(data: String) {
+        LibFreeRDP.sendClipboardData(currentSession?.instance ?: return, data)
+    }
+
+    override fun v2pTouchPointerRightClick(point: Point, down: Boolean) {
+        LibFreeRDP.sendCursorEvent(
+            currentSession?.instance ?: return,
+            point.x, point.y,
+            Mouse.getRightButtonEvent(down)
+        )
+    }
+
+    override fun v2pTouchPointerMove(point: Point) {
+        LibFreeRDP.sendCursorEvent(
+            currentSession?.instance ?: return,
+            point.x, point.y, Mouse.getMoveEvent()
+        )
+    }
+
+    /**
+     * 指针位于边缘时，画面自动往中心滚动
+     */
+    override fun v2pAutoScrollPointer(
+        tpvPointer: RdpPointerView,
+        rsvSession: RdpSessionView,
+        rsvScroll: FreeScrollView
+    ) {
+        uiHandler.tpvPointer = tpvPointer
+        uiHandler.rsvSession = rsvSession
+        uiHandler.rsvScroll = rsvScroll
+
+        // 桌面配置的宽高
+        val width = currentSession?.rdpConfig?.screenSettings?.width ?: 0
+        val height = currentSession?.rdpConfig?.screenSettings?.height ?: 0
+
+        // 指针位于边缘时，画面自动滚动
+        if (!uiHandler.hasMessages(UIHandler.HANDLER_EVENT_BORDER_SCROLL)) {
+            uiHandler.sendMessageDelayed(
+                Message.obtain(null, UIHandler.HANDLER_EVENT_BORDER_SCROLL, width, height),
+                UIHandler.HANDLER_EVENT_BORDER_SCROLL_TIMEOUT
+            )
+        }
     }
 }

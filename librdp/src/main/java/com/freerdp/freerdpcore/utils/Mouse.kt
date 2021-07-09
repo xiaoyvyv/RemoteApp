@@ -1,53 +1,37 @@
-package com.freerdp.freerdpcore.utils;
+package com.freerdp.freerdpcore.utils
 
-import android.content.Context;
+object Mouse {
+    private const val PTR_FLAGS_LEFT_BUTTON = 0x1000
+    private const val PTR_FLAGS_RIGHT_BUTTON = 0x2000
+    private const val PTR_FLAGS_DOWN = 0x8000
+    private const val PTR_FLAGS_MOVE = 0x0800
+    private const val PTR_FLAGS_WHEEL = 0x0200
+    private const val PTR_FLAGS_WHEEL_NEGATIVE = 0x0100
 
-import com.freerdp.freerdpcore.presentation.ApplicationSettingsActivity;
 
-public class Mouse {
-
-    private final static int PTRFLAGS_LBUTTON = 0x1000;
-    private final static int PTRFLAGS_RBUTTON = 0x2000;
-
-    private final static int PTRFLAGS_DOWN = 0x8000;
-    private final static int PTRFLAGS_MOVE = 0x0800;
-
-    private final static int PTRFLAGS_WHEEL = 0x0200;
-    private final static int PTRFLAGS_WHEEL_NEGATIVE = 0x0100;
-
-    public static int getLeftButtonEvent(Context context, boolean down) {
-        if (ApplicationSettingsActivity.getSwapMouseButtons(context)) {
-            return (PTRFLAGS_RBUTTON | (down ? PTRFLAGS_DOWN : 0));
-        } else {
-            return (PTRFLAGS_LBUTTON | (down ? PTRFLAGS_DOWN : 0));
-        }
+    @JvmStatic
+    fun getLeftButtonEvent(down: Boolean): Int {
+        return PTR_FLAGS_LEFT_BUTTON or if (down) PTR_FLAGS_DOWN else 0
     }
 
-    public static int getRightButtonEvent(Context context, boolean down) {
-        if (ApplicationSettingsActivity.getSwapMouseButtons(context)) {
-            return (PTRFLAGS_LBUTTON | (down ? PTRFLAGS_DOWN : 0));
-        } else {
-            return (PTRFLAGS_RBUTTON | (down ? PTRFLAGS_DOWN : 0));
-        }
+    @JvmStatic
+    fun getRightButtonEvent(down: Boolean): Int {
+        return PTR_FLAGS_RIGHT_BUTTON or if (down) PTR_FLAGS_DOWN else 0
     }
 
-    public static int getMoveEvent() {
-        return PTRFLAGS_MOVE;
+    @JvmStatic
+    fun getMoveEvent(): Int {
+        return PTR_FLAGS_MOVE
     }
 
-    public static int getScrollEvent(Context context, boolean down) {
-        int flags = PTRFLAGS_WHEEL;
-
-        // invert scrolling?
-        if (ApplicationSettingsActivity.getInvertScrolling(context)) {
-            down = !down;
-        }
-
-        if (down) {
-            flags |= (PTRFLAGS_WHEEL_NEGATIVE | 0x0088);
+    @JvmStatic
+    fun getScrollEvent(down: Boolean): Int {
+        var flags = PTR_FLAGS_WHEEL
+        flags = if (down) {
+            flags or (PTR_FLAGS_WHEEL_NEGATIVE or 0x0088)
         } else {
-            flags |= 0x0078;
+            flags or 0x0078
         }
-        return flags;
+        return flags
     }
 }

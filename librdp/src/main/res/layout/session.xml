@@ -13,7 +13,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- childs are specified bottom-up so that we have a correct z-order in our final layout -->
+    <!-- 子项自下而上指定，以便我们在最终布局中有正确的 z 顺序 -->
     <android.inputmethodservice.KeyboardView xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/extended_keyboard"
         android:layout_width="match_parent"
@@ -46,7 +46,6 @@
         android:id="@+id/touchPointerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/touch_pointer_default"
         android:visibility="visible" />
 
     <android.widget.ZoomControls

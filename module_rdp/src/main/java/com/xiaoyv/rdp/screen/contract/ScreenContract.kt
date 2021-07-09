@@ -1,11 +1,16 @@
 package com.xiaoyv.rdp.screen.contract
 
+import android.graphics.Bitmap
+import android.graphics.Point
 import android.net.Uri
 import com.freerdp.freerdpcore.domain.RdpConfig
 import com.freerdp.freerdpcore.domain.RdpSession
+import com.freerdp.freerdpcore.view.RdpPointerView
+import com.freerdp.freerdpcore.view.RdpSessionView
 import com.xiaoyv.busines.base.IBaseModel
 import com.xiaoyv.busines.base.IBasePresenter
 import com.xiaoyv.busines.base.IBaseView
+import com.xiaoyv.ui.scroll.FreeScrollView
 
 /**
  * RdpListContract
@@ -30,7 +35,26 @@ interface ScreenContract {
         fun v2pGetSession(empty: () -> Unit = {}, callback: (RdpSession) -> Unit)
         fun v2pSendDelayedMoveEvent(x: Int, y: Int)
         fun v2pCancelDelayedMoveEvent()
-         fun v2pFreeSession()
+        fun v2pFreeSession()
+        fun v2pAutoScrollPointer(
+            tpvPointer: RdpPointerView,
+            rsvSession: RdpSessionView,
+            rsvScroll: FreeScrollView
+        )
+
+        fun v2pProcessVirtualKey(virtualKeyCode: Int, down: Boolean)
+        fun v2pProcessUnicodeKey(unicodeKey: Int)
+        fun v2pTouchPointerMove(point: Point)
+        fun v2pTouchPointerRightClick(point: Point, down: Boolean)
+        fun v2pTouchPointerLeftClick(point: Point, down: Boolean)
+        fun v2pTouchPointerScroll(down: Boolean)
+        fun v2pGenericMotionScroll(vScroll: Float)
+        fun v2pSessionViewScroll(down: Boolean)
+        fun v2pSessionViewLeftTouch(x: Int, y: Int, down: Boolean, toggleMouseButtons: Boolean)
+        fun v2pSendClipboardData(data: String)
+        fun v2pGraphicsUpdate(
+            sessionView: RdpSessionView, bitmap: Bitmap, x: Int, y: Int, width: Int, height: Int
+        )
     }
 
     interface Model : IBaseModel {

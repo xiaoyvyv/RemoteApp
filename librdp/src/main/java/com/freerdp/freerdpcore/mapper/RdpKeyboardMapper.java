@@ -386,7 +386,6 @@ public class RdpKeyboardMapper {
 				if ((vkcode & KEY_FLAG_UNICODE) != 0)
 					listener.processUnicodeKey(vkcode & (~KEY_FLAG_UNICODE));
 					// if we got a valid vkcode send it - except for letters/numbers if a modifier is
-					// active
 				else if (vkcode > 0 &&
 						(event.getMetaState() & (KeyEvent.META_ALT_ON | KeyEvent.META_SHIFT_ON |
 								KeyEvent.META_SYM_ON)) == 0) {

@@ -230,7 +230,7 @@ public class FreeScrollView extends FrameLayout {
 
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        // Let the focused view and/or our descendants get the key first
+        // 让焦点视图和/或我们的后代先获得密钥
         boolean handled = super.dispatchKeyEvent(event);
         if (handled) {
             return true;

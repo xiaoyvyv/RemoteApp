@@ -21,7 +21,6 @@
             android:id="@+id/rsv_session"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clickable="true"
             android:drawingCacheQuality="low"
             android:focusable="true"
             android:focusableInTouchMode="true" />
@@ -29,11 +28,9 @@
     </com.xiaoyv.ui.scroll.FreeScrollView>
 
     <com.freerdp.freerdpcore.view.RdpPointerView
-        android:background="#6eff0000"
         android:id="@+id/tpv_pointer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/touch_pointer_default"
         android:visibility="visible" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

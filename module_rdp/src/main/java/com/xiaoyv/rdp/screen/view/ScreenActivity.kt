@@ -4,22 +4,25 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.graphics.Rect
+import android.graphics.Point
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.*
+import android.view.inputmethod.InputMethodManager
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.view.isInvisible
 import com.blankj.utilcode.util.*
 import com.freerdp.freerdpcore.application.RdpApp
 import com.freerdp.freerdpcore.domain.RdpConfig
 import com.freerdp.freerdpcore.domain.RdpSession
+import com.freerdp.freerdpcore.mapper.RdpKeyboardMapper
 import com.freerdp.freerdpcore.services.LibFreeRDP
 import com.freerdp.freerdpcore.services.UiEventListener
-import com.freerdp.freerdpcore.utils.Mouse
+import com.freerdp.freerdpcore.utils.ClipboardManagerProxy
 import com.freerdp.freerdpcore.view.RdpPointerView
 import com.freerdp.freerdpcore.view.RdpSessionView
 import com.xiaoyv.busines.base.BaseMvpActivity
@@ -31,6 +34,7 @@ import com.xiaoyv.rdp.screen.config.PinchZoomListener
 import com.xiaoyv.rdp.screen.contract.ScreenContract
 import com.xiaoyv.rdp.screen.presenter.ScreenPresenter
 import com.xiaoyv.ui.scroll.FreeScrollView
+import me.jessyan.autosize.internal.CancelAdapt
 
 
 /**
@@ -41,15 +45,27 @@ import com.xiaoyv.ui.scroll.FreeScrollView
  */
 class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     ScreenContract.View, UiEventListener, RdpSessionView.SessionViewListener,
-    FreeScrollView.ScrollView2DListener, RdpPointerView.TouchPointerListener {
+    FreeScrollView.ScrollView2DListener, RdpPointerView.TouchPointerListener, CancelAdapt,
+    ClipboardManagerProxy.OnClipboardChangedListener, RdpKeyboardMapper.KeyProcessingListener {
     private lateinit var binding: RdpActivityScreenBinding
+    private lateinit var loading: ScreenLoadingFragment
+    private lateinit var clipboardManager: ClipboardManagerProxy
+    private lateinit var rdpKeyboardMapper: RdpKeyboardMapper
+
     private val dlgVerifyCertificateLock = Object()
     private val dlgUserCredentialsLock = Object()
     private var rdpEntity: RdpEntity? = null
     private var rdpConfig: RdpConfig? = null
     private var callbackDialogResult = false
 
+    /**
+     * 是否由用户取消连接
+     */
     private var connectCancelledByUser = false
+
+    /**
+     * 手势操作是否交换鼠标左右键
+     */
     private var toggleMouseButtons = false
     private var screenLandscape = false
     private var rdpUri: Uri? = null
@@ -57,7 +73,6 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     private var rdpInstance: Long = -1
     private var bitmap: Bitmap? = null
 
-    private lateinit var loading: ScreenLoadingFragment
 
     /**
      * Rdp 事件监听
@@ -69,6 +84,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         onConnectionSuccess = {
             presenter.v2pGetSession { session ->
                 p2vBindSession(session)
+                rdpKeyboardMapper.reset(this@ScreenActivity)
             }
             p2vHideLoading()
         }
@@ -117,10 +133,16 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
             ScaleGestureDetector(this, PinchZoomListener(binding.rsvScroll, binding.rsvSession))
         )
         binding.rsvSession.setSessionViewListener(this)
+        binding.rsvSession.setTouchPointerPadding(
+            binding.tpvPointer.pointerWidth,
+            binding.tpvPointer.pointerHeight
+        )
         binding.rsvSession.requestFocus()
 
         binding.rsvScroll.setScrollViewListener(this)
         binding.tpvPointer.setTouchPointerListener(this)
+
+
     }
 
     override fun initBar() {
@@ -145,6 +167,12 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         // 注册 Rdp 事件广播接收器
         registerReceiver(rdpEventReceiver, IntentFilter(RdpApp.ACTION_EVENT_FREERDP))
 
+        clipboardManager = ClipboardManagerProxy.getClipboardManager(this)
+        clipboardManager.addClipboardChangedListener(this)
+
+        rdpKeyboardMapper = RdpKeyboardMapper()
+        rdpKeyboardMapper.init(this)
+        rdpKeyboardMapper.reset(this)
     }
 
     /**
@@ -158,7 +186,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
             // 加载中对话框
             loading = ScreenLoadingFragment.Builder()
                 .setTitle("远程桌面连接")
-                .setLoadingTitle(String.format("正在连接到：\n%s",rdpConfig?.hostname))
+                .setLoadingTitle(String.format("正在连接到：\n%s", rdpConfig?.hostname))
                 .setLoadingMessage("正在连接远程主机...")
                 .setCancel {
                     callbackDialogResult = false
@@ -210,7 +238,6 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         binding.rsvSession.onSurfaceChange(rdpSession)
         binding.rsvSession.requestFocus()
         binding.rsvScroll.requestLayout()
-//        rdpKeyboardMapper.reset(this)
 
         hideSystemUi()
     }
@@ -228,6 +255,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         if (screenLandscape) {
 
         } else {
+
         }
 
         hideSystemUi()
@@ -491,16 +519,9 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     }
 
     override fun onGraphicsUpdate(x: Int, y: Int, width: Int, height: Int) {
-        presenter.v2pGetSession { session ->
-            LibFreeRDP.updateGraphics(session.instance, bitmap!!, x, y, width, height)
-
-            binding.rsvSession.addInvalidRegion(Rect(x, y, x + width, y + height))
-
-            // 刷新 SessionView
-            ThreadUtils.runOnUiThread {
-                binding.rsvSession.invalidateRegion()
-            }
-        }
+        presenter.v2pGraphicsUpdate(
+            binding.rsvSession, bitmap ?: return, x, y, width, height
+        )
     }
 
     override fun onGraphicsResize(width: Int, height: Int, bpp: Int) {
@@ -546,9 +567,19 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         }
     }
 
+    /**
+     * 本地复制文本回调
+     */
+    override fun onLocalClipboardChanged(data: String) {
+        presenter.v2pSendClipboardData(data)
+    }
 
+    /**
+     * 远程主机复制文本回调
+     */
     override fun onRemoteClipboardChanged(data: String) {
-
+        // 将远程复制内容放到本地的剪切板上
+        clipboardManager.setLocalClipboardData(data)
     }
 
     /**
@@ -565,17 +596,10 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     override fun onSessionViewLeftTouch(x: Int, y: Int, down: Boolean) {
         if (!down) presenter.v2pCancelDelayedMoveEvent()
 
-        presenter.v2pGetSession { session ->
-            LibFreeRDP.sendCursorEvent(
-                session.instance, x, y,
-                if (toggleMouseButtons) Mouse.getRightButtonEvent(this, down)
-                else Mouse.getLeftButtonEvent(this, down)
-            )
-        }
+        presenter.v2pSessionViewLeftTouch(x, y, down, toggleMouseButtons)
 
         if (!down) toggleMouseButtons = false
     }
-
 
     override fun onSessionViewRightTouch(x: Int, y: Int, down: Boolean) {
         if (!down) toggleMouseButtons = !toggleMouseButtons
@@ -586,30 +610,18 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     }
 
     override fun onSessionViewScroll(down: Boolean) {
-        presenter.v2pGetSession { session ->
-            LibFreeRDP.sendCursorEvent(session.instance, 0, 0, Mouse.getScrollEvent(this, down))
-        }
+        presenter.v2pSessionViewScroll(down)
     }
 
+    /**
+     * 外部连接设备相关
+     */
     override fun onGenericMotionEvent(e: MotionEvent): Boolean {
         super.onGenericMotionEvent(e)
         when (e.action) {
             MotionEvent.ACTION_SCROLL -> {
                 val vScroll = e.getAxisValue(MotionEvent.AXIS_VSCROLL)
-                presenter.v2pGetSession { session ->
-                    if (vScroll < 0) {
-                        LibFreeRDP.sendCursorEvent(
-                            session.instance, 0, 0,
-                            Mouse.getScrollEvent(this, false)
-                        )
-                    }
-                    if (vScroll > 0) {
-                        LibFreeRDP.sendCursorEvent(
-                            session.instance, 0, 0,
-                            Mouse.getScrollEvent(this, true)
-                        )
-                    }
-                }
+                presenter.v2pGenericMotionScroll(vScroll)
             }
         }
         return true
@@ -619,34 +631,89 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
      * TouchPointerView 回调 ============================================================================
      */
     override fun onTouchPointerClose() {
-
+        binding.tpvPointer.isInvisible = true
+        binding.rsvSession.setTouchPointerPadding(0, 0)
     }
 
     override fun onTouchPointerLeftClick(x: Int, y: Int, down: Boolean) {
-
+        presenter.v2pTouchPointerLeftClick(mapScreenPositionToSession(x, y), down)
     }
 
     override fun onTouchPointerRightClick(x: Int, y: Int, down: Boolean) {
-
+        presenter.v2pTouchPointerRightClick(mapScreenPositionToSession(x, y), down)
     }
 
     override fun onTouchPointerMove(x: Int, y: Int) {
-
+        presenter.v2pTouchPointerMove(mapScreenPositionToSession(x, y))
+        // 边缘自动往中心滚动
+        presenter.v2pAutoScrollPointer(binding.tpvPointer, binding.rsvSession, binding.rsvScroll)
     }
 
     override fun onTouchPointerScroll(down: Boolean) {
-
+        presenter.v2pTouchPointerScroll(down)
     }
 
     override fun onTouchPointerToggleKeyboard() {
-
+        KeyboardUtils.toggleSoftInput()
     }
 
     override fun onTouchPointerToggleExtKeyboard() {
-
+//        showKeyboard(false, !extKeyboardVisible)
     }
 
     override fun onTouchPointerResetScrollZoom() {
+        binding.rsvSession.zoom = 1.0f
+        binding.rsvScroll.scrollTo(0, 0)
+    }
+
+    private fun mapScreenPositionToSession(x: Int, y: Int): Point {
+        var mappedX = ((x + binding.rsvScroll.scrollX).toFloat() / binding.rsvSession.zoom).toInt()
+        var mappedY = ((y + binding.rsvScroll.scrollY).toFloat() / binding.rsvSession.zoom).toInt()
+        bitmap?.let {
+            if (mappedX > it.width) mappedX = it.width
+            if (mappedY > it.height) mappedY = it.height
+        }
+        return Point(mappedX, mappedY)
+    }
+
+    /**
+     * Android 键盘输入处理
+     *
+     * 我们总是使用 unicode 值来处理来自 android 键盘的输入，除非按键修饰符（如 Win、Alt、Ctrl）被激活。
+     *
+     * 在这种情况下，我们将发送虚拟键代码以允许组合键（如 Win + E 打开资源管理器）。
+     */
+    override fun onKeyDown(keycode: Int, event: KeyEvent): Boolean {
+        return rdpKeyboardMapper.processAndroidKeyEvent(event)
+    }
+
+    override fun onKeyUp(keycode: Int, event: KeyEvent): Boolean {
+        return rdpKeyboardMapper.processAndroidKeyEvent(event)
+    }
+
+    /**
+     * onKeyMultiple 用于输入一些特殊字符，如变音符号和一些符号字符
+     */
+    override fun onKeyMultiple(keyCode: Int, repeatCount: Int, event: KeyEvent?): Boolean {
+        return rdpKeyboardMapper.processAndroidKeyEvent(event)
+    }
+
+    /**
+     * RdpKeyboardMapper 回调 ============================================================================
+     */
+    override fun processVirtualKey(virtualKeyCode: Int, down: Boolean) {
+        presenter.v2pProcessVirtualKey(virtualKeyCode, down)
+    }
+
+    override fun processUnicodeKey(unicodeKey: Int) {
+        presenter.v2pProcessUnicodeKey(unicodeKey)
+    }
+
+    override fun switchKeyboard(keyboardType: Int) {
+
+    }
+
+    override fun modifiersChanged() {
 
     }
 
@@ -668,6 +735,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     override fun p2vHideLoading() {
         loading.dismiss()
     }
+
 
     /**
      * 各种原因导致连接关闭
@@ -706,5 +774,6 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
             })
         }
     }
+
 
 }

@@ -13,7 +13,6 @@ import com.blankj.utilcode.util.LogUtils
 import com.blankj.utilcode.util.PathUtils
 import com.freerdp.freerdpcore.application.RdpApp
 import com.freerdp.freerdpcore.domain.RdpConfig
-import com.freerdp.freerdpcore.utils.orEmpty
 
 object LibFreeRDP {
     const val TAG = "LibFreeRDP"
@@ -331,4 +330,6 @@ object LibFreeRDP {
             }
         }
     }
+
+    private fun Long?.orEmpty() = this ?: 0L
 }

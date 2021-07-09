@@ -22,6 +22,7 @@ import com.xiaoyv.ui.status.ContentStatusView;
 import java.util.List;
 
 import me.jessyan.autosize.AutoSizeCompat;
+import me.jessyan.autosize.internal.CancelAdapt;
 
 /**
  * BaseActivity
@@ -84,6 +85,9 @@ public abstract class BaseActivity extends AppCompatActivity implements IBaseVie
 
     @Override
     public Resources getResources() {
+        if (this instanceof CancelAdapt) {
+            return super.getResources();
+        }
         Resources resources = super.getResources();
         // 解决 AutoSize 横屏时对话框显示状态，切后台再切回前台导致的适配失效问题
         runOnUiThread(() -> AutoSizeCompat.autoConvertDensity(resources, BaseApp.MAX_WIDTH_DP, !ScreenUtils.isLandscape()));

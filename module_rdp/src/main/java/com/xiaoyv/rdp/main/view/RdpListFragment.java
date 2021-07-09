@@ -10,6 +10,7 @@ import com.blankj.utilcode.util.ObjectUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 import com.drakeet.multitype.MultiTypeAdapter;
+import com.freerdp.freerdpcore.presentation.SessionActivity;
 import com.google.android.material.tabs.TabLayout;
 import com.xiaoyv.busines.base.BaseMvpFragment;
 import com.xiaoyv.busines.base.BaseSubscriber;
@@ -103,6 +104,7 @@ public class RdpListFragment extends BaseMvpFragment<RdpListContract.View, RdpLi
                     // 连接
                     case 0:
                         ScreenActivity.openSelf(new RdpEntity());
+//                        ActivityUtils.startActivity(SessionActivity.class);
                         break;
                     // 编辑
                     case 1:

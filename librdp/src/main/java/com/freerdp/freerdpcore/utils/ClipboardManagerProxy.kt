@@ -1,67 +1,61 @@
-package com.freerdp.freerdpcore.utils;
+package com.freerdp.freerdpcore.utils
 
-import android.annotation.TargetApi;
-import android.content.ClipData;
-import android.content.ClipboardManager;
-import android.content.Context;
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.ClipboardManager.OnPrimaryClipChangedListener
+import android.content.Context
 
-public abstract class ClipboardManagerProxy {
+abstract class ClipboardManagerProxy {
+    abstract fun setLocalClipboardData(data: String)
+    abstract fun addClipboardChangedListener(listener: OnClipboardChangedListener?)
+    abstract fun removeClipboardboardChangedListener(listener: OnClipboardChangedListener?)
 
-    public static ClipboardManagerProxy getClipboardManager(Context ctx) {
-		return new HCClipboardManager(ctx);
+    interface OnClipboardChangedListener {
+        fun onLocalClipboardChanged(data: String)
     }
 
-    public abstract void setClipboardData(String data);
+    private class HCClipboardManager(context: Context) : ClipboardManagerProxy(),
+        OnPrimaryClipChangedListener {
 
-    public abstract void addClipboardChangedListener(OnClipboardChangedListener listener);
+        private val mClipboardManager: ClipboardManager =
+            context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
-    public abstract void removeClipboardboardChangedListener(OnClipboardChangedListener listener);
+        private var mListener: OnClipboardChangedListener? = null
 
-    public interface OnClipboardChangedListener {
-        void onClipboardChanged(String data);
-    }
-
-    @TargetApi(11)
-    private static class HCClipboardManager
-            extends ClipboardManagerProxy implements ClipboardManager.OnPrimaryClipChangedListener {
-        private final ClipboardManager mClipboardManager;
-        private OnClipboardChangedListener mListener;
-
-        public HCClipboardManager(Context ctx) {
-            mClipboardManager = (ClipboardManager) ctx.getSystemService(Context.CLIPBOARD_SERVICE);
-        }
-
-        @Override
-        public void setClipboardData(String data) {
+        override fun setLocalClipboardData(data: String) {
             mClipboardManager.setPrimaryClip(
-                    ClipData.newPlainText("rdp-clipboard", data == null ? "" : data));
+                ClipData.newPlainText("rdp-clipboard", data ?: "")
+            )
         }
 
-        @Override
-        public void onPrimaryClipChanged() {
-            ClipData clip = mClipboardManager.getPrimaryClip();
-            String data = null;
-
-            if (clip != null && clip.getItemCount() > 0) {
-                CharSequence cs = clip.getItemAt(0).getText();
-                if (cs != null)
-                    data = cs.toString();
-            }
-            if (mListener != null) {
-                mListener.onClipboardChanged(data);
+        override fun onPrimaryClipChanged() {
+            mClipboardManager.primaryClip?.let {
+                if (it.itemCount > 0) {
+                    val firstItem = it.getItemAt(0).text
+                    firstItem?.toString()?.let { copyText ->
+                        mListener?.onLocalClipboardChanged(copyText)
+                    }
+                }
             }
         }
 
-        @Override
-        public void addClipboardChangedListener(OnClipboardChangedListener listener) {
-            mListener = listener;
-            mClipboardManager.addPrimaryClipChangedListener(this);
+        override fun addClipboardChangedListener(listener: OnClipboardChangedListener?) {
+            mListener = listener
+            mClipboardManager.addPrimaryClipChangedListener(this)
         }
 
-        @Override
-        public void removeClipboardboardChangedListener(OnClipboardChangedListener listener) {
-            mListener = null;
-            mClipboardManager.removePrimaryClipChangedListener(this);
+        override fun removeClipboardboardChangedListener(listener: OnClipboardChangedListener?) {
+            mListener = null
+            mClipboardManager.removePrimaryClipChangedListener(this)
+        }
+
+    }
+
+    companion object {
+
+        @JvmStatic
+        fun getClipboardManager(ctx: Context): ClipboardManagerProxy {
+            return HCClipboardManager(ctx)
         }
     }
 }
