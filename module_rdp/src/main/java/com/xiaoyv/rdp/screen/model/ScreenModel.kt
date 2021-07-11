@@ -38,7 +38,6 @@ class ScreenModel : ScreenContract.Model {
                         }
                         // 竖屏用长边作为高，然后 长:宽 = 16:10
                         else {
-                            ToastUtils.showShort("16:10")
                             val screenMax: Int = max(screenWidth, screenHeight)
                             screenSettings.width = (screenMax.toFloat() * 1.6f).toInt()
                             screenSettings.height = screenMax

@@ -10,27 +10,26 @@ import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.view.*
-import android.view.inputmethod.InputMethodManager
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.WindowInsetsControllerCompat
-import androidx.core.view.isInvisible
+import androidx.core.view.*
 import com.blankj.utilcode.util.*
 import com.freerdp.freerdpcore.application.RdpApp
 import com.freerdp.freerdpcore.domain.RdpConfig
 import com.freerdp.freerdpcore.domain.RdpSession
 import com.freerdp.freerdpcore.mapper.RdpKeyboardMapper
 import com.freerdp.freerdpcore.services.LibFreeRDP
-import com.freerdp.freerdpcore.services.UiEventListener
+import com.freerdp.freerdpcore.services.LibRdpUiEventListener
 import com.freerdp.freerdpcore.utils.ClipboardManagerProxy
 import com.freerdp.freerdpcore.view.RdpPointerView
 import com.freerdp.freerdpcore.view.RdpSessionView
+import com.hijamoya.keyboardview.Keyboard
 import com.xiaoyv.busines.base.BaseMvpActivity
 import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.busines.room.entity.RdpEntity
+import com.xiaoyv.rdp.R
 import com.xiaoyv.rdp.databinding.RdpActivityScreenBinding
-import com.xiaoyv.rdp.screen.config.LibFreeRDPBroadcastReceiver
-import com.xiaoyv.rdp.screen.config.PinchZoomListener
+import com.xiaoyv.rdp.screen.config.RdpBroadcastReceiver
+import com.xiaoyv.rdp.screen.config.RdpKeyboardActionListener
+import com.xiaoyv.rdp.screen.config.RdpScreenZoomListener
 import com.xiaoyv.rdp.screen.contract.ScreenContract
 import com.xiaoyv.rdp.screen.presenter.ScreenPresenter
 import com.xiaoyv.ui.scroll.FreeScrollView
@@ -44,13 +43,19 @@ import me.jessyan.autosize.internal.CancelAdapt
  * @since 2020/12/02
  */
 class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
-    ScreenContract.View, UiEventListener, RdpSessionView.SessionViewListener,
+    ScreenContract.View, LibRdpUiEventListener, RdpSessionView.SessionViewListener,
     FreeScrollView.ScrollView2DListener, RdpPointerView.TouchPointerListener, CancelAdapt,
-    ClipboardManagerProxy.OnClipboardChangedListener, RdpKeyboardMapper.KeyProcessingListener {
+    ClipboardManagerProxy.OnClipboardChangedListener, RdpKeyboardMapper.KeyProcessingListener,
+    RdpKeyboardActionListener {
     private lateinit var binding: RdpActivityScreenBinding
     private lateinit var loading: ScreenLoadingFragment
     private lateinit var clipboardManager: ClipboardManagerProxy
     private lateinit var rdpKeyboardMapper: RdpKeyboardMapper
+
+    private lateinit var modifiersKeyboard: Keyboard
+    private lateinit var cursorKeyboard: Keyboard
+    private lateinit var numberPadKeyboard: Keyboard
+    private lateinit var specialKeyboard: Keyboard
 
     private val dlgVerifyCertificateLock = Object()
     private val dlgUserCredentialsLock = Object()
@@ -68,20 +73,31 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
      */
     private var toggleMouseButtons = false
     private var screenLandscape = false
+    private var connectSuccess = false
+
+    /**
+     * Rdp
+     */
     private var rdpUri: Uri? = null
-
     private var rdpInstance: Long = -1
-    private var bitmap: Bitmap? = null
+    private var rdpBitmap: Bitmap? = null
 
+    /**
+     * 根布局宽高
+     */
+    private var rootViewWidth = 0
+    private var rootViewHeight = 0
 
     /**
      * Rdp 事件监听
      */
-    private val rdpEventReceiver = LibFreeRDPBroadcastReceiver().apply {
+    private val rdpEventReceiver = RdpBroadcastReceiver().apply {
         /**
          * 连接成功
          */
         onConnectionSuccess = {
+            connectSuccess = true
+
             presenter.v2pGetSession { session ->
                 p2vBindSession(session)
                 rdpKeyboardMapper.reset(this@ScreenActivity)
@@ -92,22 +108,38 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
          * 连接异常
          */
         onConnectionFailure = {
+            connectSuccess = false
+
             presenter.v2pCancelDelayedMoveEvent()
 
             p2vHideLoading()
             vSessionClose(RESULT_CANCELED)
         }
+
         /**
          * 连接正常退出
          */
         onDisconnected = {
+            connectSuccess = false
+
             presenter.v2pCancelDelayedMoveEvent()
             presenter.v2pGetSession { session ->
-                session.uiEventListener = null
+                session.libRdpUiEventListener = null
             }
 
             p2vHideLoading()
             vSessionClose(RESULT_OK)
+        }
+    }
+
+    /**
+     * 软键盘打开关闭监听
+     */
+    private val keyBoardListener = KeyboardUtils.OnSoftInputChangedListener {
+        if (it > 0) {
+            vOnSoftKeyBoardShow()
+        } else {
+            vOnSoftKeyBoardClose()
         }
     }
 
@@ -128,21 +160,14 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     }
 
     override fun initView() {
-
         binding.rsvSession.setScaleGestureDetector(
-            ScaleGestureDetector(this, PinchZoomListener(binding.rsvScroll, binding.rsvSession))
+            ScaleGestureDetector(this, RdpScreenZoomListener(binding.rsvScroll, binding.rsvSession))
         )
-        binding.rsvSession.setSessionViewListener(this)
         binding.rsvSession.setTouchPointerPadding(
             binding.tpvPointer.pointerWidth,
             binding.tpvPointer.pointerHeight
         )
         binding.rsvSession.requestFocus()
-
-        binding.rsvScroll.setScrollViewListener(this)
-        binding.tpvPointer.setTouchPointerListener(this)
-
-
     }
 
     override fun initBar() {
@@ -168,11 +193,39 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         registerReceiver(rdpEventReceiver, IntentFilter(RdpApp.ACTION_EVENT_FREERDP))
 
         clipboardManager = ClipboardManagerProxy.getClipboardManager(this)
-        clipboardManager.addClipboardChangedListener(this)
+
+        modifiersKeyboard = Keyboard(applicationContext, R.xml.rdp_keyboard_modifiers)
+        cursorKeyboard = Keyboard(applicationContext, R.xml.rdp_keyboard_cursor)
+        numberPadKeyboard = Keyboard(applicationContext, R.xml.rdp_keyboard_numpad)
+        specialKeyboard = Keyboard(applicationContext, R.xml.rdp_keyboard_specialkeys)
+
+        // 扩展键盘
+        binding.keyboardSpecial.keyboard = specialKeyboard
+        binding.keyboardSpecial.setOnKeyboardActionListener(this)
+
+        // 扩展修饰符键盘（ctrl|win|alt...）
+        binding.keyboardHeader.keyboard = modifiersKeyboard
+        binding.keyboardHeader.setOnKeyboardActionListener(this)
 
         rdpKeyboardMapper = RdpKeyboardMapper()
         rdpKeyboardMapper.init(this)
+    }
+
+    override fun initListener() {
+        binding.root.doOnLayout {
+            rootViewWidth = binding.root.width
+            rootViewHeight = binding.root.height
+        }
+
+        binding.rsvSession.setSessionViewListener(this)
+        binding.rsvScroll.setScrollViewListener(this)
+        binding.tpvPointer.setTouchPointerListener(this)
+
+        clipboardManager.addClipboardChangedListener(this)
         rdpKeyboardMapper.reset(this)
+
+        // 注册软键盘打开关闭监听
+        KeyboardUtils.registerSoftInputChangedListener(this, keyBoardListener)
     }
 
     /**
@@ -182,6 +235,8 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         binding.root.post {
             // 在 UI 绘制完才开始准备连接，否则屏幕宽度高度信息不准确
             vProcessArgument()
+
+            LogUtils.e(GsonUtils.toJson(rdpConfig))
 
             // 加载中对话框
             loading = ScreenLoadingFragment.Builder()
@@ -214,21 +269,26 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
                 } ?: vSessionClose(RESULT_CANCELED)
             }
             rdpEntity != null -> {
-                rdpConfig = RdpConfig().also {
+                // 获取配置信息
+                rdpConfig =
+                    GsonUtils.fromJson(rdpEntity!!.configStr.orEmpty(), RdpConfig::class.java)
+                rdpConfig?.also {
                     presenter.v2pConnectWithConfig(it)
-                }
+                } ?: vSessionClose(RESULT_CANCELED)
             }
             else -> {
                 // 其他则结束对话
-                vSessionClose(RESULT_OK)
+                vSessionClose(RESULT_CANCELED)
             }
         }
     }
 
+    override fun p2vGetRootParam(): Pair<Int, Int> = Pair(rootViewWidth, rootViewHeight)
+
     override fun p2vScreenLandscape() = screenLandscape
 
     override fun p2vStartConnect(rdpSession: RdpSession): RdpSession {
-        rdpSession.uiEventListener = this
+        rdpSession.libRdpUiEventListener = this
         // 配置广播当前 session
         rdpEventReceiver.currentInstance = rdpSession.instance
         return rdpSession
@@ -240,6 +300,8 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         binding.rsvScroll.requestLayout()
 
         hideSystemUi()
+
+        binding.tpvPointer.isVisible = true
     }
 
     override fun onScrollChanged(
@@ -248,9 +310,19 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
 
     }
 
-
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
+
+        // 重新加载键盘资源（从横向更改）
+        modifiersKeyboard = Keyboard(applicationContext, R.xml.rdp_keyboard_modifiers)
+        cursorKeyboard = Keyboard(applicationContext, R.xml.rdp_keyboard_cursor)
+        numberPadKeyboard = Keyboard(applicationContext, R.xml.rdp_keyboard_numpad)
+        specialKeyboard = Keyboard(applicationContext, R.xml.rdp_keyboard_specialkeys)
+
+        // 应用加载的键盘
+        binding.keyboardSpecial.keyboard = specialKeyboard
+        binding.keyboardHeader.keyboard = modifiersKeyboard
+
         screenLandscape = newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE
         if (screenLandscape) {
 
@@ -520,18 +592,18 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
 
     override fun onGraphicsUpdate(x: Int, y: Int, width: Int, height: Int) {
         presenter.v2pGraphicsUpdate(
-            binding.rsvSession, bitmap ?: return, x, y, width, height
+            binding.rsvSession, rdpBitmap ?: return, x, y, width, height
         )
     }
 
     override fun onGraphicsResize(width: Int, height: Int, bpp: Int) {
         presenter.v2pGetSession { session ->
             // 设置位图
-            bitmap = if (bpp > 16) Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            rdpBitmap = if (bpp > 16) Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
             else Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
 
             // 设置画面
-            session.surface = BitmapDrawable(resources, bitmap)
+            session.surface = BitmapDrawable(resources, rdpBitmap)
 
             // UI线程更新画面
             ThreadUtils.runOnUiThread {
@@ -545,11 +617,11 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     override fun onSettingsChanged(width: Int, height: Int, bpp: Int) {
         presenter.v2pGetSession { session ->
             // 设置 Bitmap 色彩深度
-            bitmap = if (bpp > 16) Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
+            rdpBitmap = if (bpp > 16) Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
             else Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
 
             // 配置画面
-            session.surface = BitmapDrawable(resources, bitmap)
+            session.surface = BitmapDrawable(resources, rdpBitmap)
 
             // 判断远程自己是否自动调整了分辨率和色彩配置
             val settings = session.rdpConfig?.screenSettings ?: return@v2pGetSession
@@ -628,6 +700,24 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     }
 
     /**
+     * 软键盘打开回调
+     */
+    override fun vOnSoftKeyBoardShow() {
+        if (connectSuccess) {
+            binding.keyboardHeader.isVisible = true
+        }
+    }
+
+    /**
+     * 软键盘打开关闭
+     */
+    override fun vOnSoftKeyBoardClose() {
+        if (!binding.keyboardSpecial.isVisible) {
+            binding.keyboardHeader.isVisible = false
+        }
+    }
+
+    /**
      * TouchPointerView 回调 ============================================================================
      */
     override fun onTouchPointerClose() {
@@ -654,11 +744,22 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     }
 
     override fun onTouchPointerToggleKeyboard() {
+        if (binding.keyboardSpecial.isVisible) {
+            binding.keyboardSpecial.isVisible = false
+        }
+
         KeyboardUtils.toggleSoftInput()
     }
 
     override fun onTouchPointerToggleExtKeyboard() {
-//        showKeyboard(false, !extKeyboardVisible)
+        KeyboardUtils.hideSoftInput(this)
+        if (binding.keyboardSpecial.isVisible) {
+            binding.keyboardSpecial.isVisible = false
+            binding.keyboardHeader.isVisible = false
+        } else {
+            binding.keyboardSpecial.isVisible = true
+            binding.keyboardHeader.isVisible = true
+        }
     }
 
     override fun onTouchPointerResetScrollZoom() {
@@ -669,7 +770,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     private fun mapScreenPositionToSession(x: Int, y: Int): Point {
         var mappedX = ((x + binding.rsvScroll.scrollX).toFloat() / binding.rsvSession.zoom).toInt()
         var mappedY = ((y + binding.rsvScroll.scrollY).toFloat() / binding.rsvSession.zoom).toInt()
-        bitmap?.let {
+        rdpBitmap?.let {
             if (mappedX > it.width) mappedX = it.width
             if (mappedY > it.height) mappedY = it.height
         }
@@ -699,6 +800,14 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     }
 
     /**
+     * KeyBoardView 回调 =================================================================================
+     */
+    override fun onKey(primaryCode: Int, keyCodes: IntArray) {
+        rdpKeyboardMapper.processCustomKeyEvent(primaryCode)
+    }
+
+
+    /**
      * RdpKeyboardMapper 回调 ============================================================================
      */
     override fun processVirtualKey(virtualKeyCode: Int, down: Boolean) {
@@ -710,13 +819,42 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     }
 
     override fun switchKeyboard(keyboardType: Int) {
-
+        when (keyboardType) {
+            RdpKeyboardMapper.KEYBOARD_TYPE_FUNCTIONKEYS ->
+                binding.keyboardSpecial.keyboard = specialKeyboard
+            RdpKeyboardMapper.KEYBOARD_TYPE_NUMPAD ->
+                binding.keyboardSpecial.keyboard = numberPadKeyboard
+            RdpKeyboardMapper.KEYBOARD_TYPE_CURSOR ->
+                binding.keyboardSpecial.keyboard = cursorKeyboard
+        }
     }
 
     override fun modifiersChanged() {
+        // 检查键码列表中是否有任何键
+        val keys: List<Keyboard.Key> = modifiersKeyboard.keys
+        for (curKey in keys) {
+            // 如果键是粘滞键 - 只需将其设置为关闭
+            if (curKey.sticky) {
+                when (rdpKeyboardMapper.getModifierState(curKey.codes[0])) {
+                    RdpKeyboardMapper.KEYSTATE_ON -> {
+                        curKey.on = true
+                        curKey.pressed = false
+                    }
+                    RdpKeyboardMapper.KEYSTATE_OFF -> {
+                        curKey.on = false
+                        curKey.pressed = false
+                    }
+                    RdpKeyboardMapper.KEYSTATE_LOCKED -> {
+                        curKey.on = true
+                        curKey.pressed = true
+                    }
+                }
+            }
+        }
 
+        // 刷新
+        binding.keyboardHeader.invalidateAllKeys()
     }
-
 
     override fun p2vShowLoading() {
         loading.show(supportFragmentManager)
@@ -759,6 +897,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
 
     override fun onDestroy() {
         unregisterReceiver(rdpEventReceiver)
+        KeyboardUtils.unregisterSoftInputChangedListener(window)
         presenter.v2pFreeSession()
         super.onDestroy()
     }
@@ -774,6 +913,5 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
             })
         }
     }
-
 
 }

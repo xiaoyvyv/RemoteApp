@@ -109,6 +109,8 @@ ext {
     poiVersion = '2.6.12'
     // 今日头条屏幕适配
     autoSizeVersion = '1.2.1'
+    keyboardVersion = '0.0.3'
+    buttonVersion = '0.0.3@aar'
 
 }
 

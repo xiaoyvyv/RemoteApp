@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  特殊键键盘布局
+  F1  F2  F3  F4  F5  F6
+  F7  F8  F9  F10 F11 F12
+  cur TAB INS HOM PgUp Win
+  123 Prt DEL END PgDn Ctx
+-->
+
+<Keyboard xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:keyHeight="@dimen/key_height"
+    app:horizontalGap="@dimen/ui_size_0"
+    app:verticalGap="@dimen/ui_size_0"
+    app:keyWidth="16.6%p">
+
+    <Row>
+        <Key
+            app:codes="@integer/keycode_F1"
+            app:keyEdgeFlags="left"
+            app:keyLabel="F1" />
+        <Key
+            app:codes="@integer/keycode_F2"
+            app:keyLabel="F2" />
+        <Key
+            app:codes="@integer/keycode_F3"
+            app:keyLabel="F3" />
+        <Key
+            app:codes="@integer/keycode_F4"
+            app:keyLabel="F4" />
+        <Key
+            app:codes="@integer/keycode_F5"
+            app:keyLabel="F5" />
+        <Key
+            app:codes="@integer/keycode_F6"
+            app:keyEdgeFlags="right"
+            app:keyLabel="F6" />
+    </Row>
+
+    <Row>
+        <Key
+            app:codes="@integer/keycode_F7"
+            app:keyEdgeFlags="left"
+            app:keyLabel="F7" />
+        <Key
+            app:codes="@integer/keycode_F8"
+            app:keyLabel="F8" />
+        <Key
+            app:codes="@integer/keycode_F9"
+            app:keyLabel="F9" />
+        <Key
+            app:codes="@integer/keycode_F10"
+            app:keyLabel="F10" />
+        <Key
+            app:codes="@integer/keycode_F11"
+            app:keyLabel="F11" />
+        <Key
+            app:codes="@integer/keycode_F12"
+            app:keyEdgeFlags="right"
+            app:keyLabel="F12" />
+    </Row>
+
+    <Row>
+        <Key
+            app:codes="@integer/keycode_cursor_keyboard"
+            app:keyEdgeFlags="left"
+            app:keyIcon="@drawable/rdp_keyboard_icon_arrows" />
+        <Key
+            app:codes="@integer/keycode_tab"
+            app:keyLabel="Tab" />
+        <Key
+            app:codes="@integer/keycode_insert"
+            app:keyLabel="Ins" />
+        <Key
+            app:codes="@integer/keycode_home"
+            app:keyLabel="Hom" />
+        <Key
+            app:codes="@integer/keycode_pgup"
+            app:keyLabel="PgUp" />
+        <Key
+            app:codes="@integer/keycode_win"
+            app:keyEdgeFlags="right"
+            app:keyIcon="@drawable/rdp_keyboard_icon_windows" />
+    </Row>
+
+    <Row app:rowEdgeFlags="bottom">
+        <Key
+            app:codes="@integer/keycode_numpad_keyboard"
+            app:keyEdgeFlags="left"
+            app:keyLabel="123" />
+        <Key
+            app:codes="@integer/keycode_print"
+            app:keyLabel="Print" />
+        <Key
+            app:codes="@integer/keycode_delete"
+            app:keyLabel="Del" />
+        <Key
+            app:codes="@integer/keycode_end"
+            app:keyLabel="End" />
+        <Key
+            app:codes="@integer/keycode_pgdn"
+            app:keyLabel="PgDn" />
+        <Key
+            app:codes="@integer/keycode_menu"
+            app:keyEdgeFlags="right"
+            app:keyIcon="@drawable/rdp_keyboard_icon_menu" />
+    </Row>
+</Keyboard>
+    

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.xiaoyv.ui.setting.UiSettingScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    app:ui_sp="TEMP">
+
+    <com.xiaoyv.ui.setting.item.UiSettingListView
+        android:id="@+id/slv_color"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ui_title="@string/settings_colors"
+        app:ui_value_desc_list="@array/colors_array"
+        app:ui_value_list="@array/colors_values_array" />
+
+    <com.xiaoyv.ui.setting.item.UiSettingListView
+        android:id="@+id/slv_resolution"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ui_title="@string/settings_resolution"
+        app:ui_value_desc_list="@array/resolutions_array"
+        app:ui_value_list="@array/resolutions_values_array" />
+
+    <com.xiaoyv.ui.setting.item.UiSettingInputView
+        android:id="@+id/siv_width"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ui_title="@string/settings_width" />
+
+    <com.xiaoyv.ui.setting.item.UiSettingInputView
+        android:id="@+id/siv_height"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:ui_title="@string/settings_height" />
+
+</com.xiaoyv.ui.setting.UiSettingScreen>

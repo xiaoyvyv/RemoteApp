@@ -1,5 +1,6 @@
 package com.freerdp.freerdpcore.domain
 
+import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.ScreenUtils
 import java.io.Serializable
 
@@ -10,6 +11,7 @@ import java.io.Serializable
  * @since 2021/07/03
  **/
 class RdpConfig : Serializable {
+
     var screenSettings: ActiveScreenSettings = ActiveScreenSettings()
     var advancedSettings: AdvancedSettings = AdvancedSettings()
     var debugSettings: DebugSettings = DebugSettings()
@@ -17,8 +19,8 @@ class RdpConfig : Serializable {
     var gatewaySettings: GatewaySettings = GatewaySettings()
 
     var enableGatewaySettings: Boolean = false
-    var clientName: String = "客户端"
-    var hostname: String = "192.168.31.202"
+    var clientName: String = "Windows 远程桌面"
+    var hostname: String = ""
     var port: Int = 3389
     var certName: String = ""
     var username: String = "Administrator"
@@ -26,10 +28,12 @@ class RdpConfig : Serializable {
     var password: String = ""
     var label: String = ""
 
+    fun toJson(): String = GsonUtils.toJson(this)
+
     /**
      * 视频设置
      */
-    class ActiveScreenSettings {
+    class ActiveScreenSettings : Serializable {
         private var resolution = AUTOMATIC
             get() {
                 when (field) {
@@ -50,7 +54,7 @@ class RdpConfig : Serializable {
                 return field
             }
 
-        var width = ScreenUtils.getScreenWidth()
+        var width = 0
             get() {
                 if (field <= 0 || field > 65536) {
                     field = 1024
@@ -58,7 +62,7 @@ class RdpConfig : Serializable {
                 return field
             }
 
-        var height = ScreenUtils.getScreenHeight()
+        var height = 0
             get() {
                 if (field <= 0 || field > 65536) {
                     field = 768
@@ -146,7 +150,7 @@ class RdpConfig : Serializable {
     /**
      * 高级设置
      */
-    class AdvancedSettings {
+    class AdvancedSettings : Serializable {
         var remoteProgram: String = ""
         var workDir: String = ""
         var consoleMode: Boolean = false
@@ -177,7 +181,7 @@ class RdpConfig : Serializable {
     /**
      * 调试设置
      */
-    class DebugSettings {
+    class DebugSettings : Serializable {
         var debugLevel = "TRACE"
             get() {
                 for (level in levels) {
@@ -203,7 +207,7 @@ class RdpConfig : Serializable {
     /**
      * 性能设置
      */
-    class PerformanceSettings {
+    class PerformanceSettings : Serializable {
         var remoteFx = true
         var gfx = true
         var h264 = true
@@ -218,7 +222,7 @@ class RdpConfig : Serializable {
     /**
      * 网关设置
      */
-    class GatewaySettings {
+    class GatewaySettings : Serializable {
         var hostname: String = ""
         var port: Int = 443
         var username: String = ""

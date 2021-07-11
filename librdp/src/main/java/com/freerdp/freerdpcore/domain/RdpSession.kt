@@ -3,7 +3,7 @@ package com.freerdp.freerdpcore.domain
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
 import com.freerdp.freerdpcore.services.LibFreeRDP
-import com.freerdp.freerdpcore.services.UiEventListener
+import com.freerdp.freerdpcore.services.LibRdpUiEventListener
 
 /**
  * RdpSession
@@ -16,7 +16,7 @@ class RdpSession {
     var rdpConfig: RdpConfig? = null
     var rdpUri: Uri? = null
     var surface: BitmapDrawable? = null
-    var uiEventListener: UiEventListener? = null
+    var libRdpUiEventListener: LibRdpUiEventListener? = null
 
     constructor(instance: Long, config: RdpConfig) {
         this.instance = instance

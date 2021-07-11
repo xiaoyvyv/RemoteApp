@@ -15,8 +15,8 @@ import com.blankj.utilcode.util.NetworkUtils;
 import com.blankj.utilcode.util.Utils;
 import com.freerdp.freerdpcore.domain.RdpConfig;
 import com.freerdp.freerdpcore.domain.RdpSession;
-import com.freerdp.freerdpcore.presentation.ApplicationSettingsActivity;
-import com.freerdp.freerdpcore.services.EventListener;
+import com.freerdp.freerdpcore.services.LibRdpSettings;
+import com.freerdp.freerdpcore.services.LibRdpEventListener;
 import com.freerdp.freerdpcore.services.LibFreeRDP;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class RdpApp implements EventListener {
+public class RdpApp implements LibRdpEventListener {
     private static volatile RdpApp globalApp;
 
     /**
@@ -58,8 +58,7 @@ public class RdpApp implements EventListener {
      */
     public static final int FREERDP_EVENT_DISCONNECTED = 4;
 
-
-    public static boolean ConnectedToMobileWork = false;
+    public static boolean IS_MOBILE_WORK = false;
 
     public static Map<Long, RdpSession> sessionMap;
 
@@ -86,15 +85,11 @@ public class RdpApp implements EventListener {
     }
 
     private void onCreate(Application application) {
-        // 初始化首选项
-        ApplicationSettingsActivity.get(application);
-
         sessionMap = Collections.synchronizedMap(new HashMap<>(0));
 
         LibFreeRDP.setEventListener(this);
 
-
-        ConnectedToMobileWork = NetworkUtils.is5G() || NetworkUtils.is4G();
+        IS_MOBILE_WORK = NetworkUtils.is5G() || NetworkUtils.is4G();
 
         // 亮屏息屏广播监听
         IntentFilter filter = new IntentFilter(Intent.ACTION_SCREEN_ON);
@@ -105,7 +100,7 @@ public class RdpApp implements EventListener {
 
     // 断开屏幕开/关事件的处理
     public static void startDisconnectTimer() {
-        final int timeoutMinutes = ApplicationSettingsActivity.getDisconnectTimeout(application);
+        final int timeoutMinutes = LibRdpSettings.getDisconnectTimeout(application);
         if (timeoutMinutes > 0) {
             // 开始断开连接超时...
             disconnectTimer = new Timer();

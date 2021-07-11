@@ -68,5 +68,4 @@
     <integer name="keycode_down">0x33</integer>
     <integer name="keycode_left">0x34</integer>
     <integer name="keycode_right">0x45</integer>
-
 </resources>

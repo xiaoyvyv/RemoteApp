@@ -41,4 +41,5 @@
     <color name="ui_status_highlight">#26d1e0</color>
     <color name="ui_status_link">#31a5ef</color>
 
+    <color name="ui_black_bb">#BB000000</color>
 </resources>

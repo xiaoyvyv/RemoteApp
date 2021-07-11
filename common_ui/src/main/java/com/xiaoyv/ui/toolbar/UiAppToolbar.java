@@ -51,6 +51,10 @@ public class UiAppToolbar extends FrameLayout {
                 ((Activity) context).finish();
             }
         });
+
+        if (isInEditMode()) {
+            return;
+        }
         setNeedStatusBar(true);
     }
 

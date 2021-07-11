@@ -41,6 +41,10 @@ dependencies {
     api "me.everything:overscroll-decor-android:${rootProject.ext.overscrollVersion}"
     // 今日头条屏幕适配
     api "me.jessyan:autosize:${rootProject.ext.autoSizeVersion}"
+    // 键盘
+    api "com.hijamoya:keyboardview:${rootProject.ext.keyboardVersion}"
+    // 开关
+    api "com.github.zcweng:switch-button:${rootProject.ext.buttonVersion}"
 
     // Kotlin
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${rootProject.ext.kotlinVersion}"

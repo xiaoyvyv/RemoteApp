@@ -8,11 +8,13 @@
     <com.xiaoyv.ui.toolbar.UiAppToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="@color/ui_system_background" />
 
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nsv_scroll"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <com.xiaoyv.ui.setting.UiSettingScreen
             android:layout_width="match_parent"
@@ -33,25 +35,48 @@
                 android:textSize="@dimen/ui_font_14"
                 android:textStyle="bold" />
 
-            <com.xiaoyv.ui.setting.UiSettingView
+            <com.xiaoyv.ui.setting.item.UiSettingInputView
                 android:id="@+id/asv_label"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                app:ui_hint="@string/rdp_add_label_empty"
+                app:ui_hint_color="@color/ui_system_error"
+                app:ui_title="@string/rdp_add_label"
+                app:ui_value="@string/rdp_add_label_default" />
 
-            <com.xiaoyv.ui.setting.UiSettingView
+            <com.xiaoyv.ui.setting.item.UiSettingInputView
                 android:id="@+id/asv_group"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                app:ui_hint="@string/rdp_add_group_empty"
+                app:ui_hint_color="@color/ui_system_error"
+                app:ui_title="@string/rdp_add_group"
+                app:ui_value="@string/rdp_add_group_default" />
 
-            <com.xiaoyv.ui.setting.UiSettingView
+            <com.xiaoyv.ui.setting.item.UiSettingInputView
                 android:id="@+id/asv_ip"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                app:ui_hint="@string/rdp_add_ip_empty"
+                app:ui_hint_color="@color/ui_system_error"
+                app:ui_title="@string/rdp_add_ip" />
 
-            <com.xiaoyv.ui.setting.UiSettingView
+            <com.xiaoyv.ui.setting.item.UiSettingInputView
+                android:id="@+id/asv_domain"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_hint="@string/rdp_add_domain_empty"
+                app:ui_hint_color="@color/ui_text_c3"
+                app:ui_title="@string/rdp_add_domain" />
+
+            <com.xiaoyv.ui.setting.item.UiSettingInputView
                 android:id="@+id/asv_port"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                app:ui_hint="@string/rdp_add_port_empty"
+                app:ui_hint_color="@color/ui_system_error"
+                app:ui_title="@string/rdp_add_port"
+                app:ui_value="@string/rdp_add_port_default" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_credentials"
@@ -67,15 +92,64 @@
                 android:textSize="@dimen/ui_font_14"
                 android:textStyle="bold" />
 
-            <com.xiaoyv.ui.setting.UiSettingView
+            <com.xiaoyv.ui.setting.item.UiSettingInputView
                 android:id="@+id/asv_account"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                app:ui_hint="@string/rdp_add_account_empty"
+                app:ui_hint_color="@color/ui_system_error"
+                app:ui_title="@string/rdp_add_account" />
 
-            <com.xiaoyv.ui.setting.UiSettingView
+            <com.xiaoyv.ui.setting.item.UiSettingInputView
                 android:id="@+id/asv_password"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                app:ui_hint="@string/rdp_add_password_empty"
+                app:ui_hint_color="@color/ui_text_c3"
+                app:ui_title="@string/rdp_add_password" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/tv_setting"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:paddingStart="@dimen/ui_size_20"
+                android:paddingTop="@dimen/ui_size_16"
+                android:paddingEnd="@dimen/ui_size_20"
+                android:paddingBottom="@dimen/ui_size_8"
+                android:text="@string/rdp_add_setting"
+                android:textColor="@color/ui_text_c1"
+                android:textSize="@dimen/ui_font_14"
+                android:textStyle="bold" />
+
+            <com.xiaoyv.ui.setting.item.UiSettingTextView
+                android:id="@+id/set_screen"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_title="@string/rdp_add_setting_screen"
+                app:ui_value="@string/rdp_add_setting_screen_message" />
+
+            <com.xiaoyv.ui.setting.item.UiSettingTextView
+                android:id="@+id/set_performance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_title="@string/rdp_add_setting_performance"
+                app:ui_value="@string/rdp_add_setting_performance_message" />
+
+            <com.xiaoyv.ui.setting.item.UiSettingTextView
+                android:id="@+id/set_advance"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_title="@string/rdp_add_setting_advance"
+                app:ui_value="@string/rdp_add_setting_advance_message" />
+
+            <com.xiaoyv.ui.setting.item.UiSettingTextView
+                android:id="@+id/set_debug"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:ui_title="@string/rdp_add_setting_debug"
+                app:ui_value="@string/rdp_add_setting_debug_message" />
+
         </com.xiaoyv.ui.setting.UiSettingScreen>
 
     </androidx.core.widget.NestedScrollView>

@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.room.Room;
 
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.blankj.utilcode.util.Utils;
 import com.xiaoyv.busines.room.dao.FtpDao;
 import com.xiaoyv.busines.room.dao.RdpDao;
@@ -57,17 +58,17 @@ public class DateBaseManger {
      * @param rdpEntity rdp 信息
      */
     public void saveRdp(@NonNull RdpEntity rdpEntity) {
-        LogUtils.json(rdpEntity);
         if (rdpEntity.id < 0) {
             getRdpDao().insert(rdpEntity);
             return;
         }
+
         RdpEntity entity = getRdpDao().getById(rdpEntity.id);
         if (entity == null) {
             getRdpDao().insert(rdpEntity);
             return;
         }
-        getRdpDao().update(entity);
+        getRdpDao().update(rdpEntity);
     }
 
     public SshDao getSshDao() {
@@ -94,7 +95,7 @@ public class DateBaseManger {
             getSshDao().insert(sshEntity);
             return;
         }
-        getSshDao().update(entity);
+        getSshDao().update(sshEntity);
     }
 
 
@@ -114,7 +115,7 @@ public class DateBaseManger {
             getFtpDao().insert(ftpEntity);
             return;
         }
-        getFtpDao().update(entity);
+        getFtpDao().update(ftpEntity);
     }
 
 

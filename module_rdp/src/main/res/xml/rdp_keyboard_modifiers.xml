@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  修饰符键盘布局按钮排列
+  ESC  SHIFT  CTRL  Win  ALT
+-->
+
+<Keyboard xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:horizontalGap="4dp"
+    app:verticalGap="4dp"
+    app:keyHeight="@dimen/key_height"
+    app:keyWidth="15%p">
+
+    <Row>
+        <Key
+            app:codes="@integer/keycode_esc"
+            app:keyEdgeFlags="left"
+            app:keyLabel="Esc" />
+        <Key
+            app:codes="@integer/keycode_toggle_shift"
+            app:isModifier="true"
+            app:isSticky="true"
+            app:keyLabel="Shift" />
+        <Key
+            app:codes="@integer/keycode_toggle_ctrl"
+            app:isModifier="true"
+            app:isSticky="true"
+            app:keyLabel="Ctrl" />
+        <Key
+            app:codes="@integer/keycode_toggle_win"
+            app:isModifier="true"
+            app:isSticky="true"
+            app:keyIcon="@drawable/rdp_keyboard_icon_windows" />
+        <Key
+            app:codes="@integer/keycode_toggle_alt"
+            app:isModifier="true"
+            app:isSticky="true"
+            app:keyEdgeFlags="right"
+            app:keyLabel="Alt" />
+    </Row>
+</Keyboard>
+    

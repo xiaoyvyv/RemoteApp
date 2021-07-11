@@ -3,9 +3,7 @@ package com.xiaoyv.rdp.screen.view
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.blankj.utilcode.util.ScreenUtils
@@ -53,7 +51,7 @@ class ScreenLoadingFragment : DialogFragment() {
             builder.cancel.invoke()
         }
 
-        this.binding=binding
+        this.binding = binding
     }
 
     fun show(fragmentManager: FragmentManager) {
@@ -70,6 +68,7 @@ class ScreenLoadingFragment : DialogFragment() {
                     dimAmount = 0.2f
                     width = ScreenUtils.getAppScreenWidth() - 60.dp()
                 }
+                window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
             }
         }
     }

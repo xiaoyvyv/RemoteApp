@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="RdpKeyboardView">
+        <item name="background">@color/ui_system_translate</item>
+        <item name="keyBackground">@drawable/rdp_keyboard_key</item>
+        <item name="keyTextSize">@dimen/ui_font_22</item>
+        <item name="keyTextColor">@color/ui_text_c1</item>
+        <item name="labelTextSize">@dimen/ui_font_14</item>
+        <item name="verticalCorrection">-10dp</item>
+    </style>
+</resources>

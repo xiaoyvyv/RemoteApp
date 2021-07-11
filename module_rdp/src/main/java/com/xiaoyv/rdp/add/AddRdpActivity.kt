@@ -8,11 +8,13 @@ import com.blankj.utilcode.util.*
 import com.blankj.utilcode.util.ThreadUtils.SimpleTask
 import com.freerdp.freerdpcore.domain.RdpConfig
 import com.xiaoyv.busines.base.BaseActivity
+import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.busines.config.NavigationPath
 import com.xiaoyv.busines.room.database.DateBaseManger
 import com.xiaoyv.busines.room.entity.RdpEntity
 import com.xiaoyv.rdp.R
 import com.xiaoyv.rdp.databinding.RdpActivityAddBinding
+import com.xiaoyv.rdp.setting.single.RdpSingleSettingActivity
 
 /**
  * AddRdpActivity
@@ -25,6 +27,7 @@ class AddRdpActivity : BaseActivity() {
     private lateinit var binding: RdpActivityAddBinding
     private lateinit var rdpEntity: RdpEntity
     private var rdpConfig: RdpConfig = RdpConfig()
+    private var isAdd = false
 
     override fun createContentView(): View {
         binding = RdpActivityAddBinding.inflate(layoutInflater)
@@ -32,11 +35,14 @@ class AddRdpActivity : BaseActivity() {
     }
 
     override fun initIntentData(intent: Intent, bundle: Bundle) {
-        rdpEntity = (getIntent().getSerializableExtra(KEY_RDP_ENTITY) as? RdpEntity) ?: RdpEntity()
-            .also {
-                it.label = "远程桌面"
-                it.group = StringUtils.getString(R.string.rdp_add_group_default)
-                it.port = StringUtils.getString(R.string.rdp_add_port_default)
+        rdpEntity = (intent.getSerializableExtra(NavigationKey.KEY_SERIALIZABLE) as? RdpEntity)
+            ?: run {
+                isAdd = true
+                RdpEntity().also {
+                    it.label = StringUtils.getString(R.string.rdp_add_label_default)
+                    it.group = StringUtils.getString(R.string.rdp_add_group_default)
+                    it.port = StringUtils.getString(R.string.rdp_add_port_default)
+                }
             }
 
         // 获取配置信息
@@ -48,38 +54,15 @@ class AddRdpActivity : BaseActivity() {
     }
 
     override fun initView() {
-        LogUtils.json(rdpEntity)
+        LogUtils.e(isAdd, GsonUtils.toJson(rdpEntity))
 
-        binding.asvLabel.setTitle(StringUtils.getString(R.string.rdp_add_label))
-            .setHint(StringUtils.getString(R.string.rdp_add_label_hint))
-            .setMessage(rdpEntity.label)
-            .setMessageHint(getString(R.string.rdp_add_label_required))
-
-        binding.asvGroup.setTitle(StringUtils.getString(R.string.rdp_add_group))
-            .setHint(StringUtils.getString(R.string.rdp_add_group_hint))
-            .setMessage(rdpEntity.group)
-            .setMessageHint()
-
-        binding.asvIp.setTitle(StringUtils.getString(R.string.rdp_add_ip))
-            .setHint(getString(R.string.rdp_add_ip_hint))
-            .setMessage(rdpEntity.ip)
-            .setMessageHint(getString(R.string.rdp_add_ip_required))
-
-        binding.asvPort.setTitle(StringUtils.getString(R.string.rdp_add_port))
-            .setInputNumberType(5)
-            .setHint(StringUtils.getString(R.string.rdp_add_port_hint))
-            .setMessage(rdpEntity.port)
-            .setMessageHint()
-
-        binding.asvAccount.setTitle(StringUtils.getString(R.string.rdp_add_account))
-            .setHint(StringUtils.getString(R.string.rdp_add_account_hint))
-            .setMessage(rdpEntity.account)
-            .setMessageHint(getString(R.string.rdp_add_account_required))
-
-        binding.asvPassword.setTitle(StringUtils.getString(R.string.rdp_add_password))
-            .setHint(StringUtils.getString(R.string.rdp_add_password_hint))
-            .setMessage(rdpEntity.password)
-            .setMessageHint("未设置密码请留空", ColorUtils.getColor(com.xiaoyv.ui.R.color.ui_text_c3))
+        binding.asvLabel.uiValue = rdpEntity.label.orEmpty()
+        binding.asvGroup.uiValue = rdpEntity.group.orEmpty()
+        binding.asvIp.uiValue = rdpEntity.ip.orEmpty()
+        binding.asvDomain.uiValue = rdpEntity.domain.orEmpty()
+        binding.asvPort.uiValue = rdpEntity.port.orEmpty()
+        binding.asvAccount.uiValue = rdpEntity.account.orEmpty()
+        binding.asvPassword.uiValue = rdpEntity.password.orEmpty()
     }
 
     override fun initData() {
@@ -87,76 +70,124 @@ class AddRdpActivity : BaseActivity() {
             .setStartClickListener { onBackPressed() }
             .setEndIcon(R.drawable.ui_icon_save)
             .setEndClickListener {
-                val label = binding.asvLabel.message
-                val group = binding.asvGroup.message
-                val ip = binding.asvIp.message
-                val port = binding.asvPort.message
-                val account = binding.asvAccount.message
-                val password = binding.asvPassword.message
-
-                if (StringUtils.isEmpty(label)) {
-                    p2vShowToast(StringUtils.getString(R.string.rdp_add_label_empty))
-                    return@setEndClickListener
-                }
-                if (StringUtils.isEmpty(group)) {
-                    p2vShowToast(StringUtils.getString(R.string.rdp_add_group_empty))
-                    return@setEndClickListener
-                }
-                if (StringUtils.isEmpty(ip)) {
-                    p2vShowToast(StringUtils.getString(R.string.rdp_add_ip_empty))
-                    return@setEndClickListener
-                }
-                if (StringUtils.isEmpty(port)) {
-                    p2vShowToast(StringUtils.getString(R.string.rdp_add_port_empty))
-                    return@setEndClickListener
-                }
-                if (StringUtils.isEmpty(account)) {
-                    p2vShowToast(StringUtils.getString(R.string.rdp_add_account_empty))
-                    return@setEndClickListener
-                }
-
-                val rdpEntity = RdpEntity()
-                rdpEntity.label = label
-                rdpEntity.group = group
-                rdpEntity.ip = ip
-                rdpEntity.port = port
-                rdpEntity.account = account
-                rdpEntity.password = password
-                rdpEntity.domain = ip
-                saveRdpBookmark(rdpEntity)
+                doSaveConfig()
             }
     }
 
+    override fun initListener() {
+        // 分辨率设置
+        binding.setScreen.setOnClickListener {
+            RdpSingleSettingActivity.openSelf(
+                this,
+                rdpConfig, RdpSingleSettingActivity.SETTING_SCREEN
+            )
+        }
+
+        // 性能设置
+        binding.setPerformance.setOnClickListener {
+            RdpSingleSettingActivity.openSelf(
+                this,
+                rdpConfig, RdpSingleSettingActivity.SETTING_PERFORMANCE
+            )
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (resultCode == RESULT_OK && requestCode == 999 && data != null) {
+            val newConfig = data.getSerializableExtra(NavigationKey.KEY_SERIALIZABLE) as? RdpConfig
+            newConfig?.let {
+                ToastUtils.showShort("更新配置")
+                LogUtils.e(GsonUtils.toJson(it))
+                rdpConfig = it
+            }
+        }
+    }
+
+    override fun onBackPressed() {
+        if (!isAdd) {
+            doSaveConfig()
+        } else {
+            super.onBackPressed()
+        }
+    }
+
+
+    private fun doSaveConfig(): Boolean {
+        val label = binding.asvLabel.uiValue
+        val group = binding.asvGroup.uiValue
+        val ip = binding.asvIp.uiValue
+        val domain = binding.asvDomain.uiValue
+        val port = binding.asvPort.uiValue
+        val account = binding.asvAccount.uiValue
+        val password = binding.asvPassword.uiValue
+
+        if (StringUtils.isEmpty(label)) {
+            p2vShowToast(StringUtils.getString(R.string.rdp_add_label_empty))
+            return false
+        }
+        if (StringUtils.isEmpty(group)) {
+            p2vShowToast(StringUtils.getString(R.string.rdp_add_group_empty))
+            return false
+        }
+        if (StringUtils.isEmpty(ip)) {
+            p2vShowToast(StringUtils.getString(R.string.rdp_add_ip_empty))
+            return false
+        }
+        if (StringUtils.isEmpty(port)) {
+            p2vShowToast(StringUtils.getString(R.string.rdp_add_port_empty))
+            return false
+        }
+        if (StringUtils.isEmpty(account)) {
+            p2vShowToast(StringUtils.getString(R.string.rdp_add_account_empty))
+            return false
+        }
+
+        saveRdpBookmark(rdpEntity.also {
+            it.label = label
+            it.group = group
+            it.ip = ip
+            it.domain = domain
+            it.port = port
+            it.account = account
+            it.password = password
+
+            it.configStr = rdpConfig.also { config ->
+                config.label = it.label
+                config.hostname = it.ip
+                config.domain = it.domain
+                config.port = it.port.toInt()
+                config.username = it.account
+                config.password = it.password
+            }.toJson()
+        })
+        return true
+    }
+
     /**
-     * 保存书签
+     * 保存配置信息
      *
      * @param rdpEntity 配置的连接信息
      */
     private fun saveRdpBookmark(rdpEntity: RdpEntity) {
-        // 保存配置信息
         ThreadUtils.executeByCached(object : SimpleTask<Boolean>() {
             @Throws(NumberFormatException::class)
             override fun doInBackground(): Boolean {
-                rdpConfig.hostname = rdpEntity.ip
-                rdpConfig.port = rdpEntity.port.toInt()
-                rdpConfig.label = rdpEntity.label
-                rdpConfig.username = rdpEntity.account
-                rdpConfig.password = rdpEntity.password
-                rdpConfig.domain = rdpEntity.domain
-                rdpEntity.configStr = GsonUtils.toJson(rdpConfig)
                 DateBaseManger.get().saveRdp(rdpEntity)
                 return true
             }
 
+            override fun onFail(t: Throwable?) {
+                ToastUtils.showShort("配置添加或更新失败")
+            }
+
             override fun onSuccess(result: Boolean) {
-                onBackPressed()
+                finish()
             }
         })
     }
 
     companion object {
-        const val KEY_RDP_ENTITY = "BOOK_MARK"
-
         /**
          * 编辑
          *
@@ -165,7 +196,7 @@ class AddRdpActivity : BaseActivity() {
         @JvmStatic
         fun openSelf(rdpEntity: RdpEntity?) {
             val intent = Intent(Utils.getApp(), AddRdpActivity::class.java)
-            intent.putExtra(KEY_RDP_ENTITY, rdpEntity)
+            intent.putExtra(NavigationKey.KEY_SERIALIZABLE, rdpEntity)
             ActivityUtils.startActivity(intent)
         }
     }

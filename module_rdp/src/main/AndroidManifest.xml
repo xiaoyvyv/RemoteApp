@@ -20,8 +20,10 @@
                     android:scheme="freerdp" />
             </intent-filter>
         </activity>
-        <activity android:name=".add.AddRdpActivity" />
-        <activity android:name=".setting.AppSettingActivity" />
-        <activity android:name=".setting.BookmarkSettingActivity" />
+        <activity
+            android:name=".add.AddRdpActivity"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".setting.RdpSettingActivity" />
+        <activity android:name=".setting.single.RdpSingleSettingActivity" />
     </application>
 </manifest>

@@ -37,22 +37,5 @@
 <!--                <category android:name="android.intent.category.DEFAULT" />-->
 <!--            </intent-filter>-->
 <!--        </activity-alias>-->
-
-        <activity
-            android:name="com.freerdp.freerdpcore.presentation.SessionActivity"
-            android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|density|screenLayout|navigation"
-            android:theme="@style/Theme.Main"
-            android:windowSoftInputMode="adjustResize">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="*"
-                    android:scheme="freerdp" />
-            </intent-filter>
-        </activity>
     </application>
 </manifest>

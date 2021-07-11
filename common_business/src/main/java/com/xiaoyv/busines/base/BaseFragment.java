@@ -14,7 +14,6 @@ import androidx.fragment.app.Fragment;
 import com.blankj.utilcode.util.ColorUtils;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ToastUtils;
-import com.xiaoyv.busines.room.entity.RdpEntity;
 import com.xiaoyv.business.R;
 import com.xiaoyv.business.databinding.BusinessFragmentRootBinding;
 import com.xiaoyv.ui.status.ContentStatusView;

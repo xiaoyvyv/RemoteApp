@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  光标键盘布局
+  Fn      Up      Backsp
+  123 Le  Dn  Ri  Enter
+-->
+
+<Keyboard xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:keyHeight="@dimen/key_height"
+    app:keyWidth="20%p"
+    app:horizontalGap="@dimen/ui_size_0"
+    app:verticalGap="@dimen/ui_size_0">
+
+    <Row>
+        <Key
+            app:codes="@integer/keycode_specialkeys_keyboard"
+            app:keyEdgeFlags="left"
+            app:keyLabel="Fn" />
+        <Key
+            app:codes="@integer/keycode_home"
+            app:keyLabel="Hom" />
+        <Key
+            app:codes="@integer/keycode_up"
+            app:keyIcon="@drawable/rdp_keyboard_icon_arrow_up" />
+        <Key
+            app:codes="@integer/keycode_end"
+            app:keyLabel="End" />
+        <Key
+            app:codes="@integer/keycode_backspace"
+            app:keyEdgeFlags="right"
+            app:keyIcon="@drawable/rdp_keyboard_icon_backspace" />
+    </Row>
+
+    <Row app:rowEdgeFlags="bottom">
+        <Key
+            app:codes="@integer/keycode_numpad_keyboard"
+            app:keyEdgeFlags="left"
+            app:keyLabel="123" />
+        <Key
+            app:codes="@integer/keycode_left"
+            app:keyIcon="@drawable/rdp_keyboard_icon_arrow_left" />
+        <Key
+            app:codes="@integer/keycode_down"
+            app:keyIcon="@drawable/rdp_keyboard_icon_arrow_down" />
+        <Key
+            app:codes="@integer/keycode_right"
+            app:keyIcon="@drawable/rdp_keyboard_icon_arrow_right" />
+        <Key
+            app:codes="@integer/keycode_enter"
+            app:keyEdgeFlags="right"
+            app:keyIcon="@drawable/rdp_keyboard_icon_enter" />
+    </Row>
+</Keyboard>
+    

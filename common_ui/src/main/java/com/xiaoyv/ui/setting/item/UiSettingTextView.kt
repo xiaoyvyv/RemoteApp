@@ -1,6 +1,7 @@
 package com.xiaoyv.ui.setting.item
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import android.view.LayoutInflater
 import androidx.annotation.ColorInt
@@ -21,45 +22,47 @@ import com.xiaoyv.ui.kotlin.dp
  * @author why
  * @since 2021/07/04
  **/
-class UiSettingTextView @JvmOverloads constructor(
+open class UiSettingTextView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
-    private val binding = UiSettingTextBinding.inflate(LayoutInflater.from(context), this)
+    @Suppress("LeakingThis")
+    val binding = UiSettingTextBinding.inflate(LayoutInflater.from(context), this)
 
     var uiKey: String = ""
 
-    var uiTitle: String = ""
+    var uiTitle: String? = ""
         set(value) {
             field = value
             binding.tvTitle.text = value
         }
 
-    var uiValue: String = ""
+    var uiValue: String? = ""
         set(value) {
             field = value
             binding.tvDesc.text = value
 
+            if (isInEditMode) return
             if (!StringUtils.isTrimEmpty(value) && !StringUtils.isTrimEmpty(uiKey)) {
                 SPUtils.getInstance().remove(uiKey)
                 SPUtils.getInstance().put(uiKey, value)
             }
         }
 
-    var uiHint: String = ""
+    var uiHint: String? = ""
         set(value) {
             field = value
             binding.tvDesc.hint = value
         }
 
     @ColorInt
-    var uiValueColor: Int = ColorUtils.getColor(R.color.ui_text_c3)
+    var uiValueColor: Int = Color.parseColor("#999999")
         set(value) {
             field = value
             binding.tvDesc.setTextColor(value)
         }
 
     @ColorInt
-    var uiHintColor: Int = ColorUtils.getColor(R.color.ui_text_c3)
+    var uiHintColor: Int = Color.RED
         set(value) {
             field = value
             binding.tvDesc.setHintTextColor(value)
@@ -71,7 +74,7 @@ class UiSettingTextView @JvmOverloads constructor(
             binding.vDivider.isVisible = value
         }
 
-    var uiDividerMargin = 20.dp()
+    var uiDividerMargin = if (isInEditMode) 40 else 20.dp()
         set(value) {
             field = value
             binding.vDivider.updateLayoutParams<MarginLayoutParams> {
@@ -95,14 +98,20 @@ class UiSettingTextView @JvmOverloads constructor(
                 array.getBoolean(R.styleable.UiSettingTextView_ui_divider_enable, true)
             uiDividerMargin =
                 array.getDimensionPixelSize(
-                    R.styleable.UiSettingTextView_ui_divider_enable, 20.dp()
+                    R.styleable.UiSettingTextView_ui_divider_enable,
+                    if (isInEditMode) 40 else 20.dp()
                 )
             array.recycle()
         }
 
-        background = ResourceUtils.getDrawable(R.drawable.ui_selector_ripper)
         isClickable = true
         isFocusable = true
-    }
 
+        if (!isInEditMode) {
+            background = ResourceUtils.getDrawable(R.drawable.ui_selector_ripper)
+        } else {
+            uiTitle = if (uiTitle.isNullOrEmpty()) "标题示例" else uiTitle
+            uiHint = if (uiHint.isNullOrEmpty()) "内容空示例" else uiHint
+        }
+    }
 }

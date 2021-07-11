@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.xiaoyv.ui.setting.UiSettingScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:animateLayoutChanges="true"
+    app:ui_sp="TEMP">
+
+    <com.xiaoyv.ui.setting.item.UiSettingSwitchView
+        android:id="@+id/sv_rfx"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:sb_checked_color="@color/ui_theme_c1"
+        app:sb_effect_duration="200"
+        app:sb_show_indicator="false"
+        app:ui_title="Remote FX"
+        app:ui_value="是否启用 Remote FX" />
+
+    <com.xiaoyv.ui.setting.item.UiSettingSwitchView
+        android:id="@+id/sv_gfx"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:sb_checked_color="@color/ui_theme_c1"
+        app:sb_effect_duration="200"
+        app:sb_show_indicator="false"
+        app:ui_title="GFX"
+        app:ui_value="是否启用 GFX" />
+
+    <com.xiaoyv.ui.setting.item.UiSettingSwitchView
+        android:id="@+id/sv_h264"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:sb_checked_color="@color/ui_theme_c1"
+        app:sb_effect_duration="200"
+        app:sb_show_indicator="false"
+        app:ui_title="H264"
+        app:ui_value="是否启用 H264 进行解码" />
+
+    <com.xiaoyv.ui.setting.item.UiSettingSwitchView
+        android:id="@+id/sv_background"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:sb_checked_color="@color/ui_theme_c1"
+        app:sb_effect_duration="200"
+        app:sb_show_indicator="false"
+        app:ui_title="显示桌面背景"
+        app:ui_value="是否启用远程主机的桌面背景" />
+
+    <com.xiaoyv.ui.setting.item.UiSettingSwitchView
+        android:id="@+id/sv_drag_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:sb_checked_color="@color/ui_theme_c1"
+        app:sb_effect_duration="200"
+        app:sb_show_indicator="false"
+        app:ui_title="显示拖动窗口的内容"
+        app:ui_value="是否显示拖动中窗口的内容" />
+
+    <com.xiaoyv.ui.setting.item.UiSettingSwitchView
+        android:id="@+id/sv_sm_font"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:sb_checked_color="@color/ui_theme_c1"
+        app:sb_effect_duration="200"
+        app:sb_show_indicator="false"
+        app:ui_title="桌面平滑字体"
+        app:ui_value="是否启用平滑字体" />
+
+    <com.xiaoyv.ui.setting.item.UiSettingSwitchView
+        android:id="@+id/sv_desktop_com"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:sb_checked_color="@color/ui_theme_c1"
+        app:sb_effect_duration="200"
+        app:sb_show_indicator="false"
+        app:ui_title="桌面合成"
+        app:ui_value="是否启用桌面合成，部分系统不支持" />
+
+    <com.xiaoyv.ui.setting.item.UiSettingSwitchView
+        android:id="@+id/sv_menu_animation"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:sb_checked_color="@color/ui_theme_c1"
+        app:sb_effect_duration="200"
+        app:sb_show_indicator="false"
+        app:ui_title="菜单动画"
+        app:ui_value="是否启用菜单动画效果" />
+
+    <com.xiaoyv.ui.setting.item.UiSettingSwitchView
+        android:id="@+id/sv_theme_style"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:sb_checked_color="@color/ui_theme_c1"
+        app:sb_effect_duration="200"
+        app:sb_show_indicator="false"
+        app:ui_title="主题样式"
+        app:ui_value="是否启用远程主机的主题样式" />
+
+</com.xiaoyv.ui.setting.UiSettingScreen>

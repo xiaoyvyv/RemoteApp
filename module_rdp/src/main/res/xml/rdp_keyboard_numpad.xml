@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  数字键盘布局
+  (   )   7   8   9   -
+  /   *   4   5   6   +
+  Fn  Num 1   2   3   BackSp
+  Cur =   0       .   Enter
+-->
+
+<Keyboard xmlns:app="http://schemas.android.com/apk/res-auto"
+    app:horizontalGap="@dimen/ui_size_0"
+    app:verticalGap="@dimen/ui_size_0"
+    app:keyHeight="@dimen/key_height"
+    app:keyWidth="16.666%p">
+
+    <Row>
+        <Key
+            app:codes="@integer/keycode_numpad_left_paren"
+            app:keyEdgeFlags="left"
+            app:keyLabel="(" />
+        <Key
+            app:codes="@integer/keycode_numpad_right_paren"
+            app:keyLabel=")" />
+        <Key
+            app:codes="@integer/keycode_numpad_7"
+            app:keyLabel="7" />
+        <Key
+            app:codes="@integer/keycode_numpad_8"
+            app:keyLabel="8" />
+        <Key
+            app:codes="@integer/keycode_numpad_9"
+            app:keyLabel="9" />
+        <Key
+            app:codes="@integer/keycode_numpad_subtract"
+            app:keyLabel="-" />
+    </Row>
+
+    <Row>
+        <Key
+            app:codes="@integer/keycode_numpad_divide"
+            app:keyEdgeFlags="left"
+            app:keyLabel="/" />
+        <Key
+            app:codes="@integer/keycode_numpad_multiply"
+            app:keyLabel="*" />
+        <Key
+            app:codes="@integer/keycode_numpad_4"
+            app:keyLabel="4" />
+        <Key
+            app:codes="@integer/keycode_numpad_5"
+            app:keyLabel="5" />
+        <Key
+            app:codes="@integer/keycode_numpad_6"
+            app:keyLabel="6" />
+        <Key
+            app:codes="@integer/keycode_numpad_add"
+            app:keyEdgeFlags="right"
+            app:keyLabel="+" />
+    </Row>
+
+    <Row>
+        <Key
+            app:codes="@integer/keycode_specialkeys_keyboard"
+            app:keyEdgeFlags="left"
+            app:keyLabel="Fn" />
+        <Key
+            app:codes="@integer/keycode_numpad_numlock"
+            app:keyLabel="Num" />
+        <Key
+            app:codes="@integer/keycode_numpad_1"
+            app:keyLabel="1" />
+        <Key
+            app:codes="@integer/keycode_numpad_2"
+            app:keyLabel="2" />
+        <Key
+            app:codes="@integer/keycode_numpad_3"
+            app:keyLabel="3" />
+        <Key
+            app:codes="@integer/keycode_backspace"
+            app:keyEdgeFlags="right"
+            app:keyIcon="@drawable/rdp_keyboard_icon_backspace" />
+    </Row>
+
+    <Row app:rowEdgeFlags="bottom">
+        <Key
+            app:codes="@integer/keycode_cursor_keyboard"
+            app:keyEdgeFlags="left"
+            app:keyIcon="@drawable/rdp_keyboard_icon_arrows" />
+        <Key
+            app:codes="@integer/keycode_numpad_equals"
+            app:keyLabel="=" />
+        <Key
+            app:codes="@integer/keycode_numpad_0"
+            app:keyLabel="0"
+            app:keyWidth="33.333%p" />
+        <Key
+            app:codes="@integer/keycode_numpad_comma"
+            app:keyLabel="." />
+        <Key
+            app:codes="@integer/keycode_numpad_enter"
+            app:keyEdgeFlags="right"
+            app:keyIcon="@drawable/rdp_keyboard_icon_enter" />
+    </Row>
+</Keyboard>
+    

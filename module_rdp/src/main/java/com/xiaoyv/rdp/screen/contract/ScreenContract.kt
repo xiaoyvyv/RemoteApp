@@ -25,7 +25,10 @@ interface ScreenContract {
         fun vSessionClose(result: Int)
         fun p2vBindSession(rdpSession: RdpSession)
         fun p2vScreenLandscape(): Boolean
+        fun p2vGetRootParam(): Pair<Int, Int>
         fun vSetLandscapeScreen(landscape: Boolean)
+        fun vOnSoftKeyBoardShow()
+        fun vOnSoftKeyBoardClose()
     }
 
     interface Presenter : IBasePresenter {

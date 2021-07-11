@@ -5,6 +5,16 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <com.hijamoya.keyboardview.KeyboardView
+        android:id="@+id/keyboard_special"
+        style="@style/RdpKeyboardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:alpha="0.6"
+        android:background="@color/ui_system_black"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
     <com.xiaoyv.ui.scroll.FreeScrollView
         android:id="@+id/rsv_scroll"
         android:layout_width="match_parent"
@@ -14,7 +24,7 @@
         android:fillViewport="true"
         android:isScrollContainer="true"
         android:scrollbars="horizontal|vertical"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/keyboard_special"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.freerdp.freerdpcore.view.RdpSessionView
@@ -31,6 +41,18 @@
         android:id="@+id/tpv_pointer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible" />
+        android:visibility="invisible" />
+
+    <com.hijamoya.keyboardview.KeyboardView
+        android:id="@+id/keyboard_header"
+        style="@style/RdpKeyboardView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/ui_size_4"
+        android:alpha="0.6"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

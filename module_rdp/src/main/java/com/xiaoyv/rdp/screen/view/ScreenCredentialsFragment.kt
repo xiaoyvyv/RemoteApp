@@ -3,6 +3,7 @@ package com.xiaoyv.rdp.screen.view
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
+import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -84,6 +85,10 @@ class ScreenCredentialsFragment : DialogFragment() {
                 window.attributes = window.attributes.apply {
                     dimAmount = 0.2f
                     width = ScreenUtils.getAppScreenWidth() - 60.dp()
+                    if (ScreenUtils.isPortrait()) {
+                        gravity = Gravity.TOP
+                        y = ScreenUtils.getAppScreenHeight() / 4
+                    }
                 }
             }
         }

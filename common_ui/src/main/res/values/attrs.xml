@@ -27,6 +27,19 @@
         <attr name="ui_divider_margin" />
     </declare-styleable>
 
+    <declare-styleable name="UiSettingListView">
+        <attr name="ui_key" />
+        <attr name="ui_title" />
+        <attr name="ui_value" />
+        <attr name="ui_value_list" format="string" />
+        <attr name="ui_value_desc_list" format="string" />
+        <attr name="ui_value_color" />
+        <attr name="ui_hint" />
+        <attr name="ui_hint_color" />
+        <attr name="ui_divider_enable" />
+        <attr name="ui_divider_margin" />
+    </declare-styleable>
+
     <!-- 设置控件属性 -->
     <declare-styleable name="UiSettingView">
         <attr name="ui_key" />

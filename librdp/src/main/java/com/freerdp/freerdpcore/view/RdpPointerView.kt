@@ -51,9 +51,9 @@ class RdpPointerView @JvmOverloads constructor(
     private var gestureDetector: GestureDetector
 
     init {
-        // 指针大小为屏幕短边的 2/5
+        // 指针大小为屏幕短边的 0.45倍
         val pointerSize =
-            (min(ScreenUtils.getScreenWidth(), ScreenUtils.getScreenHeight()) * 0.4f).toInt()
+            (min(ScreenUtils.getScreenWidth(), ScreenUtils.getScreenHeight()) * 0.45f).toInt()
         pointerActive = zoomImage(R.drawable.touch_pointer_active, pointerSize, pointerSize)
         pointerClose = zoomImage(R.drawable.touch_pointer_close, pointerSize, pointerSize)
         pointerDefault = zoomImage(R.drawable.touch_pointer_default, pointerSize, pointerSize)
@@ -211,7 +211,6 @@ class RdpPointerView @JvmOverloads constructor(
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         // 确保触摸指针可见
         if (changed) {
-            ToastUtils.showShort((right - left).toString() + ": " + (bottom - top))
             ensureVisibility(right - left, bottom - top)
         }
     }

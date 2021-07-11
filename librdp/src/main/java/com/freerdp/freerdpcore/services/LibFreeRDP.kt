@@ -30,7 +30,7 @@ object LibFreeRDP {
     var mHasH264 = true
 
     @JvmStatic
-    private var listener: EventListener? = null
+    private var listenerLibRdp: LibRdpEventListener? = null
 
     @JvmStatic
     private val mInstanceState = LongSparseArray<Boolean>()
@@ -67,8 +67,8 @@ object LibFreeRDP {
     private external fun freerdp_get_last_error_string(inst: Long): String?
 
     @JvmStatic
-    fun setEventListener(eventListener: EventListener?) {
-        listener = eventListener
+    fun setEventListener(libRdpEventListener: LibRdpEventListener?) {
+        listenerLibRdp = libRdpEventListener
     }
 
     @JvmStatic
@@ -175,7 +175,7 @@ object LibFreeRDP {
 
     @JvmStatic
     private fun OnConnectionSuccess(inst: Long) {
-        listener?.onConnectionSuccess(inst)
+        listenerLibRdp?.onConnectionSuccess(inst)
         synchronized(lock) {
             mInstanceState.append(inst, true)
             lock.notifyAll()
@@ -184,7 +184,7 @@ object LibFreeRDP {
 
     @JvmStatic
     private fun OnConnectionFailure(inst: Long) {
-        listener?.onConnectionFailure(inst)
+        listenerLibRdp?.onConnectionFailure(inst)
         synchronized(lock) {
             mInstanceState.remove(inst)
             lock.notifyAll()
@@ -193,17 +193,17 @@ object LibFreeRDP {
 
     @JvmStatic
     private fun OnPreConnect(inst: Long) {
-        listener?.onPreConnect(inst)
+        listenerLibRdp?.onPreConnect(inst)
     }
 
     @JvmStatic
     private fun OnDisconnecting(inst: Long) {
-        listener?.onDisconnecting(inst)
+        listenerLibRdp?.onDisconnecting(inst)
     }
 
     @JvmStatic
     private fun OnDisconnected(inst: Long) {
-        listener?.onDisconnected(inst)
+        listenerLibRdp?.onDisconnected(inst)
 
         synchronized(lock) {
             mInstanceState.remove(inst)
@@ -213,7 +213,7 @@ object LibFreeRDP {
 
     @JvmStatic
     private fun OnSettingsChanged(inst: Long, width: Int, height: Int, bpp: Int) {
-        RdpApp.getSession(inst)?.uiEventListener?.onSettingsChanged(width, height, bpp)
+        RdpApp.getSession(inst)?.libRdpUiEventListener?.onSettingsChanged(width, height, bpp)
     }
 
     @JvmStatic
@@ -221,7 +221,7 @@ object LibFreeRDP {
         inst: Long, username: StringBuilder, domain: StringBuilder, password: StringBuilder
     ): Boolean {
         return RdpApp.getSession(inst)
-            ?.uiEventListener
+            ?.libRdpUiEventListener
             ?.onAuthenticate(username, domain, password)
             ?: false
     }
@@ -231,7 +231,7 @@ object LibFreeRDP {
         inst: Long, username: StringBuilder, domain: StringBuilder, password: StringBuilder
     ): Boolean {
         return RdpApp.getSession(inst)
-            ?.uiEventListener
+            ?.libRdpUiEventListener
             ?.onGatewayAuthenticate(username, domain, password)
             ?: false
     }
@@ -247,7 +247,7 @@ object LibFreeRDP {
         fingerprint: String?,
         flags: Long
     ): Int = RdpApp.getSession(inst.orEmpty())
-        ?.uiEventListener
+        ?.libRdpUiEventListener
         ?.onVerifyCertificateEx(
             host.orEmpty(), port.orEmpty(), commonName.orEmpty(),
             subject.orEmpty(), issuer.orEmpty(), fingerprint.orEmpty(), flags.orEmpty()
@@ -268,7 +268,7 @@ object LibFreeRDP {
         oldFingerprint: String?,
         flags: Long
     ): Int = RdpApp.getSession(inst)
-        ?.uiEventListener
+        ?.libRdpUiEventListener
         ?.onVerifyChangedCertificateEx(
             host.orEmpty(), port.orEmpty(), commonName.orEmpty(), subject.orEmpty(),
             issuer.orEmpty(), fingerprint.orEmpty(), oldSubject.orEmpty(), oldIssuer.orEmpty(),
@@ -278,17 +278,17 @@ object LibFreeRDP {
 
     @JvmStatic
     private fun OnGraphicsUpdate(inst: Long, x: Int, y: Int, width: Int, height: Int) {
-        RdpApp.getSession(inst)?.uiEventListener?.onGraphicsUpdate(x, y, width, height)
+        RdpApp.getSession(inst)?.libRdpUiEventListener?.onGraphicsUpdate(x, y, width, height)
     }
 
     @JvmStatic
     private fun OnGraphicsResize(inst: Long, width: Int, height: Int, bpp: Int) {
-        RdpApp.getSession(inst)?.uiEventListener?.onGraphicsResize(width, height, bpp)
+        RdpApp.getSession(inst)?.libRdpUiEventListener?.onGraphicsResize(width, height, bpp)
     }
 
     @JvmStatic
     private fun OnRemoteClipboardChanged(inst: Long, data: String?) {
-        RdpApp.getSession(inst)?.uiEventListener?.onRemoteClipboardChanged(data.orEmpty())
+        RdpApp.getSession(inst)?.libRdpUiEventListener?.onRemoteClipboardChanged(data.orEmpty())
     }
 
     @JvmStatic

@@ -11,6 +11,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 
 import com.blankj.utilcode.util.ScreenUtils;
+import com.blankj.utilcode.util.ThreadUtils;
 import com.blankj.utilcode.util.Utils;
 import com.drakeet.multitype.MultiTypeAdapter;
 import com.xiaoyv.ui.databinding.UiDialogOptionsBinding;
@@ -63,12 +64,14 @@ public class OptionsDialog extends AlertDialog {
         multiTypeAdapter.register(String.class, defaultBinder);
         binding.uiOptions.setAdapter(multiTypeAdapter);
         defaultBinder.setOnItemChildClickListener(position -> {
-            if (clickListener != null) {
-                clickListener.onItemChildClick(position);
-            }
-            if (canCloseable) {
-                dismiss();
-            }
+            ThreadUtils.runOnUiThreadDelayed(() -> {
+                if (clickListener != null) {
+                    clickListener.onItemChildClick(position);
+                }
+                if (canCloseable) {
+                    dismiss();
+                }
+            }, 80);
         });
     }
 
@@ -127,7 +130,8 @@ public class OptionsDialog extends AlertDialog {
         if (window != null) {
             window.setBackgroundDrawableResource(android.R.color.transparent);
             WindowManager.LayoutParams attributes = window.getAttributes();
-            attributes.width = ScreenUtils.getAppScreenWidth() - AutoSizeUtils.dp2px(Utils.getApp(),100);
+            attributes.width = ScreenUtils.getAppScreenWidth() - AutoSizeUtils.dp2px(Utils.getApp(), 100);
+            attributes.dimAmount = 0.2f;
             window.setAttributes(attributes);
         }
     }
@@ -137,5 +141,4 @@ public class OptionsDialog extends AlertDialog {
         this.canCloseable = flag;
         super.setCancelable(flag);
     }
-
 }
