@@ -31,7 +31,7 @@ class RdpSingleDebugFragment : BaseFragment() {
             binding.svAsyncChannel.isChecked = it.asyncChannel
             binding.svAsyncUpdate.isChecked = it.asyncUpdate
             binding.svAsyncInput.isChecked = it.asyncInput
-            binding.svAsyncTransport.isChecked = it.asyncTransport
+            binding.svDebugLevel.showByValue(it.debugLevel)
         }
     }
 
@@ -40,8 +40,6 @@ class RdpSingleDebugFragment : BaseFragment() {
             val level = RdpConfig.DebugSettings.levels[index]
             rdpConfig?.debugSettings?.debugLevel = level
         }
-
-
     }
 
     private fun saveState() {
@@ -49,7 +47,6 @@ class RdpSingleDebugFragment : BaseFragment() {
             it.asyncChannel = binding.svAsyncChannel.isChecked
             it.asyncUpdate = binding.svAsyncUpdate.isChecked
             it.asyncInput = binding.svAsyncInput.isChecked
-            it.asyncTransport = binding.svAsyncTransport.isChecked
         }
     }
 

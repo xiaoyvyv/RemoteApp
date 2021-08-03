@@ -61,6 +61,5 @@
     <string name="rdp_add_setting_debug_async_channel">Async Channel</string>
     <string name="rdp_add_setting_debug_async_input">Async Input</string>
     <string name="rdp_add_setting_debug_async_update">Async Update</string>
-    <string name="rdp_add_setting_debug_async_transport">Async Transport</string>
     <string name="rdp_add_setting_debug_console_mode">控制台模式</string>
 </resources>

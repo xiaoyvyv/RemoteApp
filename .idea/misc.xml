@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/common_ui/src/main/res/layout/ui_dialog.xml" value="0.23958333333333334" />
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_activity_add.xml" value="0.20462962962962963" />
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_setting_single_advance.xml" value="0.23958333333333334" />
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_setting_single_debug.xml" value="0.23958333333333334" />

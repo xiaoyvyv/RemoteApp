@@ -194,7 +194,6 @@ class RdpConfig : Serializable {
             }
 
         var asyncChannel: Boolean = true
-        var asyncTransport: Boolean = false
         var asyncInput: Boolean = true
         var asyncUpdate: Boolean = true
 

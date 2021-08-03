@@ -46,14 +46,4 @@
         app:ui_title="@string/rdp_add_setting_debug_async_input"
         app:ui_value="是否启用 Async Input" />
 
-    <com.xiaoyv.ui.setting.item.UiSettingSwitchView
-        android:id="@+id/sv_async_transport"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:sb_checked_color="@color/ui_theme_c1"
-        app:sb_effect_duration="200"
-        app:sb_show_indicator="false"
-        app:ui_title="@string/rdp_add_setting_debug_async_transport"
-        app:ui_value="是否启用 Async Transport" />
-
 </com.xiaoyv.ui.setting.UiSettingScreen>

@@ -56,7 +56,7 @@
         app:ui_value_list="@array/security_values_array" />
 
     <com.xiaoyv.ui.setting.item.UiSettingInputView
-        android:id="@+id/siv_width"
+        android:id="@+id/siv_program_path"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:ui_hint="远程运行程序路径"
@@ -64,7 +64,7 @@
         app:ui_title="远程程序" />
 
     <com.xiaoyv.ui.setting.item.UiSettingInputView
-        android:id="@+id/siv_height"
+        android:id="@+id/siv_work_dir"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:ui_hint="远程工作目录"

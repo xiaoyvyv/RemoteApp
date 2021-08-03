@@ -17,6 +17,7 @@ import com.xiaoyv.busines.room.entity.RdpEntity
 import com.xiaoyv.rdp.R
 import com.xiaoyv.rdp.databinding.RdpActivityAddBinding
 import com.xiaoyv.rdp.setting.single.RdpSingleSettingActivity
+import com.xiaoyv.ui.dialog.normal.NormalDialog
 
 /**
  * AddRdpActivity
@@ -29,10 +30,12 @@ class AddRdpActivity : BaseActivity() {
     private lateinit var binding: RdpActivityAddBinding
     private lateinit var rdpEntity: RdpEntity
     private var rdpConfig: RdpConfig = RdpConfig()
-    private var isAdd = false
+    private var edit: Boolean = false
+    private var isAdd: Boolean = false
 
     private val screenLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            edit = true
             val screenSettings =
                 it.data?.getSerializableExtra(NavigationKey.KEY_SERIALIZABLE) as? RdpConfig.ActiveScreenSettings
                     ?: return@registerForActivityResult
@@ -41,6 +44,7 @@ class AddRdpActivity : BaseActivity() {
 
     private val advancedLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            edit = true
             val advancedSettings =
                 it.data?.getSerializableExtra(NavigationKey.KEY_SERIALIZABLE) as? RdpConfig.AdvancedSettings
                     ?: return@registerForActivityResult
@@ -49,6 +53,7 @@ class AddRdpActivity : BaseActivity() {
 
     private val performanceLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            edit = true
             val performanceSettings =
                 it.data?.getSerializableExtra(NavigationKey.KEY_SERIALIZABLE) as? RdpConfig.PerformanceSettings
                     ?: return@registerForActivityResult
@@ -57,6 +62,7 @@ class AddRdpActivity : BaseActivity() {
 
     private val debugLauncher: ActivityResultLauncher<Intent> =
         registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            edit = true
             val debugSettings =
                 it.data?.getSerializableExtra(NavigationKey.KEY_SERIALIZABLE) as? RdpConfig.DebugSettings
                     ?: return@registerForActivityResult
@@ -88,8 +94,6 @@ class AddRdpActivity : BaseActivity() {
     }
 
     override fun initView() {
-        LogUtils.e(isAdd, GsonUtils.toJson(rdpEntity))
-
         binding.asvLabel.uiValue = rdpEntity.label.orEmpty()
         binding.asvGroup.uiValue = rdpEntity.group.orEmpty()
         binding.asvIp.uiValue = rdpEntity.ip.orEmpty()
@@ -100,7 +104,7 @@ class AddRdpActivity : BaseActivity() {
     }
 
     override fun initData() {
-        binding.toolbar.setTitle(getString(R.string.rdp_add_title))
+        binding.toolbar.setTitle(if (isAdd) getString(R.string.rdp_add_title) else getString(R.string.rdp_add_edit_title))
             .setStartClickListener { onBackPressed() }
             .setEndIcon(R.drawable.ui_icon_save)
             .setEndClickListener {
@@ -223,6 +227,7 @@ class AddRdpActivity : BaseActivity() {
             }
         })
     }
+
 
     companion object {
         /**

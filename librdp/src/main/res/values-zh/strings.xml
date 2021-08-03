@@ -98,9 +98,9 @@
     <string name="settings_redirect_sdcard">SDCard 重定向</string>
     <string name="settings_redirect_sound">音频重定向</string>
     <string-array name="redirect_sound_array">
-        <item>不要播放</item>
-        <item>在远程主机播放</item>
         <item>在此设备上播放</item>
+        <item>在远程主机播放</item>
+        <item>不要播放</item>
     </string-array>
     <string name="settings_redirect_microphone">麦克风重定向</string>
     <string name="settings_security">连接协议</string>

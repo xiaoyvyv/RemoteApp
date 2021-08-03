@@ -124,16 +124,16 @@
     <string name="settings_redirect_sdcard">Redirect SD card</string>
     <string name="settings_redirect_sound">Redirect Sound</string>
     <string-array name="redirect_sound_array">
-        <item>Do not play</item>
-        <item>Play on Server</item>
         <item>Play on Device</item>
+        <item>Play on Server</item>
+        <item>Do not play</item>
     </string-array>
     <!-- This array is used as is in code,
 	do not translate! -->
     <string-array name="redirect_sound_values_array" translatable="false">
-        <item>2</item>
-        <item>1</item>
         <item>0</item>
+        <item>1</item>
+        <item>2</item>
     </string-array>
     <string name="settings_redirect_microphone">Redirect Microphone</string>
     <string name="settings_security">Security</string>
