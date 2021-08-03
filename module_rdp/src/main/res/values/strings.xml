@@ -52,9 +52,15 @@
     <string name="rdp_add_setting_performance">性能设置</string>
     <string name="rdp_add_setting_performance_message">桌面性能和速度相关设置</string>
     <string name="rdp_add_setting_advance">高级设置</string>
-    <string name="rdp_add_setting_advance_message">高级高级功能相关设置</string>
+    <string name="rdp_add_setting_advance_message">高级功能相关设置</string>
+
+    <!-- Debug 设置 -->
     <string name="rdp_add_setting_debug">调试设置</string>
     <string name="rdp_add_setting_debug_message">开发人员调试相关设置</string>
-
-
+    <string name="rdp_add_setting_debug_level">调试等级</string>
+    <string name="rdp_add_setting_debug_async_channel">Async Channel</string>
+    <string name="rdp_add_setting_debug_async_input">Async Input</string>
+    <string name="rdp_add_setting_debug_async_update">Async Update</string>
+    <string name="rdp_add_setting_debug_async_transport">Async Transport</string>
+    <string name="rdp_add_setting_debug_console_mode">控制台模式</string>
 </resources>

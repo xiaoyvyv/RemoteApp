@@ -1,55 +1,59 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<com.xiaoyv.ui.setting.UiSettingScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:animateLayoutChanges="true"
+    app:ui_sp="TEMP">
 
-    <com.xiaoyv.ui.toolbar.UiAppToolbar
-        android:id="@+id/toolbar"
+
+    <com.xiaoyv.ui.setting.item.UiSettingListView
+        android:id="@+id/sv_debug_level"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:ui_title="@string/rdp_add_setting_debug_level"
+        app:ui_value_desc_list="@array/debug_array"
+        app:ui_value_list="@array/debug_values_array" />
 
-    <androidx.core.widget.NestedScrollView
+
+    <com.xiaoyv.ui.setting.item.UiSettingSwitchView
+        android:id="@+id/sv_async_channel"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        app:sb_checked_color="@color/ui_theme_c1"
+        app:sb_effect_duration="200"
+        app:sb_show_indicator="false"
+        app:ui_title="@string/rdp_add_setting_debug_async_channel"
+        app:ui_value="是否启用 Async Channel" />
 
-        <com.xiaoyv.ui.setting.UiSettingScreen
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:animateLayoutChanges="true"
-            app:ui_sp="TEMP">
+    <com.xiaoyv.ui.setting.item.UiSettingSwitchView
+        android:id="@+id/sv_async_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:sb_checked_color="@color/ui_theme_c1"
+        app:sb_effect_duration="200"
+        app:sb_show_indicator="false"
+        app:ui_title="@string/rdp_add_setting_debug_async_update"
+        app:ui_value="是否启用 Async Update" />
 
-            <com.xiaoyv.ui.setting.UiSettingView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:ui_key="bookmark.debug_level"
-                app:ui_list_title="@array/debug_array"
-                app:ui_list_value="@array/debug_values_array"
-                app:ui_title="@string/debug_level"
-                app:ui_type="type_list_string" />
+    <com.xiaoyv.ui.setting.item.UiSettingSwitchView
+        android:id="@+id/sv_async_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:sb_checked_color="@color/ui_theme_c1"
+        app:sb_effect_duration="200"
+        app:sb_show_indicator="false"
+        app:ui_title="@string/rdp_add_setting_debug_async_input"
+        app:ui_value="是否启用 Async Input" />
 
-            <com.xiaoyv.ui.setting.UiSettingView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:ui_key="bookmark.async_channel"
-                app:ui_title="@string/settings_async_channel"
-                app:ui_type="type_boolean" />
+    <com.xiaoyv.ui.setting.item.UiSettingSwitchView
+        android:id="@+id/sv_async_transport"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:sb_checked_color="@color/ui_theme_c1"
+        app:sb_effect_duration="200"
+        app:sb_show_indicator="false"
+        app:ui_title="@string/rdp_add_setting_debug_async_transport"
+        app:ui_value="是否启用 Async Transport" />
 
-            <com.xiaoyv.ui.setting.UiSettingView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:ui_key="bookmark.async_update"
-                app:ui_title="@string/settings_async_update"
-                app:ui_type="type_boolean" />
-
-            <com.xiaoyv.ui.setting.UiSettingView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:ui_key="bookmark.async_input"
-                app:ui_title="@string/settings_async_input"
-                app:ui_type="type_boolean" />
-
-        </com.xiaoyv.ui.setting.UiSettingScreen>
-    </androidx.core.widget.NestedScrollView>
-</androidx.appcompat.widget.LinearLayoutCompat>
+</com.xiaoyv.ui.setting.UiSettingScreen>

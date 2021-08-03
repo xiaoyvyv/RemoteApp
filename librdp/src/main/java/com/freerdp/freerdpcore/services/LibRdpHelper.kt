@@ -113,6 +113,7 @@ object LibRdpHelper {
         }
         arguments.add(LibFreeRDP.addFlag("async-channels", debugSettings.asyncChannel))
         arguments.add(LibFreeRDP.addFlag("async-input", debugSettings.asyncInput))
+        arguments.add(LibFreeRDP.addFlag("async-transport", debugSettings.asyncTransport))
         arguments.add(LibFreeRDP.addFlag("async-update", debugSettings.asyncUpdate))
 
         // 内部储存重定向

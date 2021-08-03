@@ -3,6 +3,8 @@ package com.xiaoyv.rdp.add
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.blankj.utilcode.util.*
 import com.blankj.utilcode.util.ThreadUtils.SimpleTask
@@ -28,6 +30,38 @@ class AddRdpActivity : BaseActivity() {
     private lateinit var rdpEntity: RdpEntity
     private var rdpConfig: RdpConfig = RdpConfig()
     private var isAdd = false
+
+    private val screenLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val screenSettings =
+                it.data?.getSerializableExtra(NavigationKey.KEY_SERIALIZABLE) as? RdpConfig.ActiveScreenSettings
+                    ?: return@registerForActivityResult
+            rdpConfig.screenSettings = screenSettings
+        }
+
+    private val advancedLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val advancedSettings =
+                it.data?.getSerializableExtra(NavigationKey.KEY_SERIALIZABLE) as? RdpConfig.AdvancedSettings
+                    ?: return@registerForActivityResult
+            rdpConfig.advancedSettings = advancedSettings
+        }
+
+    private val performanceLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val performanceSettings =
+                it.data?.getSerializableExtra(NavigationKey.KEY_SERIALIZABLE) as? RdpConfig.PerformanceSettings
+                    ?: return@registerForActivityResult
+            rdpConfig.performanceSettings = performanceSettings
+        }
+
+    private val debugLauncher: ActivityResultLauncher<Intent> =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+            val debugSettings =
+                it.data?.getSerializableExtra(NavigationKey.KEY_SERIALIZABLE) as? RdpConfig.DebugSettings
+                    ?: return@registerForActivityResult
+            rdpConfig.debugSettings = debugSettings
+        }
 
     override fun createContentView(): View {
         binding = RdpActivityAddBinding.inflate(layoutInflater)
@@ -78,7 +112,7 @@ class AddRdpActivity : BaseActivity() {
         // 分辨率设置
         binding.setScreen.setOnClickListener {
             RdpSingleSettingActivity.openSelf(
-                this,
+                this, screenLauncher,
                 rdpConfig, RdpSingleSettingActivity.SETTING_SCREEN
             )
         }
@@ -86,21 +120,24 @@ class AddRdpActivity : BaseActivity() {
         // 性能设置
         binding.setPerformance.setOnClickListener {
             RdpSingleSettingActivity.openSelf(
-                this,
+                this, performanceLauncher,
                 rdpConfig, RdpSingleSettingActivity.SETTING_PERFORMANCE
             )
         }
-    }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (resultCode == RESULT_OK && requestCode == 999 && data != null) {
-            val newConfig = data.getSerializableExtra(NavigationKey.KEY_SERIALIZABLE) as? RdpConfig
-            newConfig?.let {
-                ToastUtils.showShort("更新配置")
-                LogUtils.e(GsonUtils.toJson(it))
-                rdpConfig = it
-            }
+        // 高级设置
+        binding.setAdvance.setOnClickListener {
+            RdpSingleSettingActivity.openSelf(
+                this, advancedLauncher,
+                rdpConfig, RdpSingleSettingActivity.SETTING_ADVANCED
+            )
+        }
+        // 高级设置
+        binding.setDebug.setOnClickListener {
+            RdpSingleSettingActivity.openSelf(
+                this, debugLauncher,
+                rdpConfig, RdpSingleSettingActivity.SETTING_DEBUG
+            )
         }
     }
 

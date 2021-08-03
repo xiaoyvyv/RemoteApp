@@ -4,14 +4,15 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.IntDef
-import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.FragmentUtils
+import com.blankj.utilcode.util.StringUtils
 import com.blankj.utilcode.util.ToastUtils
-import com.blankj.utilcode.util.Utils
 import com.freerdp.freerdpcore.domain.RdpConfig
 import com.xiaoyv.busines.base.BaseActivity
 import com.xiaoyv.busines.config.NavigationKey
+import com.xiaoyv.rdp.R
 import com.xiaoyv.rdp.databinding.RdpSettingSingleBinding
 
 /**
@@ -53,6 +54,7 @@ class RdpSingleSettingActivity : BaseActivity() {
     override fun initView() {
         when (type) {
             SETTING_SCREEN -> {
+                binding.toolbar.setTitle(StringUtils.getString(R.string.rdp_add_setting_screen))
                 FragmentUtils.add(
                     supportFragmentManager,
                     RdpSingleScreenFragment.newInstance(),
@@ -60,6 +62,7 @@ class RdpSingleSettingActivity : BaseActivity() {
                 )
             }
             SETTING_PERFORMANCE -> {
+                binding.toolbar.setTitle(StringUtils.getString(R.string.rdp_add_setting_performance))
                 FragmentUtils.add(
                     supportFragmentManager,
                     RdpSinglePerformanceFragment.newInstance(),
@@ -67,6 +70,7 @@ class RdpSingleSettingActivity : BaseActivity() {
                 )
             }
             SETTING_DEBUG -> {
+                binding.toolbar.setTitle(StringUtils.getString(R.string.rdp_add_setting_debug))
                 FragmentUtils.add(
                     supportFragmentManager,
                     RdpSingleDebugFragment.newInstance(),
@@ -74,6 +78,7 @@ class RdpSingleSettingActivity : BaseActivity() {
                 )
             }
             SETTING_ADVANCED -> {
+                binding.toolbar.setTitle(StringUtils.getString(R.string.rdp_add_setting_advance))
                 FragmentUtils.add(
                     supportFragmentManager,
                     RdpSingleAdvancedFragment.newInstance(),
@@ -93,7 +98,20 @@ class RdpSingleSettingActivity : BaseActivity() {
     override fun onBackPressed() {
         intent?.let {
             rdpConfig?.apply {
-                it.putExtra(NavigationKey.KEY_SERIALIZABLE, this)
+                when (type) {
+                    SETTING_SCREEN -> {
+                        it.putExtra(NavigationKey.KEY_SERIALIZABLE, screenSettings)
+                    }
+                    SETTING_PERFORMANCE -> {
+                        it.putExtra(NavigationKey.KEY_SERIALIZABLE, performanceSettings)
+                    }
+                    SETTING_DEBUG -> {
+                        it.putExtra(NavigationKey.KEY_SERIALIZABLE, debugSettings)
+                    }
+                    SETTING_ADVANCED -> {
+                        it.putExtra(NavigationKey.KEY_SERIALIZABLE, advancedSettings)
+                    }
+                }
                 setResult(RESULT_OK, it)
             }
         }
@@ -107,11 +125,16 @@ class RdpSingleSettingActivity : BaseActivity() {
         const val SETTING_ADVANCED = 3
 
         @JvmStatic
-        fun openSelf(activity: Activity, rdpConfig: RdpConfig, @SingleSettingType type: Int) {
-            val intent = Intent(Utils.getApp(), RdpSingleSettingActivity::class.java)
+        fun openSelf(
+            activity: Activity,
+            launcher: ActivityResultLauncher<Intent>,
+            rdpConfig: RdpConfig,
+            @SingleSettingType type: Int
+        ) {
+            val intent = Intent(activity, RdpSingleSettingActivity::class.java)
             intent.putExtra(NavigationKey.KEY_SERIALIZABLE, rdpConfig)
             intent.putExtra(NavigationKey.KEY_INT, type)
-            ActivityUtils.startActivityForResult(activity, intent, 999)
+            launcher.launch(intent)
         }
     }
 

@@ -1,12 +1,9 @@
 package com.xiaoyv.rdp.setting.single
 
-import android.os.Bundle
 import android.view.View
 import com.freerdp.freerdpcore.domain.RdpConfig
 import com.xiaoyv.busines.base.BaseFragment
-import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.rdp.databinding.RdpSettingSingleDebugBinding
-import com.xiaoyv.rdp.databinding.RdpSettingSinglePerformanceBinding
 
 /**
  * RdpSingleDebugFragment
@@ -14,8 +11,10 @@ import com.xiaoyv.rdp.databinding.RdpSettingSinglePerformanceBinding
  * @author why
  * @since 2021/07/11
  **/
-class RdpSingleDebugFragment: BaseFragment() {
+class RdpSingleDebugFragment : BaseFragment() {
     private lateinit var binding: RdpSettingSingleDebugBinding
+
+    private var rdpConfig: RdpConfig? = null
 
     override fun createContentView(): View {
         binding = RdpSettingSingleDebugBinding.inflate(layoutInflater)
@@ -23,9 +22,45 @@ class RdpSingleDebugFragment: BaseFragment() {
     }
 
     override fun initView() {
+        val settingActivity = (activity as? RdpSingleSettingActivity) ?: return
+        rdpConfig = settingActivity.rdpConfig
     }
 
     override fun initData() {
+        rdpConfig?.debugSettings?.let {
+            binding.svAsyncChannel.isChecked = it.asyncChannel
+            binding.svAsyncUpdate.isChecked = it.asyncUpdate
+            binding.svAsyncInput.isChecked = it.asyncInput
+            binding.svAsyncTransport.isChecked = it.asyncTransport
+        }
+    }
+
+    override fun initListener() {
+        binding.svDebugLevel.onSelectStringListener = { _: String, index: Int ->
+            val level = RdpConfig.DebugSettings.levels[index]
+            rdpConfig?.debugSettings?.debugLevel = level
+        }
+
+
+    }
+
+    private fun saveState() {
+        rdpConfig?.debugSettings?.let {
+            it.asyncChannel = binding.svAsyncChannel.isChecked
+            it.asyncUpdate = binding.svAsyncUpdate.isChecked
+            it.asyncInput = binding.svAsyncInput.isChecked
+            it.asyncTransport = binding.svAsyncTransport.isChecked
+        }
+    }
+
+    /**
+     * 是否消费返回事件，仅 Fragment 重写该方法
+     *
+     * @return Fragment 是否消费返回事件
+     */
+    override fun onFragmentBackPressed(): Boolean {
+        saveState()
+        return super.onFragmentBackPressed()
     }
 
     companion object {

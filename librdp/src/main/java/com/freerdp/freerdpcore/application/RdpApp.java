@@ -104,7 +104,7 @@ public class RdpApp implements LibRdpEventListener {
         if (timeoutMinutes > 0) {
             // 开始断开连接超时...
             disconnectTimer = new Timer();
-            disconnectTimer.schedule(new DisconnectTask(), timeoutMinutes * 60 * 1000);
+            disconnectTimer.schedule(new DisconnectTask(), timeoutMinutes * 60L * 1000);
         }
     }
 

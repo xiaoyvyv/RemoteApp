@@ -38,7 +38,30 @@ class RdpSinglePerformanceFragment : BaseFragment() {
             binding.svMenuAnimation.isChecked = it.menuAnimations
             binding.svThemeStyle.isChecked = it.theme
         }
+    }
 
+    private fun saveState() {
+        rdpConfig?.performanceSettings?.let {
+            it.wallpaper = binding.svBackground.isChecked
+            it.desktopComposition = binding.svDesktopCom.isChecked
+            it.fullWindowDrag = binding.svDragContent.isChecked
+            it.gfx = binding.svGfx.isChecked
+            it.h264 = binding.svH264.isChecked
+            it.remoteFx = binding.svRfx.isChecked
+            it.fontSmoothing = binding.svSmFont.isChecked
+            it.menuAnimations = binding.svMenuAnimation.isChecked
+            it.theme = binding.svThemeStyle.isChecked
+        }
+    }
+
+    /**
+     * 是否消费返回事件，仅 Fragment 重写该方法
+     *
+     * @return Fragment 是否消费返回事件
+     */
+    override fun onFragmentBackPressed(): Boolean {
+        saveState()
+        return super.onFragmentBackPressed()
     }
 
     companion object {
