@@ -881,6 +881,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     override fun vSessionClose(result: Int) {
         setResult(result, intent)
         presenter.v2pGetSession {
+            LogUtils.e(LibFreeRDP.lastError(it.instance))
             ToastUtils.showShort(LibFreeRDP.lastError(it.instance))
         }
         finish()
