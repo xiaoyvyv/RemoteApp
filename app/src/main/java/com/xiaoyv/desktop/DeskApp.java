@@ -17,10 +17,7 @@ public class DeskApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        BluePrint.init(this);
-//
-//        Utils.init(this);
-//        RdpApp.init(this);
-//        BaseApp.init(this);
+        RdpApp.init(this);
+        BaseApp.init(this);
     }
 }

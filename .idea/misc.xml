@@ -4,7 +4,12 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/app_demo/src/main/res/layout/activity_main.xml" value="0.23970818134445024" />
+        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/common_business/src/main/res/layout/business_activity_root.xml" value="0.11041666666666666" />
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/common_ui/src/main/res/layout/ui_dialog.xml" value="0.23958333333333334" />
+        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/common_ui/src/main/res/layout/ui_setting_view.xml" value="0.1" />
+        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/common_ui/src/main/res/layout/ui_view_content.xml" value="0.23958333333333334" />
+        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/common_ui/src/main/res/layout/ui_view_loading.xml" value="0.23958333333333334" />
+        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/common_ui/src/main/res/layout/ui_view_toolbar.xml" value="0.23958333333333334" />
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_main/src/main/res/layout/main_activity_splash.xml" value="0.2351851851851852" />
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_mine/src/main/res/layout/mine_fragment_dialog.xml" value="0.22037037037037038" />
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_mine/src/main/res/layout/mine_fragment_dialog_item.xml" value="0.23958333333333334" />
