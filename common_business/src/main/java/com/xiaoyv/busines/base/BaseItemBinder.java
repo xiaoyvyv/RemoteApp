@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.blankj.utilcode.util.LogUtils;
-import com.drakeet.multitype.ItemViewBinder;
+import com.chad.library.adapter.base.viewholder.BaseViewHolder;
 import com.xiaoyv.ui.listener.SimpleFastClickListener;
 
 /**
@@ -15,18 +15,23 @@ import com.xiaoyv.ui.listener.SimpleFastClickListener;
  * @author why
  * @since 2020/12/01
  **/
-public abstract class BaseItemBinder<T, VH extends RecyclerView.ViewHolder> extends ItemViewBinder<T, VH> {
+public abstract class BaseItemBinder<T> extends com.chad.library.adapter.base.binder.BaseItemBinder<T, BaseViewHolder> {
     protected RecyclerView rvRootRecycler;
+
     protected OnItemChildClickListener<T> onItemChildClickListener = (view, dataBean, position, longClick) ->
-            LogUtils.v("empty impl click listener for the item'child");
+            LogUtils.v("empty impl click listener for the item's child");
 
     public void setOnItemChildClickListener(OnItemChildClickListener<T> onItemChildClickListener) {
         this.onItemChildClickListener = onItemChildClickListener;
     }
 
     public void addClickListener(@NonNull RecyclerView.ViewHolder holder, @NonNull View view) {
-        int position = getPosition(holder);
-        @SuppressWarnings("unchecked") T o = (T) getAdapterItems().get(position);
+        int position = holder.getBindingAdapterPosition();
+
+         T o = (T) getAdapterItems().get(position);
+         view.setOnFastLimitClickListener{
+
+        }
         view.setOnClickListener(new SimpleFastClickListener(1000) {
             @Override
             public void onMultiClick(View v) {

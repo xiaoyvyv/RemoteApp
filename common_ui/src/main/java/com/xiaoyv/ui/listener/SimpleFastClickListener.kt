@@ -1,6 +1,6 @@
-package com.xiaoyv.ui.listener;
+package com.xiaoyv.ui.listener
 
-import android.view.View;
+import android.view.View
 
 /**
  * OnMultiClickListener
@@ -8,26 +8,32 @@ import android.view.View;
  * @author why
  * @since 2020/11/29
  */
-public abstract class SimpleFastClickListener implements View.OnClickListener {
-    private final long interval;
-    private long lastClickTime;
+abstract class SimpleFastClickListener(private val interval: Long = 200L) : View.OnClickListener {
+    private var lastClickTime: Long = 0
 
-    public SimpleFastClickListener() {
-        interval = 200;
+    abstract fun onMultiClick(v: View)
+
+    override fun onClick(v: View) {
+        val curClickTime = System.currentTimeMillis()
+
+        if (curClickTime - lastClickTime >= interval) {
+            lastClickTime = 0
+            onMultiClick(v)
+            return
+        }
+        lastClickTime = curClickTime
     }
+}
 
-    public SimpleFastClickListener(long interval) {
-        this.interval = interval;
-    }
-
-    public abstract void onMultiClick(View v);
-
-    @Override
-    public void onClick(View v) {
-        long curClickTime = System.currentTimeMillis();
-        if ((curClickTime - lastClickTime) >= interval) {
-            lastClickTime = curClickTime;
-            onMultiClick(v);
+inline fun View.setOnFastLimitClickListener(
+    interval: Long = 200L,
+    crossinline onMultiClick: (View) -> Unit = {}
+): SimpleFastClickListener {
+    val clickListener = object : SimpleFastClickListener(interval) {
+        override fun onMultiClick(v: View) {
+            onMultiClick.invoke(v)
         }
     }
+    setOnClickListener(clickListener)
+    return clickListener
 }

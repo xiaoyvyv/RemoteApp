@@ -6,8 +6,6 @@ import com.alibaba.android.arouter.launcher.ARouter;
 import com.blankj.utilcode.util.ObjectUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ThreadUtils;
-import com.xiaoyv.busines.base.BaseSubscriber;
-import com.xiaoyv.busines.base.ImplBasePresenter;
 import com.xiaoyv.busines.config.NavigationPath;
 import com.xiaoyv.busines.exception.RxException;
 import com.xiaoyv.busines.room.database.DateBaseManger;

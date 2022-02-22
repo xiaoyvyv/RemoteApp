@@ -9,7 +9,6 @@ import com.alibaba.android.arouter.facade.annotation.Route
 import com.blankj.utilcode.util.*
 import com.blankj.utilcode.util.ThreadUtils.SimpleTask
 import com.freerdp.freerdpcore.domain.RdpConfig
-import com.xiaoyv.busines.base.BaseActivity
 import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.busines.config.NavigationPath
 import com.xiaoyv.busines.room.database.DateBaseManger
@@ -17,7 +16,6 @@ import com.xiaoyv.busines.room.entity.RdpEntity
 import com.xiaoyv.rdp.R
 import com.xiaoyv.rdp.databinding.RdpActivityAddBinding
 import com.xiaoyv.rdp.setting.single.RdpSingleSettingActivity
-import com.xiaoyv.ui.dialog.normal.NormalDialog
 
 /**
  * AddRdpActivity

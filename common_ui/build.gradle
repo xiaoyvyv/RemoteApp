@@ -31,8 +31,6 @@ android {
 }
 
 dependencies {
-    // 多类型适配器
-    api "com.drakeet.multitype:multitype:${rootProject.ext.multitypeVersion}"
     // 常用工具类
     api "com.blankj:utilcodex:${rootProject.ext.utilCodeXVersion}"
     // 刷新

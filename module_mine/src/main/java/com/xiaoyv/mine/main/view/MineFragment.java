@@ -11,7 +11,7 @@ import com.alibaba.android.arouter.facade.annotation.Route;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 import com.drakeet.multitype.MultiTypeAdapter;
-import com.xiaoyv.busines.base.BaseFragment;
+import com.xiaoyv.blueprint.base.BaseFragment;
 import com.xiaoyv.busines.config.NavigationPath;
 import com.xiaoyv.busines.room.database.DateBaseManger;
 import com.xiaoyv.busines.room.entity.FtpEntity;
@@ -77,13 +77,13 @@ public class MineFragment extends BaseFragment implements SimpleResultListener<F
 
     @Override
     protected void initData() {
-        bottomSheet = new NormalDialog(activity);
+        bottomSheet = new NormalDialog(hostActivity);
         bottomSheet.setCustomView(dialogBinding.getRoot());
 
-        helpDialog = new NormalDialog(activity);
+        helpDialog = new NormalDialog(hostActivity);
         helpDialog.setCustomView(helpBinding.getRoot());
 
-        MineItemBinder itemBinder = new MineItemBinder(activity);
+        MineItemBinder itemBinder = new MineItemBinder(hostActivity);
         itemBinder.bindRecycler(dialogBinding.rvItem);
         multiTypeAdapter = new MultiTypeAdapter();
         multiTypeAdapter.register(List.class, itemBinder);
@@ -202,8 +202,8 @@ public class MineFragment extends BaseFragment implements SimpleResultListener<F
         });
     }
 
-    @Override
-    public boolean onFragmentBackPressed() {
-        return true;
-    }
+//    @Override
+//    public boolean onFragmentBackPressed() {
+//        return true;
+//    }
 }

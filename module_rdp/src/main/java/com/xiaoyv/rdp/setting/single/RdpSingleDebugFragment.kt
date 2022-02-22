@@ -2,7 +2,7 @@ package com.xiaoyv.rdp.setting.single
 
 import android.view.View
 import com.freerdp.freerdpcore.domain.RdpConfig
-import com.xiaoyv.busines.base.BaseFragment
+import com.xiaoyv.blueprint.base.BaseFragment
 import com.xiaoyv.rdp.databinding.RdpSettingSingleDebugBinding
 
 /**

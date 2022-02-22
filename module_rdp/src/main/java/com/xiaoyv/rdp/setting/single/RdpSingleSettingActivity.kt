@@ -10,7 +10,8 @@ import com.blankj.utilcode.util.FragmentUtils
 import com.blankj.utilcode.util.StringUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.freerdp.freerdpcore.domain.RdpConfig
-import com.xiaoyv.busines.base.BaseActivity
+import com.xiaoyv.blueprint.base.BaseActivity
+import com.xiaoyv.blueprint.utils.LazyUtils.loadRootFragment
 import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.rdp.R
 import com.xiaoyv.rdp.databinding.RdpSettingSingleBinding
@@ -38,7 +39,7 @@ class RdpSingleSettingActivity : BaseActivity() {
         return binding.root
     }
 
-    override fun initIntentData(intent: Intent, bundle: Bundle) {
+    override fun initIntentData(intent: Intent, bundle: Bundle, isNewIntent: Boolean) {
         rdpConfig = bundle.getSerializable(NavigationKey.KEY_SERIALIZABLE) as? RdpConfig
         if (rdpConfig == null) {
             ToastUtils.showShort("配置文件出错！")
@@ -52,38 +53,28 @@ class RdpSingleSettingActivity : BaseActivity() {
      * 初始化
      */
     override fun initView() {
+        val containerId = binding.flContainer.id
+
         when (type) {
             SETTING_SCREEN -> {
                 binding.toolbar.setTitle(StringUtils.getString(R.string.rdp_add_setting_screen))
-                FragmentUtils.add(
-                    supportFragmentManager,
-                    RdpSingleScreenFragment.newInstance(),
-                    binding.flContainer.id, false
-                )
+
+                loadRootFragment(containerId,  RdpSingleScreenFragment.newInstance())
             }
             SETTING_PERFORMANCE -> {
                 binding.toolbar.setTitle(StringUtils.getString(R.string.rdp_add_setting_performance))
-                FragmentUtils.add(
-                    supportFragmentManager,
-                    RdpSinglePerformanceFragment.newInstance(),
-                    binding.flContainer.id, false
-                )
+
+                loadRootFragment(containerId,  RdpSinglePerformanceFragment.newInstance())
             }
             SETTING_DEBUG -> {
                 binding.toolbar.setTitle(StringUtils.getString(R.string.rdp_add_setting_debug))
-                FragmentUtils.add(
-                    supportFragmentManager,
-                    RdpSingleDebugFragment.newInstance(),
-                    binding.flContainer.id, false
-                )
+
+                loadRootFragment(containerId,  RdpSingleDebugFragment.newInstance())
             }
             SETTING_ADVANCED -> {
                 binding.toolbar.setTitle(StringUtils.getString(R.string.rdp_add_setting_advance))
-                FragmentUtils.add(
-                    supportFragmentManager,
-                    RdpSingleAdvancedFragment.newInstance(),
-                    binding.flContainer.id, false
-                )
+
+                loadRootFragment(containerId,  RdpSingleAdvancedFragment.newInstance())
             }
         }
     }

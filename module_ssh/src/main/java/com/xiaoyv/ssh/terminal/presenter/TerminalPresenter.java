@@ -2,8 +2,6 @@ package com.xiaoyv.ssh.terminal.presenter;
 
 import com.romide.terminal.emulatorview.compat.KeycodeConstants;
 import com.trilead.ssh2.Session;
-import com.xiaoyv.busines.base.BaseSubscriber;
-import com.xiaoyv.busines.base.ImplBasePresenter;
 import com.xiaoyv.busines.bean.ssh.KeyCodeBean;
 import com.xiaoyv.busines.exception.RxException;
 import com.xiaoyv.busines.room.entity.SshEntity;

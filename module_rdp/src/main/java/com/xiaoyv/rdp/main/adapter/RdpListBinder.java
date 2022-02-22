@@ -7,9 +7,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.TimeUtils;
-import com.drakeet.multitype.ItemViewBinder;
 import com.xiaoyv.busines.base.BaseItemBinder;
 import com.xiaoyv.busines.room.entity.RdpEntity;
 import com.xiaoyv.rdp.databinding.RdpFragmentMainItemBinding;

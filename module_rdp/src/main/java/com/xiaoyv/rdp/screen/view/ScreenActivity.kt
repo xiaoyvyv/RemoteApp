@@ -1,5 +1,6 @@
 package com.xiaoyv.rdp.screen.view
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
@@ -22,7 +23,7 @@ import com.freerdp.freerdpcore.utils.ClipboardManagerProxy
 import com.freerdp.freerdpcore.view.RdpPointerView
 import com.freerdp.freerdpcore.view.RdpSessionView
 import com.hijamoya.keyboardview.Keyboard
-import com.xiaoyv.busines.base.BaseMvpActivity
+import com.xiaoyv.blueprint.base.BaseMvpActivity
 import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.busines.room.entity.RdpEntity
 import com.xiaoyv.rdp.R
@@ -152,8 +153,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         return binding.root
     }
 
-
-    override fun initIntentData(intent: Intent, bundle: Bundle) {
+    override fun initIntentData(intent: Intent, bundle: Bundle, isNewIntent: Boolean) {
         rdpEntity = intent.getSerializableExtra(KEY_RDP_ENTITY) as? RdpEntity
         rdpInstance = intent.getLongExtra(KEY_RDP_INSTANCE, rdpInstance)
         rdpUri = intent.data
@@ -170,7 +170,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         binding.rsvSession.requestFocus()
     }
 
-    override fun initBar() {
+    override fun initBarConfig() {
         vSetLandscapeScreen(true)
     }
 
@@ -856,15 +856,11 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         binding.keyboardHeader.invalidateAllKeys()
     }
 
-    override fun p2vShowLoading() {
-        loading.show(supportFragmentManager)
-    }
-
-    override fun p2vShowLoading(msg: String) {
+    override fun p2vShowLoading(msg: String?) {
         loading.arguments = loading.arguments?.also {
             val builder =
                 it.getSerializable(NavigationKey.KEY_SERIALIZABLE) as? ScreenLoadingFragment.Builder
-            builder?.loadingMessage = msg
+            builder?.loadingMessage = msg.orEmpty()
             it.putSerializable(NavigationKey.KEY_SERIALIZABLE, builder)
         }
         loading.show(supportFragmentManager)
@@ -873,7 +869,6 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     override fun p2vHideLoading() {
         loading.dismiss()
     }
-
 
     /**
      * 各种原因导致连接关闭
@@ -888,6 +883,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     }
 
 
+    @SuppressLint("MissingSuperCall")
     override fun onBackPressed() {
         presenter.v2pGetSession(empty = {
             finish()

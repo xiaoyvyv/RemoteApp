@@ -4,7 +4,7 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     buildFeatures {
-        viewBinding = true
+        viewBinding  true
     }
 
     defaultConfig {

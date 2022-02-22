@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment;
 
 import com.alibaba.android.arouter.launcher.ARouter;
 import com.blankj.utilcode.util.FragmentUtils;
-import com.xiaoyv.busines.base.BaseActivity;
+import com.xiaoyv.blueprint.base.BaseActivity;
 import com.xiaoyv.busines.config.NavigationPath;
 import com.xiaoyv.main.R;
 import com.xiaoyv.main.databinding.MainActivityHomeBinding;

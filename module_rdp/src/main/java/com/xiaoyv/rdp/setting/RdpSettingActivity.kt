@@ -6,7 +6,7 @@ import android.view.View
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.StringUtils
 import com.blankj.utilcode.util.Utils
-import com.xiaoyv.busines.base.BaseActivity
+import com.xiaoyv.blueprint.base.BaseActivity
 import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.rdp.R
 import com.xiaoyv.rdp.databinding.RdpSettingClientBinding
@@ -53,7 +53,7 @@ class RdpSettingActivity : BaseActivity() {
         }
     }
 
-    override fun initIntentData(intent: Intent, bundle: Bundle) {
+    override fun initIntentData(intent: Intent, bundle: Bundle, isNewIntent: Boolean) {
         type = getIntent().getStringExtra(NavigationKey.KEY_STRING)
     }
 
@@ -97,7 +97,7 @@ class RdpSettingActivity : BaseActivity() {
         var TYPE_SETTING_CLIENT = "TYPE_SETTING_CLIENT"
 
         @JvmStatic
-            fun openSelf(typeSetting: String) {
+        fun openSelf(typeSetting: String) {
             val intent = Intent(Utils.getApp(), RdpSettingActivity::class.java)
             intent.putExtra(NavigationKey.KEY_STRING, typeSetting)
             ActivityUtils.startActivity(intent)

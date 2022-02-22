@@ -1,36 +1,28 @@
-package com.xiaoyv.rdp.main.contract;
+package com.xiaoyv.rdp.main.contract
 
-import androidx.annotation.NonNull;
-
-import com.google.android.material.tabs.TabLayout;
-import com.xiaoyv.busines.base.BaseSubscriber;
-import com.xiaoyv.busines.base.IBaseModel;
-import com.xiaoyv.busines.base.IBasePresenter;
-import com.xiaoyv.busines.base.IBaseView;
-import com.xiaoyv.busines.room.entity.RdpEntity;
-import com.xiaoyv.ui.listener.SimpleResultListener;
-
-import java.util.List;
-
-import io.reactivex.rxjava3.core.Observable;
+import com.google.android.material.tabs.TabLayout
+import com.xiaoyv.blueprint.base.IBasePresenter
+import com.xiaoyv.blueprint.base.IBaseView
+import com.xiaoyv.busines.room.entity.RdpEntity
+import com.xiaoyv.ui.listener.SimpleResultListener
+import io.reactivex.rxjava3.core.Observable
 
 /**
  * RdpListContract
  *
  * @author why
  * @since 2020/11/29
- **/
-public interface RdpListContract {
-    interface View extends IBaseView {
-
-        void removeItem(RdpEntity dataBean, int adapterPos);
+ */
+interface RdpListContract {
+    interface View : IBaseView {
+        fun removeItem(dataBean: RdpEntity, adapterPos: Int)
 
         /**
          * Rdp 列表
          *
          * @param rdpEntities 列表
          */
-        void p2vQueryLocalRdp(List<RdpEntity> rdpEntities);
+        fun p2vQueryLocalRdp(rdpEntities: List<RdpEntity>)
 
         /**
          * Rdp 列表
@@ -38,54 +30,51 @@ public interface RdpListContract {
          * @param rdpEntities 列表
          * @param group       组
          */
-        void p2vQueryLocalRdpByGroup(List<RdpEntity> rdpEntities, String group);
+        fun p2vQueryLocalRdpByGroup(rdpEntities: List<RdpEntity>, group: String)
 
         /**
          * 获取TabLayout
          *
          * @return 分组标签
          */
-        TabLayout p2vGetTabLayout();
+        fun p2vGetTabLayout(): TabLayout
     }
 
-    interface Presenter extends IBasePresenter {
+    interface Presenter : IBasePresenter {
         /**
          * 获取全部 rdp
          */
-        void v2pQueryLocalRdp();
+        fun v2pQueryLocalRdp()
 
         /**
          * 根据组获取全部 rdp
          *
          * @param group 组
          */
-        void v2pQueryLocalRdpByGroup(String group);
+        fun v2pQueryLocalRdpByGroup(group: String)
 
         /**
          * 查询全部分组
          *
          * @param rdpEntities 全部列表
-         * @param subscribe   subscribe
          */
-        void v2pResolveAllGroup(@NonNull List<RdpEntity> rdpEntities, BaseSubscriber<List<String>> subscribe);
+        fun v2pResolveAllGroup(rdpEntities: List<RdpEntity>)
 
         /**
          * 删除一个配置信息
          *
          * @param dataBean       配置信息
-         * @param resultListener 回调
          */
-        void v2pDeleteRdp(RdpEntity dataBean, SimpleResultListener<Boolean> resultListener);
+        fun v2pDeleteRdp(dataBean: RdpEntity)
     }
 
-    interface Model extends IBaseModel {
-
+    interface Model {
         /**
          * 数据库查询 rdp
          *
          * @return 列表
          */
-        Observable<List<RdpEntity>> p2mQueryLocalRdp();
+        fun p2mQueryLocalRdp(): Observable<List<RdpEntity>>
 
         /**
          * 数据库查询 rdp
@@ -93,6 +82,9 @@ public interface RdpListContract {
          * @param group 组
          * @return 列表
          */
-        Observable<List<RdpEntity>> p2mQueryLocalRdpByGroup(String group);
+        fun p2mQueryLocalRdpByGroup(group: String): Observable<List<RdpEntity>>
+        fun p2mDeleteRdp(dataBean: RdpEntity): Observable<Boolean>
+        fun p2mResolveAllGroup(rdpEntities: List<RdpEntity>): Observable<List<String>>
+
     }
 }

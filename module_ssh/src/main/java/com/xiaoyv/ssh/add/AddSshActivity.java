@@ -11,7 +11,6 @@ import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 import com.blankj.utilcode.util.Utils;
-import com.xiaoyv.busines.base.BaseActivity;
 import com.xiaoyv.busines.config.NavigationPath;
 import com.xiaoyv.busines.room.database.DateBaseManger;
 import com.xiaoyv.busines.room.entity.SshEntity;

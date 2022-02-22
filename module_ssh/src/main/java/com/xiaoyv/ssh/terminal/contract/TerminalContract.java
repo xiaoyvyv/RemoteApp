@@ -1,9 +1,6 @@
 package com.xiaoyv.ssh.terminal.contract;
 
 import com.trilead.ssh2.Session;
-import com.xiaoyv.busines.base.IBaseModel;
-import com.xiaoyv.busines.base.IBasePresenter;
-import com.xiaoyv.busines.base.IBaseView;
 import com.xiaoyv.busines.bean.ssh.KeyCodeBean;
 import com.xiaoyv.busines.room.entity.SshEntity;
 
@@ -45,7 +42,7 @@ public interface TerminalContract {
         List<KeyCodeBean> v2pGetSymbol();
     }
 
-    interface Model extends IBaseModel {
+    interface Model {
         /**
          * 连接SSH
          *

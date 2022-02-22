@@ -3,10 +3,6 @@ package com.xiaoyv.ssh.main.contract;
 import androidx.annotation.NonNull;
 
 import com.google.android.material.tabs.TabLayout;
-import com.xiaoyv.busines.base.BaseSubscriber;
-import com.xiaoyv.busines.base.IBaseModel;
-import com.xiaoyv.busines.base.IBasePresenter;
-import com.xiaoyv.busines.base.IBaseView;
 import com.xiaoyv.busines.room.entity.SshEntity;
 import com.xiaoyv.ui.listener.SimpleResultListener;
 
@@ -78,7 +74,7 @@ public interface SshListContract {
         void v2pDeleteSsh(SshEntity dataBean, SimpleResultListener<Boolean> resultListener);
     }
 
-    interface Model extends IBaseModel {
+    interface Model {
 
         /**
          * 数据库查询 Ssh

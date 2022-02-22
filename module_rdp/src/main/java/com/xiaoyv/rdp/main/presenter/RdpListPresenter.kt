@@ -1,130 +1,88 @@
-package com.xiaoyv.rdp.main.presenter;
+package com.xiaoyv.rdp.main.presenter
 
-import androidx.annotation.NonNull;
-
-import com.alibaba.android.arouter.launcher.ARouter;
-import com.blankj.utilcode.util.GsonUtils;
-import com.blankj.utilcode.util.ObjectUtils;
-import com.blankj.utilcode.util.StringUtils;
-import com.blankj.utilcode.util.ThreadUtils;
-import com.freerdp.freerdpcore.domain.RdpConfig;
-import com.xiaoyv.busines.base.BaseSubscriber;
-import com.xiaoyv.busines.base.ImplBasePresenter;
-import com.xiaoyv.busines.config.NavigationPath;
-import com.xiaoyv.busines.exception.RxException;
-import com.xiaoyv.busines.room.database.DateBaseManger;
-import com.xiaoyv.busines.room.entity.RdpEntity;
-import com.xiaoyv.rdp.R;
-import com.xiaoyv.rdp.main.contract.RdpListContract;
-import com.xiaoyv.rdp.main.model.RdpListModel;
-import com.xiaoyv.ui.listener.SimpleResultListener;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.core.ObservableOnSubscribe;
+import com.blankj.utilcode.util.ObjectUtils
+import com.blankj.utilcode.util.StringUtils
+import com.xiaoyv.blueprint.base.ImplBasePresenter
+import com.xiaoyv.blueprint.base.subscribesWithPresenter
+import com.xiaoyv.busines.room.entity.RdpEntity
+import com.xiaoyv.rdp.R
+import com.xiaoyv.rdp.main.contract.RdpListContract
+import com.xiaoyv.rdp.main.model.RdpListModel
 
 /**
  * RdpListPresenter
  *
  * @author why
  * @since 2020/11/29
- **/
-public class RdpListPresenter extends ImplBasePresenter<RdpListContract.View> implements RdpListContract.Presenter {
-    private final RdpListContract.Model model;
+ */
+class RdpListPresenter : ImplBasePresenter<RdpListContract.View>(), RdpListContract.Presenter {
+    private val model = RdpListModel()
 
-    public RdpListPresenter() {
-        this.model = new RdpListModel();
-    }
-
-    @Override
-    public void v2pQueryLocalRdp() {
+    override fun v2pQueryLocalRdp() {
         model.p2mQueryLocalRdp()
-                .compose(bindTransformer())
-                .to(bindLifecycle())
-                .subscribe(new BaseSubscriber<List<RdpEntity>>() {
-                    @Override
-                    public void onError(RxException e) {
-                        // 没有配置的桌面则显示去创建
-                        getView().p2vGetStatusView()
-                                .showTryAgain(StringUtils.getString(R.string.rdp_main_list_empty), StringUtils.getString(R.string.rdp_main_add_now), v ->
-                                                ARouter.getInstance().build(NavigationPath.PATH_RDP_ADD_ACTIVITY).navigation());
-                        getView().p2vGetTabLayout().removeAllTabs();
+            .subscribesWithPresenter(
+                presenter = this,
+                onSuccess = {
+                    if (ObjectUtils.isEmpty(it)) {
+                        return@subscribesWithPresenter
                     }
-
-                    @Override
-                    public void onSuccess(List<RdpEntity> rdpEntities) {
-                        if (ObjectUtils.isEmpty(rdpEntities)) {
-                            onError(null);
-                            return;
-                        }
-                        getView().p2vQueryLocalRdp(rdpEntities);
-                    }
-                });
+                    requireView.p2vQueryLocalRdp(it)
+                },
+                onError = {
+                    // 没有配置的桌面则显示去创建
+                    requireView.stateController
+                        .showRetryView(
+                            StringUtils.getString(R.string.rdp_main_list_empty),
+                            StringUtils.getString(R.string.rdp_main_add_now),
+                            R.drawable.ui_pic_status_empty
+                        )
+                    requireView.p2vGetTabLayout().removeAllTabs()
+                }
+            )
     }
 
-    @Override
-    public void v2pQueryLocalRdpByGroup(String group) {
+    override fun v2pQueryLocalRdpByGroup(group: String) {
         model.p2mQueryLocalRdpByGroup(group)
-                .compose(bindTransformer())
-                .to(bindLifecycle())
-                .subscribe(new BaseSubscriber<List<RdpEntity>>() {
-                    @Override
-                    public void onError(RxException e) {
-                        // 当前组没有配置的桌面则显示暂无内容
-                        getView().p2vShowEmptyView();
+            .subscribesWithPresenter(
+                presenter = this,
+                onSuccess = {
+                    if (ObjectUtils.isEmpty(it)) {
+                        requireView.stateController.showEmptyView()
+                        return@subscribesWithPresenter
                     }
-
-                    @Override
-                    public void onSuccess(List<RdpEntity> rdpEntities) {
-                        if (ObjectUtils.isEmpty(rdpEntities)) {
-                            getView().p2vShowEmptyView();
-                            return;
-                        }
-                        getView().p2vQueryLocalRdpByGroup(rdpEntities, group);
-                    }
-                });
+                    requireView.p2vQueryLocalRdpByGroup(it, group)
+                },
+                onError = {
+                    // 当前组没有配置的桌面则显示暂无内容
+                    requireView.stateController.showEmptyView()
+                }
+            )
     }
 
-    @Override
-    public void v2pResolveAllGroup(@NonNull List<RdpEntity> rdpEntities, BaseSubscriber<List<String>> subscribe) {
-        Observable.create((ObservableOnSubscribe<List<String>>) emitter -> {
-            List<String> groups = new ArrayList<>();
-            for (RdpEntity rdpEntity : rdpEntities) {
-                String group = rdpEntity.group;
-                if (StringUtils.isEmpty(group)) {
-                    group = StringUtils.getString(R.string.rdp_main_group);
+
+    override fun v2pResolveAllGroup(rdpEntities: List<RdpEntity>) {
+        model.p2mResolveAllGroup(rdpEntities)
+            .subscribesWithPresenter(
+                presenter = this,
+                onSuccess = {
+
+                },
+                onError = {
+
                 }
-                if (!groups.contains(group)) {
-                    groups.add(group);
-                }
-            }
-            Collections.sort(groups, String::compareTo);
-            emitter.onNext(groups);
-            emitter.onComplete();
-        }).compose(bindTransformer()).to(bindLifecycle()).subscribe(subscribe);
+            )
     }
 
-    @Override
-    public void v2pDeleteRdp(@NonNull final RdpEntity dataBean, @NonNull final SimpleResultListener<Boolean> resultListener) {
-        // 删除配置信息
-        ThreadUtils.executeByCached(new ThreadUtils.SimpleTask<Boolean>() {
-            @Override
-            public Boolean doInBackground() {
-                // 清除RDP配置数据库当前条目
-                RdpConfig rdpBookmark = GsonUtils.fromJson(dataBean.configStr, RdpConfig.class);
+    override fun v2pDeleteRdp(dataBean: RdpEntity) {
+        model.p2mDeleteRdp(dataBean)
+            .subscribesWithPresenter(
+                presenter = this,
+                onSuccess = {
 
-                // 清除 RdpEntity 当前条目
-                DateBaseManger.get().getRdpDao().delete(dataBean);
-                return true;
-            }
+                },
+                onError = {
 
-            @Override
-            public void onSuccess(Boolean result) {
-                resultListener.onResult(result);
-            }
-        });
+                }
+            )
     }
 }

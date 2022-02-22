@@ -3,12 +3,8 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/common_ui/src/main/res/layout/ui_dialog.xml" value="0.23958333333333334" />
-        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_activity_add.xml" value="0.20462962962962963" />
-        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_setting_single_advance.xml" value="0.23958333333333334" />
-        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_setting_single_debug.xml" value="0.23958333333333334" />
-        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_setting_single_performance.xml" value="0.264" />
-        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_setting_single_screen.xml" value="0.23958333333333334" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_activity_screen_loading.xml" value="0.329417773237998" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_fragment_main.xml" value="0.329417773237998" />
       </map>
     </option>
   </component>
@@ -37,7 +33,7 @@
     </option>
     <option name="myNotNulls">
       <value>
-        <list size="14">
+        <list size="13">
           <item index="0" class="java.lang.String" itemvalue="org.jetbrains.annotations.NotNull" />
           <item index="1" class="java.lang.String" itemvalue="edu.umd.cs.findbugs.annotations.NonNull" />
           <item index="2" class="java.lang.String" itemvalue="android.support.annotation.NonNull" />
@@ -51,12 +47,11 @@
           <item index="10" class="java.lang.String" itemvalue="org.eclipse.jdt.annotation.NonNull" />
           <item index="11" class="java.lang.String" itemvalue="io.reactivex.annotations.NonNull" />
           <item index="12" class="java.lang.String" itemvalue="io.reactivex.rxjava3.annotations.NonNull" />
-          <item index="13" class="java.lang.String" itemvalue="lombok.NonNull" />
         </list>
       </value>
     </option>
   </component>
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" project-jdk-name="11" project-jdk-type="JavaSDK">
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>
   <component name="ProjectType">

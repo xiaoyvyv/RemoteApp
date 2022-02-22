@@ -7,9 +7,9 @@ import com.freerdp.freerdpcore.domain.RdpConfig
 import com.freerdp.freerdpcore.domain.RdpSession
 import com.freerdp.freerdpcore.view.RdpPointerView
 import com.freerdp.freerdpcore.view.RdpSessionView
-import com.xiaoyv.busines.base.IBaseModel
-import com.xiaoyv.busines.base.IBasePresenter
-import com.xiaoyv.busines.base.IBaseView
+import com.xiaoyv.blueprint.base.IBaseModel
+import com.xiaoyv.blueprint.base.IBasePresenter
+import com.xiaoyv.blueprint.base.IBaseView
 import com.xiaoyv.ui.scroll.FreeScrollView
 
 /**

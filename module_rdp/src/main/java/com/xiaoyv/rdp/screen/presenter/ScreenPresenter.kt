@@ -14,7 +14,7 @@ import com.freerdp.freerdpcore.services.LibFreeRDP
 import com.freerdp.freerdpcore.utils.RdpMouse
 import com.freerdp.freerdpcore.view.RdpPointerView
 import com.freerdp.freerdpcore.view.RdpSessionView
-import com.xiaoyv.busines.base.ImplBasePresenter
+import com.xiaoyv.blueprint.base.ImplBasePresenter
 import com.xiaoyv.rdp.screen.contract.ScreenContract
 import com.xiaoyv.rdp.screen.model.ScreenModel
 import com.xiaoyv.rdp.screen.config.RdpUiEventHandler
@@ -39,7 +39,7 @@ class ScreenPresenter : ImplBasePresenter<ScreenContract.View>(), ScreenContract
 
     override fun v2pConnectWithConfig(rdpConfig: RdpConfig) {
         // 配置信息
-        model.p2mApplyConfig(rdpConfig, view.p2vScreenLandscape())
+        model.p2mApplyConfig(rdpConfig, requireView.p2vScreenLandscape())
         // 创建一个会话信息
         val rdpSession = RdpApp.createSession(rdpConfig, Utils.getApp())
         v2pStartConnect(rdpSession, false)
@@ -51,10 +51,10 @@ class ScreenPresenter : ImplBasePresenter<ScreenContract.View>(), ScreenContract
     }
 
     override fun v2pStartConnect(rdpSession: RdpSession, resumeConnect: Boolean) {
-        val session = view.p2vStartConnect(rdpSession)
+        val session = requireView.p2vStartConnect(rdpSession)
         // 若是恢复已经连接的实例，则不用重新连接
         if (resumeConnect) {
-            view.p2vBindSession(session)
+            requireView.p2vBindSession(session)
         } else {
             // 若存在实例，且不需要恢复则先取消再连接
             LibFreeRDP.cancelConnection(session.instance)
@@ -222,8 +222,8 @@ class ScreenPresenter : ImplBasePresenter<ScreenContract.View>(), ScreenContract
         uiHandler.rsvScroll = rsvScroll
 
         // 根布局宽高
-        val width = view.p2vGetRootParam().first
-        val height = view.p2vGetRootParam().second
+        val width = requireView.p2vGetRootParam().first
+        val height = requireView.p2vGetRootParam().second
 
         // 指针位于边缘时，画面自动滚动
         if (!uiHandler.hasMessages(RdpUiEventHandler.HANDLER_EVENT_BORDER_SCROLL)) {

@@ -42,10 +42,16 @@ allprojects {
             url 'https://maven.aliyun.com/repository/public/'
         }
         maven {
+            url 'https://maven.aliyun.com/repository/google/'
+        }
+        maven{
+            url 'https://s01.oss.sonatype.org/content/repositories/releases/'
+        }
+        maven {
             url 'https://jitpack.io'
         }
-        google()
         mavenCentral()
+        google()
     }
 }
 

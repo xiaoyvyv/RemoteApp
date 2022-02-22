@@ -8,17 +8,11 @@ import com.blankj.utilcode.util.ActivityUtils;
 import com.blankj.utilcode.util.ColorUtils;
 import com.blankj.utilcode.util.ObjectUtils;
 import com.blankj.utilcode.util.StringUtils;
-import com.blankj.utilcode.util.ThreadUtils;
-import com.blankj.utilcode.util.ToastUtils;
 import com.drakeet.multitype.MultiTypeAdapter;
 import com.google.android.material.tabs.TabLayout;
-import com.trilead.ssh2.Session;
-import com.xiaoyv.busines.base.BaseMvpFragment;
-import com.xiaoyv.busines.base.BaseSubscriber;
 import com.xiaoyv.busines.config.NavigationPath;
 import com.xiaoyv.busines.exception.RxException;
 import com.xiaoyv.busines.room.entity.SshEntity;
-import com.xiaoyv.busines.utils.ScanUtils;
 import com.xiaoyv.ssh.R;
 import com.xiaoyv.ssh.add.AddSshActivity;
 import com.xiaoyv.ssh.databinding.SshFragmentMainBinding;
@@ -30,7 +24,6 @@ import com.xiaoyv.ui.dialog.OptionsDialog;
 import com.xiaoyv.ui.listener.SimpleRefreshListener;
 import com.xiaoyv.ui.listener.SimpleTabSelectListener;
 
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import me.everything.android.ui.overscroll.IOverScrollDecor;

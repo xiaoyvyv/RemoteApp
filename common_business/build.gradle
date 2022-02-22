@@ -53,6 +53,10 @@ kapt {
 dependencies {
     api project(':common_ui')
 
+    // 框架
+    api 'io.github.xiaoyvyv:blueprint:1.0.4'
+    api 'androidx.annotation:annotation:1.3.0'
+
     // 腾讯Bugly
     api "com.tencent.bugly:crashreport:${rootProject.ext.buglyCrashVersion}"
 

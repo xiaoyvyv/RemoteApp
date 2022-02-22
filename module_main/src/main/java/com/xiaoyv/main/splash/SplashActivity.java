@@ -1,11 +1,9 @@
 package com.xiaoyv.main.splash;
 
-import android.content.Intent;
-import android.os.Bundle;
 import android.view.View;
 
 import com.blankj.utilcode.util.ActivityUtils;
-import com.xiaoyv.busines.base.BaseActivity;
+import com.xiaoyv.blueprint.base.BaseActivity;
 import com.xiaoyv.main.databinding.MainActivitySplashBinding;
 import com.xiaoyv.main.home.HomeActivity;
 
