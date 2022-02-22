@@ -6,7 +6,6 @@ import android.os.Bundle
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.annotation.IntDef
-import com.blankj.utilcode.util.FragmentUtils
 import com.blankj.utilcode.util.StringUtils
 import com.blankj.utilcode.util.ToastUtils
 import com.freerdp.freerdpcore.domain.RdpConfig
@@ -57,24 +56,25 @@ class RdpSingleSettingActivity : BaseActivity() {
 
         when (type) {
             SETTING_SCREEN -> {
-                binding.toolbar.setTitle(StringUtils.getString(R.string.rdp_add_setting_screen))
+                binding.toolbar.title = StringUtils.getString(R.string.rdp_add_setting_screen)
 
-                loadRootFragment(containerId,  RdpSingleScreenFragment.newInstance())
+                loadRootFragment(containerId, RdpSingleScreenFragment.newInstance())
             }
             SETTING_PERFORMANCE -> {
-                binding.toolbar.setTitle(StringUtils.getString(R.string.rdp_add_setting_performance))
+                binding.toolbar.title =
+                    StringUtils.getString(R.string.rdp_add_setting_performance)
 
-                loadRootFragment(containerId,  RdpSinglePerformanceFragment.newInstance())
+                loadRootFragment(containerId, RdpSinglePerformanceFragment.newInstance())
             }
             SETTING_DEBUG -> {
-                binding.toolbar.setTitle(StringUtils.getString(R.string.rdp_add_setting_debug))
+                binding.toolbar.title = StringUtils.getString(R.string.rdp_add_setting_debug)
 
-                loadRootFragment(containerId,  RdpSingleDebugFragment.newInstance())
+                loadRootFragment(containerId, RdpSingleDebugFragment.newInstance())
             }
             SETTING_ADVANCED -> {
-                binding.toolbar.setTitle(StringUtils.getString(R.string.rdp_add_setting_advance))
+                binding.toolbar.title = StringUtils.getString(R.string.rdp_add_setting_advance)
 
-                loadRootFragment(containerId,  RdpSingleAdvancedFragment.newInstance())
+                loadRootFragment(containerId, RdpSingleAdvancedFragment.newInstance())
             }
         }
     }

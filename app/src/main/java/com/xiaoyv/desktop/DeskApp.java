@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.blankj.utilcode.util.Utils;
 import com.freerdp.freerdpcore.application.RdpApp;
+import com.xiaoyv.blueprint.BluePrint;
 import com.xiaoyv.busines.BaseApp;
 
 /**
@@ -16,8 +17,10 @@ public class DeskApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Utils.init(this);
-        RdpApp.init(this);
-        BaseApp.init(this);
+        BluePrint.init(this);
+//
+//        Utils.init(this);
+//        RdpApp.init(this);
+//        BaseApp.init(this);
     }
 }

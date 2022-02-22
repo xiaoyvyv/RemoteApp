@@ -21,11 +21,12 @@ import com.xiaoyv.rdp.databinding.RdpSettingUiBinding
  * @since 2020/12/04
  */
 class RdpSettingActivity : BaseActivity() {
-    private var type: String? = null
     private lateinit var uiBinding: RdpSettingUiBinding
     private lateinit var securityBinding: RdpSettingSecurityBinding
     private lateinit var powerBinding: RdpSettingPowerBinding
     private lateinit var clientBinding: RdpSettingClientBinding
+
+    private var type: String? = null
 
     override fun createContentView(): View {
         return when {
@@ -75,10 +76,7 @@ class RdpSettingActivity : BaseActivity() {
             }
         }
 
-        uiBinding.toolbar.setTitle(title)
-            .setStartClickListener {
-                onBackPressed()
-            }
+        uiBinding.toolbar.title = title
     }
 
     override fun initData() {}

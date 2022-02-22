@@ -10,3 +10,4 @@ include ':libssh'
 include ':librdp'
 include ':app'
 rootProject.name = "RemoteApp"
+include ':app_demo'

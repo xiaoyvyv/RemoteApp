@@ -1,7 +1,10 @@
 package com.xiaoyv.rdp.screen.model
 
 import android.content.res.Configuration
-import com.blankj.utilcode.util.*
+import com.blankj.utilcode.util.BarUtils
+import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ScreenUtils
+import com.blankj.utilcode.util.Utils
 import com.freerdp.freerdpcore.domain.RdpConfig
 import com.xiaoyv.rdp.screen.contract.ScreenContract
 import kotlin.math.max

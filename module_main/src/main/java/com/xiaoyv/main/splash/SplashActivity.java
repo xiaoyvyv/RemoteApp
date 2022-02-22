@@ -1,6 +1,11 @@
 package com.xiaoyv.main.splash;
 
+import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.blankj.utilcode.util.ActivityUtils;
 import com.xiaoyv.blueprint.base.BaseActivity;
@@ -13,30 +18,15 @@ import com.xiaoyv.main.home.HomeActivity;
  * @author why
  * @since 2020/11/28
  **/
-public class SplashActivity extends BaseActivity {
+public class SplashActivity extends AppCompatActivity {
     private MainActivitySplashBinding binding;
 
     @Override
-    protected View createContentView() {
-        binding = MainActivitySplashBinding.inflate(getLayoutInflater());
-        return binding.getRoot();
+    protected void onCreate(@Nullable @org.jetbrains.annotations.Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        binding = MainActivitySplashBinding.inflate(LayoutInflater.from(this));
+        setContentView(binding.getRoot());
     }
 
-    @Override
-    protected void initView() {
-
-    }
-
-    @Override
-    protected void initData() {
-
-    }
-
-    @Override
-    protected void initListener() {
-        binding.tvEnter.setOnClickListener(v -> {
-            ActivityUtils.startActivity(HomeActivity.class);
-            finish();
-        });
-    }
 }

@@ -3,9 +3,5 @@
     package="com.xiaoyv.main">
 
     <application>
-        <activity android:name=".splash.SplashActivity" />
-        <activity
-            android:name=".home.HomeActivity"/>
     </application>
-
 </manifest>

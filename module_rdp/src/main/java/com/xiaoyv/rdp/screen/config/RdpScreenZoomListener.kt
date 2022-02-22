@@ -1,8 +1,6 @@
 package com.xiaoyv.rdp.screen.config
 
 import android.view.ScaleGestureDetector
-import com.blankj.utilcode.util.LogUtils
-import com.blankj.utilcode.util.ToastUtils
 import com.freerdp.freerdpcore.view.RdpSessionView
 import com.xiaoyv.ui.scroll.FreeScrollView
 import kotlin.math.max

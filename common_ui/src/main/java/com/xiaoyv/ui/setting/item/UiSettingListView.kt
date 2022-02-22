@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import com.xiaoyv.ui.R
 import com.xiaoyv.ui.dialog.OptionsDialog
+import com.xiaoyv.ui.dialog.OptionsDialogItemBinder
 
 /**
  * UiSettingItemView
@@ -39,13 +40,16 @@ class UiSettingListView @JvmOverloads constructor(
         if (!isInEditMode) {
             this.optionsDialog = OptionsDialog(context).also {
                 it.setOptions(*uiListValueDesc)
-                it.setOnItemChildClickListener { position: Int ->
-                    binding.tvDesc.text = uiListValueDesc[position].toString()
-                    val charSequence = uiListValue[position].toString()
+                it.setOnItemChildClickListener(object :
+                    OptionsDialogItemBinder.OnItemChildClickListener {
+                    override fun onItemChildClick(position: Int) {
+                        binding.tvDesc.text = uiListValueDesc[position].toString()
+                        val charSequence = uiListValue[position].toString()
 
-                    onSelectStringListener.invoke(charSequence, position)
-                    onSelectIntListener.invoke(charSequence.toIntOrNull() ?: 0, position)
-                }
+                        onSelectStringListener.invoke(charSequence, position)
+                        onSelectIntListener.invoke(charSequence.toIntOrNull() ?: 0, position)
+                    }
+                })
             }
 
             super.setOnClickListener {

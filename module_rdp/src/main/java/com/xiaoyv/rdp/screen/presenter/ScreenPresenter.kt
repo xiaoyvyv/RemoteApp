@@ -15,9 +15,9 @@ import com.freerdp.freerdpcore.utils.RdpMouse
 import com.freerdp.freerdpcore.view.RdpPointerView
 import com.freerdp.freerdpcore.view.RdpSessionView
 import com.xiaoyv.blueprint.base.ImplBasePresenter
+import com.xiaoyv.rdp.screen.config.RdpUiEventHandler
 import com.xiaoyv.rdp.screen.contract.ScreenContract
 import com.xiaoyv.rdp.screen.model.ScreenModel
-import com.xiaoyv.rdp.screen.config.RdpUiEventHandler
 import com.xiaoyv.ui.scroll.FreeScrollView
 
 /**

@@ -9,6 +9,7 @@ import com.alibaba.android.arouter.facade.annotation.Route
 import com.blankj.utilcode.util.*
 import com.blankj.utilcode.util.ThreadUtils.SimpleTask
 import com.freerdp.freerdpcore.domain.RdpConfig
+import com.xiaoyv.blueprint.base.BaseActivity
 import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.busines.config.NavigationPath
 import com.xiaoyv.busines.room.database.DateBaseManger
@@ -16,6 +17,7 @@ import com.xiaoyv.busines.room.entity.RdpEntity
 import com.xiaoyv.rdp.R
 import com.xiaoyv.rdp.databinding.RdpActivityAddBinding
 import com.xiaoyv.rdp.setting.single.RdpSingleSettingActivity
+import com.xiaoyv.widget.toolbar.UiToolbar
 
 /**
  * AddRdpActivity
@@ -72,7 +74,7 @@ class AddRdpActivity : BaseActivity() {
         return binding.root
     }
 
-    override fun initIntentData(intent: Intent, bundle: Bundle) {
+    override fun initIntentData(intent: Intent, bundle: Bundle, isNewIntent: Boolean) {
         rdpEntity = (intent.getSerializableExtra(NavigationKey.KEY_SERIALIZABLE) as? RdpEntity)
             ?: run {
                 isAdd = true
@@ -91,6 +93,7 @@ class AddRdpActivity : BaseActivity() {
         }
     }
 
+
     override fun initView() {
         binding.asvLabel.uiValue = rdpEntity.label.orEmpty()
         binding.asvGroup.uiValue = rdpEntity.group.orEmpty()
@@ -102,12 +105,16 @@ class AddRdpActivity : BaseActivity() {
     }
 
     override fun initData() {
-        binding.toolbar.setTitle(if (isAdd) getString(R.string.rdp_add_title) else getString(R.string.rdp_add_edit_title))
-            .setStartClickListener { onBackPressed() }
-            .setEndIcon(R.drawable.ui_icon_save)
-            .setEndClickListener {
-                doSaveConfig()
-            }
+        binding.toolbar.title =
+            (if (isAdd) getString(R.string.rdp_add_title) else getString(R.string.rdp_add_edit_title))
+
+        binding.toolbar.setRightIcon(
+            R.drawable.ui_icon_save,
+            onBarClickListener = object : UiToolbar.OnBarClickListener {
+                override fun onClick(view: View, which: Int) {
+                    doSaveConfig()
+                }
+            })
     }
 
     override fun initListener() {

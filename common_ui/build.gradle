@@ -1,10 +1,5 @@
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
-
-    buildFeatures {
-        viewBinding = true
-    }
 
     defaultConfig {
         minSdkVersion rootProject.ext.minSdkVersion
@@ -31,6 +26,8 @@ android {
 }
 
 dependencies {
+    api 'io.github.xiaoyvyv:widget:1.0.5'
+
     // 常用工具类
     api "com.blankj:utilcodex:${rootProject.ext.utilCodeXVersion}"
     // 刷新
@@ -45,8 +42,6 @@ dependencies {
     api "com.github.zcweng:switch-button:${rootProject.ext.buttonVersion}"
 
     // Kotlin
-    api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${rootProject.ext.kotlinVersion}"
-    api "org.jetbrains.kotlin:kotlin-reflect:${rootProject.ext.kotlinVersion}"
     api "androidx.core:core-ktx:${rootProject.ext.kotlinKtxVersion}"
 
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"

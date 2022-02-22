@@ -14,7 +14,9 @@
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
 
-        <activity android:name="com.xiaoyv.main.home.HomeActivity">
+        <activity
+            android:name="com.xiaoyv.main.splash.SplashActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

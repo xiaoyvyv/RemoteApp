@@ -3,7 +3,10 @@ package com.xiaoyv.rdp.screen.view
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.blankj.utilcode.util.ScreenUtils

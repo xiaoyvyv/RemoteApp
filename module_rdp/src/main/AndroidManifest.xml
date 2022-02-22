@@ -6,6 +6,7 @@
         <activity
             android:name=".screen.view.ScreenActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|density|screenLayout|navigation"
+            android:exported="true"
             android:screenOrientation="portrait"
             android:theme="@style/UiApp.NoActionBar.RdpScreen"
             android:windowSoftInputMode="adjustResize">
@@ -21,6 +22,7 @@
             </intent-filter>
         </activity>
         <activity
+            android:exported="false"
             android:name=".add.AddRdpActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".setting.RdpSettingActivity" />

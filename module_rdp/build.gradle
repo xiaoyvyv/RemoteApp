@@ -1,7 +1,6 @@
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
 
     buildFeatures {
         viewBinding = true

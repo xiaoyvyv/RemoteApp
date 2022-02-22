@@ -4,7 +4,7 @@
 
     <application>
         <activity
-            android:name=".terminal.view.TerminalActivity"
+            android:name=".terminal.TerminalActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
         <activity android:name=".add.AddSshActivity"/>
     </application>

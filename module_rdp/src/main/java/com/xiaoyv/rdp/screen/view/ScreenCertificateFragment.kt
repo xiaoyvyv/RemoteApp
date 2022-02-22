@@ -9,12 +9,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.blankj.utilcode.util.ScreenUtils
-import com.xiaoyv.busines.BaseApp
 import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.rdp.R
 import com.xiaoyv.rdp.databinding.RdpActivityScreenCertificateBinding
 import com.xiaoyv.ui.kotlin.dp
-import me.jessyan.autosize.AutoSize
 import java.io.Serializable
 
 /**
