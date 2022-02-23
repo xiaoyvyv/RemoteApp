@@ -7,7 +7,7 @@
             android:name=".screen.view.ScreenActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|density|screenLayout|navigation"
             android:exported="true"
-            android:screenOrientation="portrait"
+            android:screenOrientation="unspecified"
             android:theme="@style/UiApp.NoActionBar.RdpScreen"
             android:windowSoftInputMode="adjustResize">
             <intent-filter>

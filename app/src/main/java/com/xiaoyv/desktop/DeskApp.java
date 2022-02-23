@@ -17,7 +17,7 @@ public class DeskApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        RdpApp.init(this);
         BaseApp.init(this);
+        RdpApp.init(this);
     }
 }

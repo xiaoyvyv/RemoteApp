@@ -1,9 +1,8 @@
-
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     buildFeatures {
-        viewBinding = true
+        viewBinding true
     }
 
     defaultConfig {

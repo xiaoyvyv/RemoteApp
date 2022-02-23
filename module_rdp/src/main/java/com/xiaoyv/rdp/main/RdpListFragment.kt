@@ -8,20 +8,22 @@ import com.blankj.utilcode.util.ColorUtils
 import com.blankj.utilcode.util.ObjectUtils
 import com.blankj.utilcode.util.StringUtils
 import com.chad.library.adapter.base.BaseBinderAdapter
-import com.chad.library.adapter.base.listener.OnItemChildClickListener
+import com.github.nukc.stateview.StateView
 import com.google.android.material.tabs.TabLayout
 import com.xiaoyv.blueprint.base.binding.BaseMvpBindingFragment
-import com.xiaoyv.ui.base.setOnItemClickListener
 import com.xiaoyv.busines.config.NavigationPath
 import com.xiaoyv.busines.room.entity.RdpEntity
 import com.xiaoyv.rdp.R
 import com.xiaoyv.rdp.add.AddRdpActivity
 import com.xiaoyv.rdp.databinding.RdpFragmentMainBinding
 import com.xiaoyv.rdp.screen.view.ScreenActivity
+import com.xiaoyv.rdp.setting.RdpSettingActivity
+import com.xiaoyv.ui.base.setOnItemClickListener
 import com.xiaoyv.ui.dialog.OptionsDialog
 import com.xiaoyv.ui.dialog.OptionsDialogItemBinder
 import com.xiaoyv.ui.listener.SimpleRefreshListener
 import com.xiaoyv.ui.listener.SimpleTabSelectListener
+import com.xiaoyv.widget.utils.doOnBarClick
 import com.xiaoyv.widget.utils.overScrollV
 import me.everything.android.ui.overscroll.IOverScrollDecor
 
@@ -48,6 +50,12 @@ class RdpListFragment :
     override fun createPresenter() = RdpListPresenter()
 
     override fun initView() {
+        binding.toolbar.title = StringUtils.getString(R.string.rdp_main_title)
+        binding.toolbar.setRightIcon(
+            R.drawable.ui_icon_search,
+            onBarClickListener = doOnBarClick { view, which ->
+                RdpSettingActivity.openSelf(RdpSettingActivity.TYPE_SETTING_UI)
+            })
 //        binding.toolbar
 //            .setTitle(StringUtils.getString(R.string.rdp_main_title))
 //            .setEndIcon(R.drawable.ui_icon_search)
@@ -56,6 +64,8 @@ class RdpListFragment :
 //                RdpSettingActivity.openSelf(RdpSettingActivity.TYPE_SETTING_POWER)
 //                RdpSettingActivity.openSelf(RdpSettingActivity.TYPE_SETTING_SECURITY)
 //            }
+        stateController.fitTitleAndStatusBar = true
+
         scrollDecor = binding.rvContent.overScrollV()
     }
 
@@ -78,7 +88,8 @@ class RdpListFragment :
             optionsDialog.setCancelable(true)
             optionsDialog.setOptions(*StringUtils.getStringArray(R.array.ui_context_menu))
             optionsDialog.setLastTextColor(ColorUtils.getColor(R.color.ui_status_error))
-            optionsDialog.setOnItemChildClickListener(object :OptionsDialogItemBinder.OnItemChildClickListener{
+            optionsDialog.setOnItemChildClickListener(object :
+                OptionsDialogItemBinder.OnItemChildClickListener {
                 override fun onItemChildClick(position: Int) {
                     when (position) {
                         0 -> ScreenActivity.openSelf(dataBean)
@@ -157,7 +168,7 @@ class RdpListFragment :
         return binding.tlGroup
     }
 
-    override fun p2vClickStatusView() {
+    override fun p2vClickStatusView(stateView: StateView, view: View) {
         ARouter.getInstance().build(NavigationPath.PATH_RDP_ADD_ACTIVITY).navigation()
     }
 }

@@ -73,7 +73,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
      * 手势操作是否交换鼠标左右键
      */
     private var toggleMouseButtons = false
-    private var screenLandscape = false
+    private var screenLandscape = true
     private var connectSuccess = false
 
     /**
@@ -170,23 +170,13 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         binding.rsvSession.requestFocus()
     }
 
-    override fun initBarConfig() {
-        vSetLandscapeScreen(true)
+
+    override fun initWindowConfig(window: Window) {
+        hideSystemUi()
+
+        vSetLandscapeScreen(screenLandscape)
     }
 
-    /**
-     * 设置横屏或竖屏
-     */
-    override fun vSetLandscapeScreen(landscape: Boolean) {
-        screenLandscape = if (landscape) {
-            ScreenUtils.setLandscape(this)
-            true
-        } else {
-            ScreenUtils.setPortrait(this)
-            false
-        }
-        hideSystemUi()
-    }
 
     override fun initData() {
         // 注册 Rdp 事件广播接收器
@@ -281,6 +271,16 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
                 vSessionClose(RESULT_CANCELED)
             }
         }
+    }
+
+    override fun vSetLandscapeScreen(landscape: Boolean) {
+        this.screenLandscape = landscape
+        if (landscape) {
+            ScreenUtils.setLandscape(this)
+        } else {
+            ScreenUtils.setPortrait(this)
+        }
+        hideSystemUi()
     }
 
     override fun p2vGetRootParam(): Pair<Int, Int> = Pair(rootViewWidth, rootViewHeight)
@@ -892,6 +892,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         })
     }
 
+    @SuppressLint("MissingSuperCall")
     override fun onDestroy() {
         unregisterReceiver(rdpEventReceiver)
         KeyboardUtils.unregisterSoftInputChangedListener(window)

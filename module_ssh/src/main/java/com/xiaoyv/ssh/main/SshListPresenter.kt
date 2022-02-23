@@ -47,7 +47,7 @@ class SshListPresenter : ImplBasePresenter<SshListContract.View>(), SshListContr
                     requireView.stateController.showRetryView(
                         StringUtils.getString(R.string.ssh_main_list_empty),
                         StringUtils.getString(R.string.ssh_main_add_now),
-                        R.drawable.ui_pic_status_empty
+                        R.drawable.ui_pic_status_empty_normal
                     )
                     requireView.p2vGetTabLayout().removeAllTabs()
                 }
