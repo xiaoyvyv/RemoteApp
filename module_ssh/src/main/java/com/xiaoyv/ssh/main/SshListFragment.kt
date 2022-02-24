@@ -11,15 +11,16 @@ import com.blankj.utilcode.util.StringUtils
 import com.chad.library.adapter.base.BaseBinderAdapter
 import com.google.android.material.tabs.TabLayout
 import com.xiaoyv.blueprint.base.binding.BaseMvpBindingFragment
-import com.xiaoyv.ui.base.setOnItemClickListener
 import com.xiaoyv.busines.config.NavigationPath
 import com.xiaoyv.busines.room.entity.SshEntity
 import com.xiaoyv.ssh.R
 import com.xiaoyv.ssh.add.AddSshActivity
 import com.xiaoyv.ssh.databinding.SshFragmentMainBinding
 import com.xiaoyv.ssh.terminal.TerminalActivity
+import com.xiaoyv.ui.base.setOnItemClickListener
 import com.xiaoyv.ui.listener.SimpleRefreshListener
 import com.xiaoyv.ui.listener.SimpleTabSelectListener
+import com.xiaoyv.widget.dialog.UiOptionsDialog
 import com.xiaoyv.widget.toolbar.UiToolbar
 import com.xiaoyv.widget.utils.overScrollV
 import me.everything.android.ui.overscroll.IOverScrollDecor
@@ -126,21 +127,22 @@ class SshListFragment :
                 return@setOnItemClickListener
             }
 
-            val optionsDialog = OptionsDialog.get(activity)
-            optionsDialog.setCancelable(true)
-            optionsDialog.setOptions(*StringUtils.getStringArray(R.array.ui_context_menu))
-            optionsDialog.setLastTextColor(ColorUtils.getColor(R.color.ui_status_error))
-            optionsDialog.show()
-            optionsDialog.setOnItemChildClickListener(object :OptionsDialogItemBinder.OnItemChildClickListener{
-                override fun onItemChildClick(position: Int) {
+            val optionsDialog = UiOptionsDialog.Builder().apply {
+                backCancelable = true
+                itemDataList = StringUtils.getStringArray(R.array.ui_context_menu).toList().map {
+                    toString()
+                }
+                itemLastColor = ColorUtils.getColor(R.color.ui_status_error)
+                onOptionsClickListener = { _, position ->
                     when (position) {
                         0 -> TerminalActivity.openSelf(dataBean)
                         1 -> AddSshActivity.openSelf(dataBean)
                         2 -> removeItem(dataBean, position)
                     }
+                    true
                 }
-            })
-
+            }.create()
+            optionsDialog.show(this)
         }
 
         binding.fabAddSsh.setOnClickListener {
