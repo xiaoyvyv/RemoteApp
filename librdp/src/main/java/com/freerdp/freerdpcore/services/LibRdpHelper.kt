@@ -70,18 +70,20 @@ object LibRdpHelper {
 
         // 分辨率
         arguments.add(
-            String.format(
-                Locale.CANADA, "/size:%dx%d", screenSettings.width, screenSettings.height
-            )
+            String.format("/size:%dx%d", screenSettings.width, screenSettings.height)
         )
+        // 色彩
         arguments.add("/bpp:" + screenSettings.colors)
 
         if (advancedSettings.consoleMode) {
             arguments.add("/admin")
         }
         when (advancedSettings.security) {
+            // NLA
             3 -> arguments.add("/sec-nla")
+            // TLS
             2 -> arguments.add("/sec-tls")
+            // RDP
             1 -> arguments.add("/sec-rdp")
             else -> {
             }
@@ -158,7 +160,8 @@ object LibRdpHelper {
         if (advancedSettings.redirectMicrophone) {
             arguments.add("/microphone")
         }
-//        arguments.add("/cert-ignore")
+
+        // arguments.add("/cert-ignore")
 
         arguments.add("/log-level:" + debugSettings.debugLevel)
         return arguments.toTypedArray()

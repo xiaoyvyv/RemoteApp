@@ -207,9 +207,9 @@ class RdpConfig : Serializable {
      * 性能设置
      */
     class PerformanceSettings : Serializable {
-        var remoteFx = true
-        var gfx = true
-        var h264 = true
+        var remoteFx = false
+        var gfx = false
+        var h264 = false
         var wallpaper = false
         var theme = true
         var fullWindowDrag = false

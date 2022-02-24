@@ -44,7 +44,7 @@ allprojects {
         maven {
             url 'https://maven.aliyun.com/repository/google/'
         }
-        maven{
+        maven {
             url 'https://s01.oss.sonatype.org/content/repositories/releases/'
         }
         maven {
@@ -60,7 +60,7 @@ allprojects {
  */
 configure(subprojects) { project ->
     def name = project.getName()
-    if (name == 'app' || name == 'app_demo') {
+    if (name.startsWith('app')) {
         apply plugin: 'com.android.application'
     } else {
         apply plugin: 'com.android.library'

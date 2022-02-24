@@ -5,14 +5,12 @@ package com.freerdp.freerdpcore.services
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import androidx.collection.LongSparseArray
-import com.blankj.utilcode.util.FileIOUtils
-import com.blankj.utilcode.util.FileUtils
 import com.blankj.utilcode.util.LogUtils
-import com.blankj.utilcode.util.PathUtils
 import com.freerdp.freerdpcore.application.RdpApp
 import com.freerdp.freerdpcore.domain.RdpConfig
+import java.util.*
+import java.util.regex.Pattern
 
 object LibFreeRDP {
     const val TAG = "LibFreeRDP"
@@ -27,7 +25,7 @@ object LibFreeRDP {
     const val VERIFY_CERT_FLAG_FP_IS_PEM: Long = 0x200
 
     @JvmStatic
-    var mHasH264 = true
+    var mHasH264 = false
 
     @JvmStatic
     private var listenerLibRdp: LibRdpEventListener? = null
@@ -43,9 +41,12 @@ object LibFreeRDP {
         return mHasH264
     }
 
+    /**
+     * Native 方法开始 -----------------------------------------------------------------------------
+     */
+    private external fun freerdp_has_h264(): Boolean
     private external fun freerdp_get_jni_version(): String?
     private external fun freerdp_get_version(): String?
-    private external fun freerdp_get_build_date(): String?
     private external fun freerdp_get_build_revision(): String?
     private external fun freerdp_get_build_config(): String?
     private external fun freerdp_new(context: Context): Long
@@ -147,7 +148,11 @@ object LibFreeRDP {
 
     @JvmStatic
     fun updateGraphics(
-        inst: Long, bitmap: Bitmap, x: Int, y: Int, width: Int,
+        inst: Long,
+        bitmap: Bitmap,
+        x: Int,
+        y: Int,
+        width: Int,
         height: Int
     ): Boolean {
         return freerdp_update_graphics(inst, bitmap, x, y, width, height)
@@ -176,6 +181,7 @@ object LibFreeRDP {
     @JvmStatic
     private fun OnConnectionSuccess(inst: Long) {
         listenerLibRdp?.onConnectionSuccess(inst)
+
         synchronized(lock) {
             mInstanceState.append(inst, true)
             lock.notifyAll()
@@ -185,6 +191,7 @@ object LibFreeRDP {
     @JvmStatic
     private fun OnConnectionFailure(inst: Long) {
         listenerLibRdp?.onConnectionFailure(inst)
+
         synchronized(lock) {
             mInstanceState.remove(inst)
             lock.notifyAll()
@@ -213,12 +220,17 @@ object LibFreeRDP {
 
     @JvmStatic
     private fun OnSettingsChanged(inst: Long, width: Int, height: Int, bpp: Int) {
-        RdpApp.getSession(inst)?.libRdpUiEventListener?.onSettingsChanged(width, height, bpp)
+        RdpApp.getSession(inst)
+            ?.libRdpUiEventListener
+            ?.onSettingsChanged(width, height, bpp)
     }
 
     @JvmStatic
     private fun OnAuthenticate(
-        inst: Long, username: StringBuilder, domain: StringBuilder, password: StringBuilder
+        inst: Long,
+        username: StringBuilder,
+        domain: StringBuilder,
+        password: StringBuilder
     ): Boolean {
         return RdpApp.getSession(inst)
             ?.libRdpUiEventListener
@@ -228,7 +240,10 @@ object LibFreeRDP {
 
     @JvmStatic
     private fun OnGatewayAuthenticate(
-        inst: Long, username: StringBuilder, domain: StringBuilder, password: StringBuilder
+        inst: Long,
+        username: StringBuilder,
+        domain: StringBuilder,
+        password: StringBuilder
     ): Boolean {
         return RdpApp.getSession(inst)
             ?.libRdpUiEventListener
@@ -246,11 +261,11 @@ object LibFreeRDP {
         issuer: String?,
         fingerprint: String?,
         flags: Long
-    ): Int = RdpApp.getSession(inst.orEmpty())
+    ): Int = RdpApp.getSession(inst)
         ?.libRdpUiEventListener
         ?.onVerifyCertificateEx(
-            host.orEmpty(), port.orEmpty(), commonName.orEmpty(),
-            subject.orEmpty(), issuer.orEmpty(), fingerprint.orEmpty(), flags.orEmpty()
+            host.orEmpty(), port, commonName.orEmpty(),
+            subject.orEmpty(), issuer.orEmpty(), fingerprint.orEmpty(), flags
         ) ?: 0
 
 
@@ -270,9 +285,9 @@ object LibFreeRDP {
     ): Int = RdpApp.getSession(inst)
         ?.libRdpUiEventListener
         ?.onVerifyChangedCertificateEx(
-            host.orEmpty(), port.orEmpty(), commonName.orEmpty(), subject.orEmpty(),
+            host.orEmpty(), port, commonName.orEmpty(), subject.orEmpty(),
             issuer.orEmpty(), fingerprint.orEmpty(), oldSubject.orEmpty(), oldIssuer.orEmpty(),
-            oldFingerprint.orEmpty(), flags.orEmpty()
+            oldFingerprint.orEmpty(), flags
         ) ?: 0
 
 
@@ -298,38 +313,42 @@ object LibFreeRDP {
     fun lastError(inst: Long) = freerdp_get_last_error_string(inst).orEmpty()
 
     init {
-        val h264 = "openh264"
-        val libraries = arrayOf(
-            h264,
-            "freerdp-openssl",
-            "ssl",
-            "crypto",
-            "jpeg",
-            "winpr3",
-            "freerdp3",
-            "freerdp-client3",
-            "freerdp-android3"
-        )
-        val libraryPath = System.getProperty("java.library.path")
-        libraries.forEach { lib ->
-            try {
-                System.loadLibrary(lib)
-                Log.v(TAG, "尝试从路径: $libraryPath 加载库 $lib 成功")
-            } catch (e: UnsatisfiedLinkError) {
-                Log.e(TAG, "尝试从路径: $libraryPath 加载库 $lib 失败 ${e.message}")
-                if (lib == h264) {
-                    mHasH264 = false
-                }
-            }
+        runCatching {
+            System.loadLibrary("freerdp-android")
+
+            // 读取原生库的版本号 aa.bb.cc
+            val version = freerdp_get_jni_version().orEmpty()
+            val pattern = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+).*")
+            val matcher = pattern.matcher(version)
+            if (!matcher.matches() || matcher.groupCount() < 3) throw java.lang.RuntimeException(
+                "APK 错误：LibFreeRDP 原生库版本版本 $version 不符合当前 APK 要求！"
+            )
+
+            // 主要版本 aa
+            val major = Objects.requireNonNull(matcher.group(1)).toInt()
+            // 次要版本 bb
+            val minor = Objects.requireNonNull(matcher.group(2)).toInt()
+            // 补丁版本 cc
+            val patch = Objects.requireNonNull(matcher.group(3)).toInt()
+
+            // 不同兼容性判断是否支持 H264
+            mHasH264 = if (major > 2) freerdp_has_h264()
+            else if (minor > 5) freerdp_has_h264()
+            else if (minor == 5 && patch >= 1) freerdp_has_h264()
+            else throw java.lang.RuntimeException("APK 错误：LibFreeRDP 原生库版本版本 $version 不符合当前 APK 要求！")
+
+            LogUtils.i(TAG, "加载库成功！是否支持 H264: $mHasH264")
+
+        }.onFailure {
+
+            LogUtils.e(TAG, "加载库失败！${it.message}")
         }
 
-        FileUtils.listFilesInDir(PathUtils.getInternalAppFilesPath(), true).forEach {
-            if (it.isFile) {
-                val cert = FileIOUtils.readFile2String(it)
-                Log.e(TAG, it.absolutePath + "  " + cert)
-            }
-        }
+//        FileUtils.listFilesInDir(PathUtils.getInternalAppFilesPath(), true).forEach {
+//            if (it.isFile) {
+//                val cert = FileIOUtils.readFile2String(it)
+//                Log.e(TAG, it.absolutePath + "  " + cert)
+//            }
+//        }
     }
-
-    private fun Long?.orEmpty() = this ?: 0L
 }
