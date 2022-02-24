@@ -19,10 +19,9 @@ import com.xiaoyv.rdp.databinding.RdpFragmentMainBinding
 import com.xiaoyv.rdp.screen.view.ScreenActivity
 import com.xiaoyv.rdp.setting.RdpSettingActivity
 import com.xiaoyv.ui.base.setOnItemClickListener
-import com.xiaoyv.ui.dialog.OptionsDialog
-import com.xiaoyv.ui.dialog.OptionsDialogItemBinder
 import com.xiaoyv.ui.listener.SimpleRefreshListener
 import com.xiaoyv.ui.listener.SimpleTabSelectListener
+import com.xiaoyv.widget.dialog.UiOptionsDialog
 import com.xiaoyv.widget.utils.doOnBarClick
 import com.xiaoyv.widget.utils.overScrollV
 import me.everything.android.ui.overscroll.IOverScrollDecor
@@ -84,21 +83,21 @@ class RdpListFragment :
                 ScreenActivity.openSelf(dataBean)
                 return@setOnItemClickListener
             }
-            val optionsDialog = OptionsDialog.get(activity)
-            optionsDialog.setCancelable(true)
-            optionsDialog.setOptions(*StringUtils.getStringArray(R.array.ui_context_menu))
-            optionsDialog.setLastTextColor(ColorUtils.getColor(R.color.ui_status_error))
-            optionsDialog.setOnItemChildClickListener(object :
-                OptionsDialogItemBinder.OnItemChildClickListener {
-                override fun onItemChildClick(position: Int) {
+
+            val optionsDialog = UiOptionsDialog.Builder().apply {
+                itemDataList = StringUtils.getStringArray(R.array.ui_context_menu).toList()
+                itemLastColor = ColorUtils.getColor(R.color.ui_status_error)
+                onOptionsClickListener = { _, position ->
                     when (position) {
                         0 -> ScreenActivity.openSelf(dataBean)
                         1 -> AddRdpActivity.openSelf(dataBean)
                         2 -> removeItem(dataBean, position)
                     }
+                    true
                 }
-            })
-            optionsDialog.show()
+
+            }.create()
+            optionsDialog.show(this)
         }
 
         binding.fabAdd.setOnClickListener {
