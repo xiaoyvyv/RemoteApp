@@ -1,5 +1,6 @@
 package com.xiaoyv.ui.setting;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Typeface;
@@ -19,19 +20,23 @@ import androidx.annotation.ColorInt;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.fragment.app.FragmentActivity;
 
 import com.blankj.utilcode.util.ArrayUtils;
 import com.blankj.utilcode.util.ColorUtils;
 import com.blankj.utilcode.util.KeyboardUtils;
-import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.xiaoyv.ui.R;
 import com.xiaoyv.ui.databinding.UiSettingInputBinding;
 import com.xiaoyv.ui.databinding.UiSettingViewBinding;
-import com.xiaoyv.ui.dialog.OptionsDialog;
 import com.xiaoyv.ui.listener.SimpleTextChangeListener;
+import com.xiaoyv.widget.dialog.UiOptionsDialog;
+import com.xiaoyv.widget.utils.ActivityKtKt;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * AppSettingView
@@ -65,7 +70,7 @@ public class UiSettingView extends FrameLayout {
     protected int uiType = UiSettingViewType.TYPE_STRING;
 
     protected CompoundButton.OnCheckedChangeListener checkedChangeListener;
-    protected OptionsDialog optionsDialog;
+    protected UiOptionsDialog optionsDialog;
     protected OnSettingClickListener onSettingClickListener;
 
     public interface OnSettingClickListener {
@@ -182,13 +187,19 @@ public class UiSettingView extends FrameLayout {
             }
             if (uiType == UiSettingViewType.TYPE_LIST_STRING) {
                 if (optionsDialog != null) {
-                    optionsDialog.show();
+                    Activity activity = ActivityKtKt.getActivity(this);
+                    if (activity instanceof FragmentActivity) {
+                        optionsDialog.show((FragmentActivity) activity);
+                    }
                 }
                 return;
             }
             if (uiType == UiSettingViewType.TYPE_LIST_INTEGER) {
                 if (optionsDialog != null) {
-                    optionsDialog.show();
+                    Activity activity = ActivityKtKt.getActivity(this);
+                    if (activity instanceof FragmentActivity) {
+                        optionsDialog.show((FragmentActivity) activity);
+                    }
                 }
                 return;
             }
@@ -305,39 +316,49 @@ public class UiSettingView extends FrameLayout {
                 break;
             }
             case UiSettingViewType.TYPE_LIST_INTEGER: {
-                optionsDialog = new OptionsDialog(context)
-                        .setOptions(uiListTitle)
-                        .setOnItemChildClickListener(position -> {
-                            optionsDialog.dismiss();
-                            try {
-                                String input = String.valueOf(uiListValue[position]);
-                                SPUtils.getInstance(sharePreferenceName).put(spKey, Integer.parseInt(input));
-                            } catch (NumberFormatException e) {
-                                e.printStackTrace();
-                            }
-                            refreshUi();
-                        });
+                UiOptionsDialog.Builder builder = new UiOptionsDialog.Builder();
+                builder.setItemDataList(toList(uiListTitle));
+                builder.setOnOptionsClickListener((s, integer) -> {
+                    optionsDialog.dismiss();
+                    try {
+                        String input = String.valueOf(uiListValue[integer]);
+                        SPUtils.getInstance(sharePreferenceName).put(spKey, Integer.parseInt(input));
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
+                    refreshUi();
+                    return true;
+                });
                 break;
             }
             case UiSettingViewType.TYPE_LIST_STRING: {
-                optionsDialog = new OptionsDialog(context)
-                        .setOptions(uiListTitle)
-                        .setOnItemChildClickListener(position -> {
-                            optionsDialog.dismiss();
-                            try {
-                                String input = String.valueOf(uiListValue[position]);
-                                SPUtils.getInstance(sharePreferenceName).put(spKey, input);
-                            } catch (NumberFormatException e) {
-                                e.printStackTrace();
-                            }
-                            refreshUi();
-                        });
+                UiOptionsDialog.Builder builder = new UiOptionsDialog.Builder();
+                builder.setItemDataList(toList(uiListTitle));
+                builder.setOnOptionsClickListener((s, integer) -> {
+                    optionsDialog.dismiss();
+                    try {
+                        String input = String.valueOf(uiListValue[integer]);
+                        SPUtils.getInstance(sharePreferenceName).put(spKey, input);
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                    }
+                    refreshUi();
+                    return true;
+                });
                 break;
             }
             default:
 
                 break;
         }
+    }
+
+    private List<String> toList(CharSequence[] charSequences) {
+        List<String> stringList = new ArrayList<>();
+        for (CharSequence sequence : charSequences) {
+            stringList.add(sequence.toString());
+        }
+        return stringList;
     }
 
     public void refreshUi() {

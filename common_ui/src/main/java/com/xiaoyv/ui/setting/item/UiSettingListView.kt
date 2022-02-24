@@ -2,9 +2,10 @@ package com.xiaoyv.ui.setting.item
 
 import android.content.Context
 import android.util.AttributeSet
+import androidx.fragment.app.FragmentActivity
 import com.xiaoyv.ui.R
-import com.xiaoyv.ui.dialog.OptionsDialog
-import com.xiaoyv.ui.dialog.OptionsDialogItemBinder
+import com.xiaoyv.widget.dialog.UiOptionsDialog
+import com.xiaoyv.widget.utils.getActivity
 
 /**
  * UiSettingItemView
@@ -15,7 +16,7 @@ import com.xiaoyv.ui.dialog.OptionsDialogItemBinder
 class UiSettingListView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : UiSettingTextView(context, attrs, defStyleAttr) {
-    private var optionsDialog: OptionsDialog? = null
+    private var optionsDialog: UiOptionsDialog? = null
 
     var uiListValueDesc: Array<CharSequence?> = arrayOf()
     var uiListValue: Array<CharSequence?> = arrayOf()
@@ -38,23 +39,25 @@ class UiSettingListView @JvmOverloads constructor(
         showByIndex()
 
         if (!isInEditMode) {
-            this.optionsDialog = OptionsDialog(context).also {
-                it.setOptions(*uiListValueDesc)
-                it.setOnItemChildClickListener(object :
-                    OptionsDialogItemBinder.OnItemChildClickListener {
-                    override fun onItemChildClick(position: Int) {
-                        binding.tvDesc.text = uiListValueDesc[position].toString()
-                        val charSequence = uiListValue[position].toString()
+            this.optionsDialog = UiOptionsDialog.Builder().apply {
+                itemDataList = uiListValueDesc.toList().map { toString() }
+                onOptionsClickListener = { _, position ->
+                    binding.tvDesc.text = uiListValueDesc[position].toString()
+                    val charSequence = uiListValue[position].toString()
 
-                        onSelectStringListener.invoke(charSequence, position)
-                        onSelectIntListener.invoke(charSequence.toIntOrNull() ?: 0, position)
-                    }
-                })
-            }
+                    onSelectStringListener.invoke(charSequence, position)
+                    onSelectIntListener.invoke(charSequence.toIntOrNull() ?: 0, position)
+                    true
+                }
+            }.create()
 
             super.setOnClickListener {
                 onClickListener?.onClick(this)
-                optionsDialog?.show()
+
+                val activity = getActivity()
+                if (activity is FragmentActivity) {
+                    optionsDialog?.show(activity)
+                }
             }
         }
     }
