@@ -318,8 +318,8 @@ public class UiSettingView extends FrameLayout {
             case UiSettingViewType.TYPE_LIST_INTEGER: {
                 UiOptionsDialog.Builder builder = new UiOptionsDialog.Builder();
                 builder.setItemDataList(toList(uiListTitle));
-                builder.setOnOptionsClickListener((s, integer) -> {
-                    optionsDialog.dismiss();
+                builder.setOnOptionsClickListener((d,s, integer) -> {
+                    d.dismissAllowingStateLoss();
                     try {
                         String input = String.valueOf(uiListValue[integer]);
                         SPUtils.getInstance(sharePreferenceName).put(spKey, Integer.parseInt(input));
@@ -334,8 +334,8 @@ public class UiSettingView extends FrameLayout {
             case UiSettingViewType.TYPE_LIST_STRING: {
                 UiOptionsDialog.Builder builder = new UiOptionsDialog.Builder();
                 builder.setItemDataList(toList(uiListTitle));
-                builder.setOnOptionsClickListener((s, integer) -> {
-                    optionsDialog.dismiss();
+                builder.setOnOptionsClickListener((d,s, integer) -> {
+                    d.dismissAllowingStateLoss();
                     try {
                         String input = String.valueOf(uiListValue[integer]);
                         SPUtils.getInstance(sharePreferenceName).put(spKey, input);

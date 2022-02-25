@@ -18,7 +18,7 @@ interface LibRdpUiEventListener {
         password: StringBuilder
     ): Boolean
 
-    fun onVerifyCertificateEx(
+    fun onVerifyCertificate(
         host: String,
         port: Long,
         commonName: String,
@@ -28,7 +28,7 @@ interface LibRdpUiEventListener {
         flags: Long
     ): Int
 
-    fun onVerifyChangedCertificateEx(
+    fun onVerifyChangedCertificate(
         host: String,
         port: Long,
         commonName: String,

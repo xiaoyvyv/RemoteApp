@@ -463,7 +463,7 @@ public class SessionActivity extends AppCompatActivity
 				// small screen device i.e. phone:
 				// Automatic uses the largest side length of the screen and
 				// makes a 16:10 resolution setting out of it
-				int screenMax = Math.max(screen_width, screen_height);
+				int screenMax = (screen_width > screen_height) ? screen_width : screen_height;
 				screenSettings.setHeight(screenMax);
 				screenSettings.setWidth((int)((float)screenMax * 1.6f));
 			}
@@ -598,9 +598,10 @@ public class SessionActivity extends AppCompatActivity
 		// check if any key is in the keycodes list
 
 		List<Keyboard.Key> keys = modifiersKeyboard.getKeys();
-		for (Keyboard.Key curKey : keys)
+		for (Iterator<Keyboard.Key> it = keys.iterator(); it.hasNext();)
 		{
 			// if the key is a sticky key - just set it to off
+			Keyboard.Key curKey = it.next();
 			if (curKey.sticky)
 			{
 				switch (keyboardMapper.getModifierState(curKey.codes[0]))
@@ -819,7 +820,7 @@ public class SessionActivity extends AppCompatActivity
 		else
 			bitmap = Bitmap.createBitmap(width, height, Config.RGB_565);
 
-		session.setSurface(new BitmapDrawable(getResources(), bitmap));
+		session.setSurface(new BitmapDrawable(bitmap));
 
 		if (session.getBookmark() == null)
 		{
@@ -861,7 +862,7 @@ public class SessionActivity extends AppCompatActivity
 			bitmap = Bitmap.createBitmap(width, height, Config.ARGB_8888);
 		else
 			bitmap = Bitmap.createBitmap(width, height, Config.RGB_565);
-		session.setSurface(new BitmapDrawable(getResources(), bitmap));
+		session.setSurface(new BitmapDrawable(bitmap));
 
 		/*
 		 * since sessionView can only be modified from the UI thread any
@@ -957,8 +958,8 @@ public class SessionActivity extends AppCompatActivity
 	}
 
 	@Override
-	public int OnVerifiyCertificateEx(String host, long port, String commonName, String subject,
-	                                  String issuer, String fingerprint, long flags)
+	public int OnVerifiyCertificate(String commonName, String subject, String issuer,
+	                                String fingerprint, boolean mismatch)
 	{
 		// see if global settings says accept all
 		if (ApplicationSettingsActivity.getAcceptAllCertificates(this))
@@ -969,19 +970,8 @@ public class SessionActivity extends AppCompatActivity
 
 		// set message
 		String msg = getResources().getString(R.string.dlg_msg_verify_certificate);
-		String type = "RDP-Server";
-		if ((flags & LibFreeRDP.VERIFY_CERT_FLAG_GATEWAY) != 0)
-			type = "RDP-Gateway";
-		if ((flags & LibFreeRDP.VERIFY_CERT_FLAG_REDIRECT) != 0)
-			type = "RDP-Redirect";
-		msg += "\n\n" + type + ": " + host + ":" + port;
-
-		msg += "\n\nSubject: " + subject + "\nIssuer: " + issuer;
-
-		if ((flags & LibFreeRDP.VERIFY_CERT_FLAG_FP_IS_PEM) != 0)
-			msg += "\nCertificate: " + fingerprint;
-		else
-			msg += "\nFingerprint: " + fingerprint;
+		msg = msg + "\n\nSubject: " + subject + "\nIssuer: " + issuer +
+		      "\nFingerprint: " + fingerprint;
 		dlgVerifyCertificate.setMessage(msg);
 
 		// start dialog in UI thread
@@ -1003,10 +993,9 @@ public class SessionActivity extends AppCompatActivity
 	}
 
 	@Override
-	public int OnVerifyChangedCertificateEx(String host, long port, String commonName,
-	                                        String subject, String issuer, String fingerprint,
-	                                        String oldSubject, String oldIssuer,
-	                                        String oldFingerprint, long flags)
+	public int OnVerifyChangedCertificate(String commonName, String subject, String issuer,
+	                                      String fingerprint, String oldSubject, String oldIssuer,
+	                                      String oldFingerprint)
 	{
 		// see if global settings says accept all
 		if (ApplicationSettingsActivity.getAcceptAllCertificates(this))
@@ -1017,17 +1006,8 @@ public class SessionActivity extends AppCompatActivity
 
 		// set message
 		String msg = getResources().getString(R.string.dlg_msg_verify_certificate);
-		String type = "RDP-Server";
-		if ((flags & LibFreeRDP.VERIFY_CERT_FLAG_GATEWAY) != 0)
-			type = "RDP-Gateway";
-		if ((flags & LibFreeRDP.VERIFY_CERT_FLAG_REDIRECT) != 0)
-			type = "RDP-Redirect";
-		msg += "\n\n" + type + ": " + host + ":" + port;
-		msg += "\n\nSubject: " + subject + "\nIssuer: " + issuer;
-		if ((flags & LibFreeRDP.VERIFY_CERT_FLAG_FP_IS_PEM) != 0)
-			msg += "\nCertificate: " + fingerprint;
-		else
-			msg += "\nFingerprint: " + fingerprint;
+		msg = msg + "\n\nSubject: " + subject + "\nIssuer: " + issuer +
+		      "\nFingerprint: " + fingerprint;
 		dlgVerifyCertificate.setMessage(msg);
 
 		// start dialog in UI thread

@@ -93,14 +93,14 @@ public class GlobalApp extends Application implements LibFreeRDP.EventListener
 	static public SessionState createSession(BookmarkBase bookmark, Context context)
 	{
 		SessionState session = new SessionState(LibFreeRDP.newInstance(context), bookmark);
-		sessionMap.put(session.getInstance(), session);
+		sessionMap.put(Long.valueOf(session.getInstance()), session);
 		return session;
 	}
 
 	static public SessionState createSession(Uri openUri, Context context)
 	{
 		SessionState session = new SessionState(LibFreeRDP.newInstance(context), openUri);
-		sessionMap.put(session.getInstance(), session);
+		sessionMap.put(Long.valueOf(session.getInstance()), session);
 		return session;
 	}
 
@@ -112,7 +112,7 @@ public class GlobalApp extends Application implements LibFreeRDP.EventListener
 	static public Collection<SessionState> getSessions()
 	{
 		// return a copy of the session items
-		return new ArrayList<>(sessionMap.values());
+		return new ArrayList<SessionState>(sessionMap.values());
 	}
 
 	static public void freeSession(long instance)

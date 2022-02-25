@@ -12,7 +12,8 @@ import com.blankj.utilcode.util.ScreenUtils
 import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.rdp.R
 import com.xiaoyv.rdp.databinding.RdpActivityScreenCertificateBinding
-import com.xiaoyv.ui.kotlin.dp
+
+import com.xiaoyv.widget.utils.dpi
 import java.io.Serializable
 
 /**
@@ -64,14 +65,12 @@ class ScreenCertificateFragment : DialogFragment() {
 
     override fun onStart() {
         super.onStart()
-        dialog?.let {
-            it.window?.let { window ->
-                window.setBackgroundDrawableResource(R.color.ui_system_translate)
-                window.attributes = window.attributes.apply {
-                    dimAmount = 0.2f
-                    width = ScreenUtils.getAppScreenWidth() - 60.dp()
-                }
-            }
+
+        val window = dialog?.window ?: return
+        window.setBackgroundDrawableResource(R.color.ui_transparent)
+        window.attributes = window.attributes.apply {
+            dimAmount = 0.2f
+            width = 375.dpi
         }
     }
 

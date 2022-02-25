@@ -70,8 +70,8 @@ public class AboutActivity extends AppCompatActivity
 
 		try
 		{
-			try (BufferedReader r =
-			         new BufferedReader(new InputStreamReader(getAssets().open(file))))
+			BufferedReader r = new BufferedReader(new InputStreamReader(getAssets().open(file)));
+			try
 			{
 				String line;
 				while ((line = r.readLine()) != null)
@@ -79,6 +79,10 @@ public class AboutActivity extends AppCompatActivity
 					total.append(line);
 					total.append("\n");
 				}
+			}
+			finally
+			{
+				r.close();
 			}
 		}
 		catch (IOException e)

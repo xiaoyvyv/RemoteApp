@@ -41,7 +41,9 @@ class UiSettingListView @JvmOverloads constructor(
         if (!isInEditMode) {
             this.optionsDialog = UiOptionsDialog.Builder().apply {
                 itemDataList = uiListValueDesc.toList().map { toString() }
-                onOptionsClickListener = { _, position ->
+                onOptionsClickListener = {dialog, _, position ->
+                    dialog.dismiss()
+
                     binding.tvDesc.text = uiListValueDesc[position].toString()
                     val charSequence = uiListValue[position].toString()
 

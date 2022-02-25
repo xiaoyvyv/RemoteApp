@@ -87,7 +87,9 @@ class RdpListFragment :
             val optionsDialog = UiOptionsDialog.Builder().apply {
                 itemDataList = StringUtils.getStringArray(R.array.ui_context_menu).toList()
                 itemLastColor = ColorUtils.getColor(R.color.ui_status_error)
-                onOptionsClickListener = { _, position ->
+
+                onOptionsClickListener = {dialog, _, position ->
+                    dialog.dismiss()
                     when (position) {
                         0 -> ScreenActivity.openSelf(dataBean)
                         1 -> AddRdpActivity.openSelf(dataBean)

@@ -37,6 +37,10 @@ class ScreenPresenter : ImplBasePresenter<ScreenContract.View>(), ScreenContract
 
     private var currentSession: RdpSession? = null
 
+    private val instance: Long
+        get() = currentSession?.instance ?: 0L
+
+
     override fun v2pConnectWithConfig(rdpConfig: RdpConfig) {
         // 配置信息
         model.p2mApplyConfig(rdpConfig, requireView.p2vScreenLandscape())
@@ -67,6 +71,10 @@ class ScreenPresenter : ImplBasePresenter<ScreenContract.View>(), ScreenContract
         uiHandler.session = session
     }
 
+    override fun v2pGetSession(emptySession: () -> Unit, callback: (RdpSession) -> Unit) {
+        currentSession?.also { callback.invoke(it) } ?: emptySession.invoke()
+    }
+
     override fun v2pFreeSession() {
         // 取消运行断开计时器
         RdpApp.cancelDisconnectTimer()
@@ -77,13 +85,10 @@ class ScreenPresenter : ImplBasePresenter<ScreenContract.View>(), ScreenContract
             LibFreeRDP.disconnect(session.instance)
         }
 
-        RdpApp.freeSession(currentSession?.instance ?: return)
+        RdpApp.freeSession(instance)
         currentSession = null
     }
 
-    override fun v2pGetSession(empty: () -> Unit, callback: (RdpSession) -> Unit) {
-        currentSession?.let { callback.invoke(it) }
-    }
 
     /**
      * 发送光标移动事件
@@ -106,12 +111,12 @@ class ScreenPresenter : ImplBasePresenter<ScreenContract.View>(), ScreenContract
     }
 
     override fun v2pProcessVirtualKey(virtualKeyCode: Int, down: Boolean) {
-        LibFreeRDP.sendKeyEvent(currentSession?.instance ?: return, virtualKeyCode, down)
+        LibFreeRDP.sendKeyEvent(instance, virtualKeyCode, down)
     }
 
     override fun v2pProcessUnicodeKey(unicodeKey: Int) {
-        LibFreeRDP.sendUnicodeKeyEvent(currentSession?.instance ?: return, unicodeKey, true)
-        LibFreeRDP.sendUnicodeKeyEvent(currentSession?.instance ?: return, unicodeKey, true)
+        LibFreeRDP.sendUnicodeKeyEvent(instance, unicodeKey, true)
+        LibFreeRDP.sendUnicodeKeyEvent(instance, unicodeKey, true)
     }
 
     /**
@@ -122,37 +127,24 @@ class ScreenPresenter : ImplBasePresenter<ScreenContract.View>(), ScreenContract
     }
 
     override fun v2pTouchPointerLeftClick(point: Point, down: Boolean) {
-        LibFreeRDP.sendCursorEvent(
-            currentSession?.instance ?: return,
-            point.x, point.y,
-            RdpMouse.getLeftButtonEvent(down)
-        )
+        LibFreeRDP.sendCursorEvent(instance, point.x, point.y, RdpMouse.getLeftButtonEvent(down))
     }
 
     override fun v2pTouchPointerScroll(down: Boolean) {
-        LibFreeRDP.sendCursorEvent(
-            currentSession?.instance ?: return, 0, 0, RdpMouse.getScrollEvent(down)
-        )
+        LibFreeRDP.sendCursorEvent(instance, 0, 0, RdpMouse.getScrollEvent(down))
     }
 
     override fun v2pGenericMotionScroll(vScroll: Float) {
         if (vScroll < 0) {
-            LibFreeRDP.sendCursorEvent(
-                currentSession?.instance ?: return, 0, 0, RdpMouse.getScrollEvent(false)
-            )
+            LibFreeRDP.sendCursorEvent(instance, 0, 0, RdpMouse.getScrollEvent(false))
         }
         if (vScroll > 0) {
-            LibFreeRDP.sendCursorEvent(
-                currentSession?.instance ?: return, 0, 0, RdpMouse.getScrollEvent(true)
-            )
+            LibFreeRDP.sendCursorEvent(instance, 0, 0, RdpMouse.getScrollEvent(true))
         }
     }
 
     override fun v2pSessionViewScroll(down: Boolean) {
-        LibFreeRDP.sendCursorEvent(
-            currentSession?.instance ?: return,
-            0, 0, RdpMouse.getScrollEvent(down)
-        )
+        LibFreeRDP.sendCursorEvent(instance, 0, 0, RdpMouse.getScrollEvent(down))
     }
 
     override fun v2pSessionViewLeftTouch(
@@ -162,7 +154,7 @@ class ScreenPresenter : ImplBasePresenter<ScreenContract.View>(), ScreenContract
         toggleMouseButtons: Boolean
     ) {
         LibFreeRDP.sendCursorEvent(
-            currentSession?.instance ?: return, x, y,
+            instance, x, y,
             if (toggleMouseButtons) RdpMouse.getRightButtonEvent(down)
             else RdpMouse.getLeftButtonEvent(down)
         )
@@ -176,9 +168,7 @@ class ScreenPresenter : ImplBasePresenter<ScreenContract.View>(), ScreenContract
         width: Int,
         height: Int
     ) {
-        LibFreeRDP.updateGraphics(
-            currentSession?.instance ?: return, bitmap, x, y, width, height
-        )
+        LibFreeRDP.updateGraphics(instance, bitmap, x, y, width, height)
         sessionView.addInvalidRegion(Rect(x, y, x + width, y + height))
 
         // 刷新 SessionView
@@ -191,22 +181,15 @@ class ScreenPresenter : ImplBasePresenter<ScreenContract.View>(), ScreenContract
      * 将本地复制内容放到远程主机的剪切板上
      */
     override fun v2pSendClipboardData(data: String) {
-        LibFreeRDP.sendClipboardData(currentSession?.instance ?: return, data)
+        LibFreeRDP.sendClipboardData(instance, data)
     }
 
     override fun v2pTouchPointerRightClick(point: Point, down: Boolean) {
-        LibFreeRDP.sendCursorEvent(
-            currentSession?.instance ?: return,
-            point.x, point.y,
-            RdpMouse.getRightButtonEvent(down)
-        )
+        LibFreeRDP.sendCursorEvent(instance, point.x, point.y, RdpMouse.getRightButtonEvent(down))
     }
 
     override fun v2pTouchPointerMove(point: Point) {
-        LibFreeRDP.sendCursorEvent(
-            currentSession?.instance ?: return,
-            point.x, point.y, RdpMouse.getMoveEvent()
-        )
+        LibFreeRDP.sendCursorEvent(instance, point.x, point.y, RdpMouse.getMoveEvent())
     }
 
     /**

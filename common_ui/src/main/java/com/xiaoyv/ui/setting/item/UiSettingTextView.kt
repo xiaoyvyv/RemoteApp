@@ -14,7 +14,8 @@ import com.blankj.utilcode.util.SPUtils
 import com.blankj.utilcode.util.StringUtils
 import com.xiaoyv.ui.R
 import com.xiaoyv.ui.databinding.UiSettingTextBinding
-import com.xiaoyv.ui.kotlin.dp
+
+import com.xiaoyv.widget.utils.getDpx
 
 /**
  * UiSettingTextView
@@ -74,7 +75,7 @@ open class UiSettingTextView @JvmOverloads constructor(
             binding.vDivider.isVisible = value
         }
 
-    var uiDividerMargin = if (isInEditMode) 40 else 20.dp()
+    var uiDividerMargin = getDpx(20f)
         set(value) {
             field = value
             binding.vDivider.updateLayoutParams<MarginLayoutParams> {
@@ -99,7 +100,7 @@ open class UiSettingTextView @JvmOverloads constructor(
             uiDividerMargin =
                 array.getDimensionPixelSize(
                     R.styleable.UiSettingTextView_ui_divider_enable,
-                    if (isInEditMode) 40 else 20.dp()
+                    getDpx(20f)
                 )
             array.recycle()
         }

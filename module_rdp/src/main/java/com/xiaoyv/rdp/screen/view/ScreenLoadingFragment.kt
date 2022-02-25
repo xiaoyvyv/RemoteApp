@@ -6,14 +6,12 @@ import android.os.Parcelable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowManager
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import com.blankj.utilcode.util.ScreenUtils
 import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.rdp.R
 import com.xiaoyv.rdp.databinding.RdpActivityScreenLoadingBinding
-import com.xiaoyv.ui.kotlin.dp
+import com.xiaoyv.widget.utils.dpi
 import java.io.Serializable
 
 /**
@@ -61,18 +59,15 @@ class ScreenLoadingFragment : DialogFragment() {
         show(fragmentManager, javaClass.simpleName)
     }
 
+
     override fun onStart() {
         super.onStart()
 
-        dialog?.let {
-            it.window?.let { window ->
-                window.setBackgroundDrawableResource(R.color.ui_system_translate)
-                window.attributes = window.attributes.apply {
-                    dimAmount = 0.2f
-                    width = ScreenUtils.getAppScreenWidth() - 60.dp()
-                }
-                window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE)
-            }
+        val window = dialog?.window ?: return
+        window.setBackgroundDrawableResource(R.color.ui_transparent)
+        window.attributes = window.attributes.apply {
+            dimAmount = 0.2f
+            width = 375.dpi
         }
     }
 

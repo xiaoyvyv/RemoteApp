@@ -15,6 +15,7 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.freerdp.freerdpcore.domain.RdpSession;
 import com.freerdp.freerdpcore.utils.DoubleGestureDetector;
 import com.freerdp.freerdpcore.utils.GestureDetector;
@@ -100,6 +101,7 @@ public class RdpSessionView extends View {
         Bitmap bitmap = surface.getBitmap();
         width = bitmap.getWidth();
         height = bitmap.getHeight();
+        LogUtils.d("onSurfaceChange: width " + width +"   height "+ height);
         surface.setBounds(0, 0, width, height);
 
         setMinimumWidth(width);

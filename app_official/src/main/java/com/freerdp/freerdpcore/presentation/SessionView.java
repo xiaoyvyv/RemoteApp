@@ -31,381 +31,340 @@ import com.freerdp.freerdpcore.utils.GestureDetector;
 
 import java.util.Stack;
 
-public class SessionView extends View
-{
-	public static final float MAX_SCALE_FACTOR = 3.0f;
-	public static final float MIN_SCALE_FACTOR = 1.0f;
-	private static final String TAG = "SessionView";
-	private static final float SCALE_FACTOR_DELTA = 0.0001f;
-	private static final float TOUCH_SCROLL_DELTA = 10.0f;
-	private int width;
-	private int height;
-	private BitmapDrawable surface;
-	private Stack<Rect> invalidRegions;
-	private int touchPointerPaddingWidth = 0;
-	private int touchPointerPaddingHeight = 0;
-	private SessionViewListener sessionViewListener = null;
-	// helpers for scaling gesture handling
-	private float scaleFactor = 1.0f;
-	private Matrix scaleMatrix;
-	private Matrix invScaleMatrix;
-	private RectF invalidRegionF;
-	private GestureDetector gestureDetector;
-	private SessionState currentSession;
+public class SessionView extends View {
+    public static final float MAX_SCALE_FACTOR = 3.0f;
+    public static final float MIN_SCALE_FACTOR = 1.0f;
+    private static final String TAG = "SessionView";
+    private static final float SCALE_FACTOR_DELTA = 0.0001f;
+    private static final float TOUCH_SCROLL_DELTA = 10.0f;
+    private int width;
+    private int height;
+    private BitmapDrawable surface;
+    private Stack<Rect> invalidRegions;
+    private int touchPointerPaddingWidth = 0;
+    private int touchPointerPaddingHeight = 0;
+    private SessionViewListener sessionViewListener = null;
+    // helpers for scaling gesture handling
+    private float scaleFactor = 1.0f;
+    private Matrix scaleMatrix;
+    private Matrix invScaleMatrix;
+    private RectF invalidRegionF;
+    private GestureDetector gestureDetector;
+    private SessionState currentSession;
 
-	// private static final String TAG = "FreeRDP.SessionView";
-	private DoubleGestureDetector doubleGestureDetector;
-	public SessionView(Context context)
-	{
-		super(context);
-		initSessionView(context);
-	}
+    // private static final String TAG = "FreeRDP.SessionView";
+    private DoubleGestureDetector doubleGestureDetector;
 
-	public SessionView(Context context, AttributeSet attrs)
-	{
-		super(context, attrs);
-		initSessionView(context);
-	}
+    public SessionView(Context context) {
+        super(context);
+        initSessionView(context);
+    }
 
-	public SessionView(Context context, AttributeSet attrs, int defStyle)
-	{
-		super(context, attrs, defStyle);
-		initSessionView(context);
-	}
+    public SessionView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initSessionView(context);
+    }
 
-	private void initSessionView(Context context)
-	{
-		invalidRegions = new Stack<>();
-		gestureDetector = new GestureDetector(context, new SessionGestureListener(), null, true);
-		doubleGestureDetector =
-		    new DoubleGestureDetector(context, null, new SessionDoubleGestureListener());
+    public SessionView(Context context, AttributeSet attrs, int defStyle) {
+        super(context, attrs, defStyle);
+        initSessionView(context);
+    }
 
-		scaleFactor = 1.0f;
-		scaleMatrix = new Matrix();
-		invScaleMatrix = new Matrix();
-		invalidRegionF = new RectF();
+    private void initSessionView(Context context) {
+        invalidRegions = new Stack<Rect>();
+        gestureDetector = new GestureDetector(context, new SessionGestureListener(), null, true);
+        doubleGestureDetector =
+                new DoubleGestureDetector(context, null, new SessionDoubleGestureListener());
 
-		setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
-		                      View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-	}
+        scaleFactor = 1.0f;
+        scaleMatrix = new Matrix();
+        invScaleMatrix = new Matrix();
+        invalidRegionF = new RectF();
 
-	public void setScaleGestureDetector(ScaleGestureDetector scaleGestureDetector)
-	{
-		doubleGestureDetector.setScaleGestureDetector(scaleGestureDetector);
-	}
+        setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+    }
 
-	public void setSessionViewListener(SessionViewListener sessionViewListener)
-	{
-		this.sessionViewListener = sessionViewListener;
-	}
+    public void setScaleGestureDetector(ScaleGestureDetector scaleGestureDetector) {
+        doubleGestureDetector.setScaleGestureDetector(scaleGestureDetector);
+    }
 
-	public void addInvalidRegion(Rect invalidRegion)
-	{
-		// correctly transform invalid region depending on current scaling
-		invalidRegionF.set(invalidRegion);
-		scaleMatrix.mapRect(invalidRegionF);
-		invalidRegionF.roundOut(invalidRegion);
+    public void setSessionViewListener(SessionViewListener sessionViewListener) {
+        this.sessionViewListener = sessionViewListener;
+    }
 
-		invalidRegions.add(invalidRegion);
-	}
+    public void addInvalidRegion(Rect invalidRegion) {
+        // correctly transform invalid region depending on current scaling
+        invalidRegionF.set(invalidRegion);
+        scaleMatrix.mapRect(invalidRegionF);
+        invalidRegionF.roundOut(invalidRegion);
 
-	public void invalidateRegion()
-	{
-		invalidate(invalidRegions.pop());
-	}
+        invalidRegions.add(invalidRegion);
+    }
 
-	public void onSurfaceChange(SessionState session)
-	{
-		surface = session.getSurface();
-		Bitmap bitmap = surface.getBitmap();
-		width = bitmap.getWidth();
-		height = bitmap.getHeight();
-		surface.setBounds(0, 0, width, height);
+    public void invalidateRegion() {
+        invalidate(invalidRegions.pop());
+    }
 
-		setMinimumWidth(width);
-		setMinimumHeight(height);
+    public void onSurfaceChange(SessionState session) {
+        surface = session.getSurface();
+        Bitmap bitmap = surface.getBitmap();
+        width = bitmap.getWidth();
+        height = bitmap.getHeight();
+        surface.setBounds(0, 0, width, height);
 
-		requestLayout();
-		currentSession = session;
-	}
+        setMinimumWidth(width);
+        setMinimumHeight(height);
 
-	public float getZoom()
-	{
-		return scaleFactor;
-	}
+        requestLayout();
+        currentSession = session;
+    }
 
-	public void setZoom(float factor)
-	{
-		// calc scale matrix and inverse scale matrix (to correctly transform the view and moues
-		// coordinates)
-		scaleFactor = factor;
-		scaleMatrix.setScale(scaleFactor, scaleFactor);
-		invScaleMatrix.setScale(1.0f / scaleFactor, 1.0f / scaleFactor);
+    public float getZoom() {
+        return scaleFactor;
+    }
 
-		// update layout
-		requestLayout();
-	}
+    public void setZoom(float factor) {
+        // calc scale matrix and inverse scale matrix (to correctly transform the view and moues
+        // coordinates)
+        scaleFactor = factor;
+        scaleMatrix.setScale(scaleFactor, scaleFactor);
+        invScaleMatrix.setScale(1.0f / scaleFactor, 1.0f / scaleFactor);
 
-	public boolean isAtMaxZoom()
-	{
-		return (scaleFactor > (MAX_SCALE_FACTOR - SCALE_FACTOR_DELTA));
-	}
+        // update layout
+        requestLayout();
+    }
 
-	public boolean isAtMinZoom()
-	{
-		return (scaleFactor < (MIN_SCALE_FACTOR + SCALE_FACTOR_DELTA));
-	}
+    public boolean isAtMaxZoom() {
+        return (scaleFactor > (MAX_SCALE_FACTOR - SCALE_FACTOR_DELTA));
+    }
 
-	public boolean zoomIn(float factor)
-	{
-		boolean res = true;
-		scaleFactor += factor;
-		if (scaleFactor > (MAX_SCALE_FACTOR - SCALE_FACTOR_DELTA))
-		{
-			scaleFactor = MAX_SCALE_FACTOR;
-			res = false;
-		}
-		setZoom(scaleFactor);
-		return res;
-	}
+    public boolean isAtMinZoom() {
+        return (scaleFactor < (MIN_SCALE_FACTOR + SCALE_FACTOR_DELTA));
+    }
 
-	public boolean zoomOut(float factor)
-	{
-		boolean res = true;
-		scaleFactor -= factor;
-		if (scaleFactor < (MIN_SCALE_FACTOR + SCALE_FACTOR_DELTA))
-		{
-			scaleFactor = MIN_SCALE_FACTOR;
-			res = false;
-		}
-		setZoom(scaleFactor);
-		return res;
-	}
+    public boolean zoomIn(float factor) {
+        boolean res = true;
+        scaleFactor += factor;
+        if (scaleFactor > (MAX_SCALE_FACTOR - SCALE_FACTOR_DELTA)) {
+            scaleFactor = MAX_SCALE_FACTOR;
+            res = false;
+        }
+        setZoom(scaleFactor);
+        return res;
+    }
 
-	public void setTouchPointerPadding(int widht, int height)
-	{
-		touchPointerPaddingWidth = widht;
-		touchPointerPaddingHeight = height;
-		requestLayout();
-	}
+    public boolean zoomOut(float factor) {
+        boolean res = true;
+        scaleFactor -= factor;
+        if (scaleFactor < (MIN_SCALE_FACTOR + SCALE_FACTOR_DELTA)) {
+            scaleFactor = MIN_SCALE_FACTOR;
+            res = false;
+        }
+        setZoom(scaleFactor);
+        return res;
+    }
 
-	public int getTouchPointerPaddingWidth()
-	{
-		return touchPointerPaddingWidth;
-	}
+    public void setTouchPointerPadding(int widht, int height) {
+        touchPointerPaddingWidth = widht;
+        touchPointerPaddingHeight = height;
+        requestLayout();
+    }
 
-	public int getTouchPointerPaddingHeight()
-	{
-		return touchPointerPaddingHeight;
-	}
+    public int getTouchPointerPaddingWidth() {
+        return touchPointerPaddingWidth;
+    }
 
-	@Override public void onMeasure(int widthMeasureSpec, int heightMeasureSpec)
-	{
-		Log.v(TAG, width + "x" + height);
-		this.setMeasuredDimension((int)(width * scaleFactor) + touchPointerPaddingWidth,
-		                          (int)(height * scaleFactor) + touchPointerPaddingHeight);
-	}
+    public int getTouchPointerPaddingHeight() {
+        return touchPointerPaddingHeight;
+    }
 
-	@Override public void onDraw(Canvas canvas)
-	{
-		super.onDraw(canvas);
+    @Override
+    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        Log.v(TAG, width + "x" + height);
+        this.setMeasuredDimension((int) (width * scaleFactor) + touchPointerPaddingWidth,
+                (int) (height * scaleFactor) + touchPointerPaddingHeight);
+    }
 
-		canvas.save();
-		canvas.concat(scaleMatrix);
-		canvas.drawColor(Color.BLACK);
-		surface.draw(canvas);
-		canvas.restore();
-	}
+    @Override
+    public void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
 
-	// dirty hack: we call back to our activity and call onBackPressed as this doesn't reach us when
-	// the soft keyboard is shown ...
-	@Override public boolean dispatchKeyEventPreIme(KeyEvent event)
-	{
-		if (event.getKeyCode() == KeyEvent.KEYCODE_BACK &&
-		    event.getAction() == KeyEvent.ACTION_DOWN)
-			((SessionActivity)this.getContext()).onBackPressed();
-		return super.dispatchKeyEventPreIme(event);
-	}
+        canvas.save();
+        canvas.concat(scaleMatrix);
+        canvas.drawColor(Color.BLACK);
+        surface.draw(canvas);
+        canvas.restore();
+    }
 
-	// perform mapping on the touch event's coordinates according to the current scaling
-	private MotionEvent mapTouchEvent(MotionEvent event)
-	{
-		MotionEvent mappedEvent = MotionEvent.obtain(event);
-		float[] coordinates = { mappedEvent.getX(), mappedEvent.getY() };
-		invScaleMatrix.mapPoints(coordinates);
-		mappedEvent.setLocation(coordinates[0], coordinates[1]);
-		return mappedEvent;
-	}
+    // dirty hack: we call back to our activity and call onBackPressed as this doesn't reach us when
+    // the soft keyboard is shown ...
+    @Override
+    public boolean dispatchKeyEventPreIme(KeyEvent event) {
+        if (event.getKeyCode() == KeyEvent.KEYCODE_BACK &&
+                event.getAction() == KeyEvent.ACTION_DOWN)
+            ((SessionActivity) this.getContext()).onBackPressed();
+        return super.dispatchKeyEventPreIme(event);
+    }
 
-	// perform mapping on the double touch event's coordinates according to the current scaling
-	private MotionEvent mapDoubleTouchEvent(MotionEvent event)
-	{
-		MotionEvent mappedEvent = MotionEvent.obtain(event);
-		float[] coordinates = { (mappedEvent.getX(0) + mappedEvent.getX(1)) / 2,
-			                    (mappedEvent.getY(0) + mappedEvent.getY(1)) / 2 };
-		invScaleMatrix.mapPoints(coordinates);
-		mappedEvent.setLocation(coordinates[0], coordinates[1]);
-		return mappedEvent;
-	}
+    // perform mapping on the touch event's coordinates according to the current scaling
+    private MotionEvent mapTouchEvent(MotionEvent event) {
+        MotionEvent mappedEvent = MotionEvent.obtain(event);
+        float[] coordinates = {mappedEvent.getX(), mappedEvent.getY()};
+        invScaleMatrix.mapPoints(coordinates);
+        mappedEvent.setLocation(coordinates[0], coordinates[1]);
+        return mappedEvent;
+    }
 
-	@Override public boolean onTouchEvent(MotionEvent event)
-	{
-		boolean res = gestureDetector.onTouchEvent(event);
-		res |= doubleGestureDetector.onTouchEvent(event);
-		return res;
-	}
+    // perform mapping on the double touch event's coordinates according to the current scaling
+    private MotionEvent mapDoubleTouchEvent(MotionEvent event) {
+        MotionEvent mappedEvent = MotionEvent.obtain(event);
+        float[] coordinates = {(mappedEvent.getX(0) + mappedEvent.getX(1)) / 2,
+                (mappedEvent.getY(0) + mappedEvent.getY(1)) / 2};
+        invScaleMatrix.mapPoints(coordinates);
+        mappedEvent.setLocation(coordinates[0], coordinates[1]);
+        return mappedEvent;
+    }
 
-	public interface SessionViewListener {
-		abstract void onSessionViewBeginTouch();
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        boolean res = gestureDetector.onTouchEvent(event);
+        res |= doubleGestureDetector.onTouchEvent(event);
+        return res;
+    }
 
-		abstract void onSessionViewEndTouch();
+    public interface SessionViewListener {
+        abstract void onSessionViewBeginTouch();
 
-		abstract void onSessionViewLeftTouch(int x, int y, boolean down);
+        abstract void onSessionViewEndTouch();
 
-		abstract void onSessionViewRightTouch(int x, int y, boolean down);
+        abstract void onSessionViewLeftTouch(int x, int y, boolean down);
 
-		abstract void onSessionViewMove(int x, int y);
+        abstract void onSessionViewRightTouch(int x, int y, boolean down);
 
-		abstract void onSessionViewScroll(boolean down);
-	}
+        abstract void onSessionViewMove(int x, int y);
 
-	private class SessionGestureListener extends GestureDetector.SimpleOnGestureListener
-	{
-		boolean longPressInProgress = false;
+        abstract void onSessionViewScroll(boolean down);
+    }
 
-		public boolean onDown(MotionEvent e)
-		{
-			return true;
-		}
+    private class SessionGestureListener extends GestureDetector.SimpleOnGestureListener {
+        boolean longPressInProgress = false;
 
-		public boolean onUp(MotionEvent e)
-		{
-			sessionViewListener.onSessionViewEndTouch();
-			return true;
-		}
+        public boolean onDown(MotionEvent e) {
+            return true;
+        }
 
-		public void onLongPress(MotionEvent e)
-		{
-			MotionEvent mappedEvent = mapTouchEvent(e);
-			sessionViewListener.onSessionViewBeginTouch();
-			sessionViewListener.onSessionViewLeftTouch((int)mappedEvent.getX(),
-			                                           (int)mappedEvent.getY(), true);
-			longPressInProgress = true;
-		}
+        public boolean onUp(MotionEvent e) {
+            sessionViewListener.onSessionViewEndTouch();
+            return true;
+        }
 
-		public void onLongPressUp(MotionEvent e)
-		{
-			MotionEvent mappedEvent = mapTouchEvent(e);
-			sessionViewListener.onSessionViewLeftTouch((int)mappedEvent.getX(),
-			                                           (int)mappedEvent.getY(), false);
-			longPressInProgress = false;
-			sessionViewListener.onSessionViewEndTouch();
-		}
+        public void onLongPress(MotionEvent e) {
+            MotionEvent mappedEvent = mapTouchEvent(e);
+            sessionViewListener.onSessionViewBeginTouch();
+            sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(),
+                    (int) mappedEvent.getY(), true);
+            longPressInProgress = true;
+        }
 
-		public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY)
-		{
-			if (longPressInProgress)
-			{
-				MotionEvent mappedEvent = mapTouchEvent(e2);
-				sessionViewListener.onSessionViewMove((int)mappedEvent.getX(),
-				                                      (int)mappedEvent.getY());
-				return true;
-			}
+        public void onLongPressUp(MotionEvent e) {
+            MotionEvent mappedEvent = mapTouchEvent(e);
+            sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(),
+                    (int) mappedEvent.getY(), false);
+            longPressInProgress = false;
+            sessionViewListener.onSessionViewEndTouch();
+        }
 
-			return false;
-		}
+        public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            if (longPressInProgress) {
+                MotionEvent mappedEvent = mapTouchEvent(e2);
+                sessionViewListener.onSessionViewMove((int) mappedEvent.getX(),
+                        (int) mappedEvent.getY());
+                return true;
+            }
 
-		public boolean onDoubleTap(MotionEvent e)
-		{
-			// send 2nd click for double click
-			MotionEvent mappedEvent = mapTouchEvent(e);
-			sessionViewListener.onSessionViewLeftTouch((int)mappedEvent.getX(),
-			                                           (int)mappedEvent.getY(), true);
-			sessionViewListener.onSessionViewLeftTouch((int)mappedEvent.getX(),
-			                                           (int)mappedEvent.getY(), false);
-			return true;
-		}
+            return false;
+        }
 
-		public boolean onSingleTapUp(MotionEvent e)
-		{
-			// send single click
-			MotionEvent mappedEvent = mapTouchEvent(e);
-			sessionViewListener.onSessionViewBeginTouch();
-			switch (e.getButtonState())
-			{
-				case MotionEvent.BUTTON_PRIMARY:
-					sessionViewListener.onSessionViewLeftTouch((int)mappedEvent.getX(),
-					                                           (int)mappedEvent.getY(), true);
-					sessionViewListener.onSessionViewLeftTouch((int)mappedEvent.getX(),
-					                                           (int)mappedEvent.getY(), false);
-					break;
-				case MotionEvent.BUTTON_SECONDARY:
-					sessionViewListener.onSessionViewRightTouch((int)mappedEvent.getX(),
-					                                            (int)mappedEvent.getY(), true);
-					sessionViewListener.onSessionViewRightTouch((int)mappedEvent.getX(),
-					                                            (int)mappedEvent.getY(), false);
-					sessionViewListener.onSessionViewLeftTouch((int)mappedEvent.getX(),
-					                                           (int)mappedEvent.getY(), true);
-					sessionViewListener.onSessionViewLeftTouch((int)mappedEvent.getX(),
-					                                           (int)mappedEvent.getY(), false);
-					break;
-			}
-			sessionViewListener.onSessionViewEndTouch();
-			return true;
-		}
-	}
+        public boolean onDoubleTap(MotionEvent e) {
+            // send 2nd click for double click
+            MotionEvent mappedEvent = mapTouchEvent(e);
+            sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(),
+                    (int) mappedEvent.getY(), true);
+            sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(),
+                    (int) mappedEvent.getY(), false);
+            return true;
+        }
 
-	private class SessionDoubleGestureListener
-	    implements DoubleGestureDetector.OnDoubleGestureListener
-	{
-		private MotionEvent prevEvent = null;
+        public boolean onSingleTapUp(MotionEvent e) {
+            // send single click
+            MotionEvent mappedEvent = mapTouchEvent(e);
+            sessionViewListener.onSessionViewBeginTouch();
+            switch (e.getButtonState()) {
+                case MotionEvent.BUTTON_PRIMARY:
+                    sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(),
+                            (int) mappedEvent.getY(), true);
+                    sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(),
+                            (int) mappedEvent.getY(), false);
+                    break;
+                case MotionEvent.BUTTON_SECONDARY:
+                    sessionViewListener.onSessionViewRightTouch((int) mappedEvent.getX(),
+                            (int) mappedEvent.getY(), true);
+                    sessionViewListener.onSessionViewRightTouch((int) mappedEvent.getX(),
+                            (int) mappedEvent.getY(), false);
+                    sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(),
+                            (int) mappedEvent.getY(), true);
+                    sessionViewListener.onSessionViewLeftTouch((int) mappedEvent.getX(),
+                            (int) mappedEvent.getY(), false);
+                    break;
+            }
+            sessionViewListener.onSessionViewEndTouch();
+            return true;
+        }
+    }
 
-		public boolean onDoubleTouchDown(MotionEvent e)
-		{
-			sessionViewListener.onSessionViewBeginTouch();
-			prevEvent = MotionEvent.obtain(e);
-			return true;
-		}
+    private class SessionDoubleGestureListener
+            implements DoubleGestureDetector.OnDoubleGestureListener {
+        private MotionEvent prevEvent = null;
 
-		public boolean onDoubleTouchUp(MotionEvent e)
-		{
-			if (prevEvent != null)
-			{
-				prevEvent.recycle();
-				prevEvent = null;
-			}
-			sessionViewListener.onSessionViewEndTouch();
-			return true;
-		}
+        public boolean onDoubleTouchDown(MotionEvent e) {
+            sessionViewListener.onSessionViewBeginTouch();
+            prevEvent = MotionEvent.obtain(e);
+            return true;
+        }
 
-		public boolean onDoubleTouchScroll(MotionEvent e1, MotionEvent e2)
-		{
-			// calc if user scrolled up or down (or if any scrolling happened at all)
-			float deltaY = e2.getY() - prevEvent.getY();
-			if (deltaY > TOUCH_SCROLL_DELTA)
-			{
-				sessionViewListener.onSessionViewScroll(true);
-				prevEvent.recycle();
-				prevEvent = MotionEvent.obtain(e2);
-			}
-			else if (deltaY < -TOUCH_SCROLL_DELTA)
-			{
-				sessionViewListener.onSessionViewScroll(false);
-				prevEvent.recycle();
-				prevEvent = MotionEvent.obtain(e2);
-			}
-			return true;
-		}
+        public boolean onDoubleTouchUp(MotionEvent e) {
+            if (prevEvent != null) {
+                prevEvent.recycle();
+                prevEvent = null;
+            }
+            sessionViewListener.onSessionViewEndTouch();
+            return true;
+        }
 
-		public boolean onDoubleTouchSingleTap(MotionEvent e)
-		{
-			// send single click
-			MotionEvent mappedEvent = mapDoubleTouchEvent(e);
-			sessionViewListener.onSessionViewRightTouch((int)mappedEvent.getX(),
-			                                            (int)mappedEvent.getY(), true);
-			sessionViewListener.onSessionViewRightTouch((int)mappedEvent.getX(),
-			                                            (int)mappedEvent.getY(), false);
-			return true;
-		}
-	}
+        public boolean onDoubleTouchScroll(MotionEvent e1, MotionEvent e2) {
+            // calc if user scrolled up or down (or if any scrolling happened at all)
+            float deltaY = e2.getY() - prevEvent.getY();
+            if (deltaY > TOUCH_SCROLL_DELTA) {
+                sessionViewListener.onSessionViewScroll(true);
+                prevEvent.recycle();
+                prevEvent = MotionEvent.obtain(e2);
+            } else if (deltaY < -TOUCH_SCROLL_DELTA) {
+                sessionViewListener.onSessionViewScroll(false);
+                prevEvent.recycle();
+                prevEvent = MotionEvent.obtain(e2);
+            }
+            return true;
+        }
+
+        public boolean onDoubleTouchSingleTap(MotionEvent e) {
+            // send single click
+            MotionEvent mappedEvent = mapDoubleTouchEvent(e);
+            sessionViewListener.onSessionViewRightTouch((int) mappedEvent.getX(),
+                    (int) mappedEvent.getY(), true);
+            sessionViewListener.onSessionViewRightTouch((int) mappedEvent.getX(),
+                    (int) mappedEvent.getY(), false);
+            return true;
+        }
+    }
 }

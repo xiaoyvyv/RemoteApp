@@ -3,15 +3,14 @@ package com.xiaoyv.ui.progress
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.LinearInterpolator
-import com.blankj.utilcode.util.ColorUtils
 import com.xiaoyv.ui.R
-import com.xiaoyv.ui.kotlin.dp
+import com.xiaoyv.widget.utils.getColor
+import com.xiaoyv.widget.utils.getDpx
 
 
 /**
@@ -29,12 +28,10 @@ class UiWindowsProgressView @JvmOverloads constructor(
     private var viewHeight = 0
     private var viewWidth = 0
 
-    var strokeWidth = let { if (isInEditMode) 30 else 30.dp() }
+    var strokeWidth = getDpx(30f)
     var progressBlockWidth = 80
 
-    var progressColor = let {
-        if (isInEditMode) Color.GREEN else ColorUtils.getColor(R.color.ui_status_success)
-    }
+    var progressColor = getColor(R.color.ui_status_success)
 
     init {
         setBackgroundResource(R.drawable.ui_shape_window_progress_bg)

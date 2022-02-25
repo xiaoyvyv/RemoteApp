@@ -133,7 +133,9 @@ class SshListFragment :
                     toString()
                 }
                 itemLastColor = ColorUtils.getColor(R.color.ui_status_error)
-                onOptionsClickListener = { _, position ->
+
+                onOptionsClickListener = {dialog, _, position ->
+                    dialog.dismiss()
                     when (position) {
                         0 -> TerminalActivity.openSelf(dataBean)
                         1 -> AddSshActivity.openSelf(dataBean)

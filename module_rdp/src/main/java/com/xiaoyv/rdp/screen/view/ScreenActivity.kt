@@ -8,10 +8,11 @@ import android.graphics.Bitmap
 import android.graphics.Point
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.view.*
-import androidx.core.view.*
+import androidx.core.view.doOnLayout
+import androidx.core.view.isInvisible
+import androidx.core.view.isVisible
 import com.blankj.utilcode.util.*
 import com.freerdp.freerdpcore.application.RdpApp
 import com.freerdp.freerdpcore.domain.RdpConfig
@@ -22,6 +23,8 @@ import com.freerdp.freerdpcore.services.LibRdpUiEventListener
 import com.freerdp.freerdpcore.utils.ClipboardManagerProxy
 import com.freerdp.freerdpcore.view.RdpPointerView
 import com.freerdp.freerdpcore.view.RdpSessionView
+import com.gyf.immersionbar.BarHide
+import com.gyf.immersionbar.ImmersionBar
 import com.hijamoya.keyboardview.Keyboard
 import com.xiaoyv.blueprint.base.BaseMvpActivity
 import com.xiaoyv.busines.config.NavigationKey
@@ -34,6 +37,7 @@ import com.xiaoyv.rdp.screen.config.RdpScreenZoomListener
 import com.xiaoyv.rdp.screen.contract.ScreenContract
 import com.xiaoyv.rdp.screen.presenter.ScreenPresenter
 import com.xiaoyv.ui.scroll.FreeScrollView
+import com.xiaoyv.widget.utils.autoConvertDensity
 import me.jessyan.autosize.internal.CancelAdapt
 
 
@@ -98,22 +102,22 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
          */
         onConnectionSuccess = {
             connectSuccess = true
+            p2vHideLoading()
 
             presenter.v2pGetSession { session ->
                 p2vBindSession(session)
                 rdpKeyboardMapper.reset(this@ScreenActivity)
             }
-            p2vHideLoading()
         }
         /**
          * 连接异常
          */
         onConnectionFailure = {
             connectSuccess = false
+            p2vHideLoading()
 
             presenter.v2pCancelDelayedMoveEvent()
 
-            p2vHideLoading()
             vSessionClose(RESULT_CANCELED)
         }
 
@@ -122,13 +126,13 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
          */
         onDisconnected = {
             connectSuccess = false
+            p2vHideLoading()
 
             presenter.v2pCancelDelayedMoveEvent()
             presenter.v2pGetSession { session ->
                 session.libRdpUiEventListener = null
             }
 
-            p2vHideLoading()
             vSessionClose(RESULT_OK)
         }
     }
@@ -170,6 +174,9 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         binding.rsvSession.requestFocus()
     }
 
+    override fun initBarConfig() {
+        hideSystemUi()
+    }
 
     override fun initWindowConfig(window: Window) {
         hideSystemUi()
@@ -334,18 +341,10 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     }
 
     private fun hideSystemUi() {
-        val controller = ViewCompat.getWindowInsetsController(window.decorView)
-        controller?.hide(WindowInsetsCompat.Type.statusBars())
-        controller?.hide(WindowInsetsCompat.Type.navigationBars())
-        // 导航栏隐藏时手势操作
-        controller?.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-
-        // 刘海屏幕适配，允许使用刘海屏区进行绘制
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            window.attributes.layoutInDisplayCutoutMode =
-                WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-        }
+        ImmersionBar.with(this)
+            .fullScreen(true)
+            .hideBar(BarHide.FLAG_HIDE_BAR)
+            .init()
     }
 
 
@@ -459,7 +458,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         return callbackDialogResult
     }
 
-    override fun onVerifyCertificateEx(
+    override fun onVerifyCertificate(
         host: String,
         port: Long,
         commonName: String,
@@ -523,7 +522,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
         return if (callbackDialogResult) 1 else 0
     }
 
-    override fun onVerifyChangedCertificateEx(
+    override fun onVerifyChangedCertificate(
         host: String,
         port: Long,
         commonName: String,
@@ -603,6 +602,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
             else Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
 
             // 设置画面
+            resources.autoConvertDensity()
             session.surface = BitmapDrawable(resources, rdpBitmap)
 
             // UI线程更新画面
@@ -621,6 +621,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
             else Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
 
             // 配置画面
+            resources.autoConvertDensity()
             session.surface = BitmapDrawable(resources, rdpBitmap)
 
             // 判断远程自己是否自动调整了分辨率和色彩配置
@@ -885,7 +886,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
 
     @SuppressLint("MissingSuperCall")
     override fun onBackPressed() {
-        presenter.v2pGetSession(empty = {
+        presenter.v2pGetSession(emptySession = {
             finish()
         }, callback = { session ->
             LibFreeRDP.disconnect(session.instance)

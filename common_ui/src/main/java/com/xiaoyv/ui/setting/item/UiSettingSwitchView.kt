@@ -4,7 +4,8 @@ import android.content.Context
 import android.util.AttributeSet
 import android.widget.Checkable
 import com.suke.widget.SwitchButton
-import com.xiaoyv.ui.kotlin.dp
+
+import com.xiaoyv.widget.utils.getDpx
 
 /**
  * UiSettingSwitchView
@@ -27,9 +28,9 @@ class UiSettingSwitchView @JvmOverloads constructor(
                 it.bottomToBottom = LayoutParams.PARENT_ID
                 it.endToEnd = LayoutParams.PARENT_ID
                 it.startToStart = LayoutParams.PARENT_ID
-                it.marginEnd = if (isInEditMode) 40 else 20.dp()
-                it.marginStart = if (isInEditMode) 40 else 20.dp()
-                it.height = if (isInEditMode) 80 else 30.dp()
+                it.marginEnd = getDpx(20f)
+                it.marginStart = getDpx(20f)
+                it.height = getDpx(30f)
             }
         )
 

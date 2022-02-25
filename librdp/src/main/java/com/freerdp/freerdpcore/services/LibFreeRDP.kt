@@ -252,7 +252,7 @@ object LibFreeRDP {
     }
 
     @JvmStatic
-    private fun OnVerifyCertificateEx(
+    private fun OnVerifyCertificate(
         inst: Long,
         host: String?,
         port: Long,
@@ -263,14 +263,14 @@ object LibFreeRDP {
         flags: Long
     ): Int = RdpApp.getSession(inst)
         ?.libRdpUiEventListener
-        ?.onVerifyCertificateEx(
+        ?.onVerifyCertificate(
             host.orEmpty(), port, commonName.orEmpty(),
             subject.orEmpty(), issuer.orEmpty(), fingerprint.orEmpty(), flags
         ) ?: 0
 
 
     @JvmStatic
-    private fun OnVerifyChangedCertificateEx(
+    private fun OnVerifyChangedCertificate(
         inst: Long,
         host: String?,
         port: Long,
@@ -284,7 +284,7 @@ object LibFreeRDP {
         flags: Long
     ): Int = RdpApp.getSession(inst)
         ?.libRdpUiEventListener
-        ?.onVerifyChangedCertificateEx(
+        ?.onVerifyChangedCertificate(
             host.orEmpty(), port, commonName.orEmpty(), subject.orEmpty(),
             issuer.orEmpty(), fingerprint.orEmpty(), oldSubject.orEmpty(), oldIssuer.orEmpty(),
             oldFingerprint.orEmpty(), flags
@@ -314,6 +314,7 @@ object LibFreeRDP {
 
     init {
         runCatching {
+            System.loadLibrary("openh264")
             System.loadLibrary("freerdp-android")
 
             // 读取原生库的版本号 aa.bb.cc
