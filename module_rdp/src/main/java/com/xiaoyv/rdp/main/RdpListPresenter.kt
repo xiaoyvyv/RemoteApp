@@ -5,7 +5,7 @@ import com.blankj.utilcode.util.StringUtils
 import com.xiaoyv.blueprint.base.ImplBasePresenter
 import com.xiaoyv.blueprint.base.subscribesWithPresenter
 import com.xiaoyv.busines.room.entity.RdpEntity
-import com.xiaoyv.rdp.R
+import com.xiaoyv.desktop.rdp.R
 
 /**
  * RdpListPresenter
@@ -34,9 +34,8 @@ class RdpListPresenter : ImplBasePresenter<RdpListContract.View>(), RdpListContr
             )
     }
 
-
-    override fun v2pResolveRdpByGroup() {
-        model.p2mResolveAllGroup()
+    override fun v2pQueryGroup() {
+        model.p2mQueryGroup()
             .subscribesWithPresenter(
                 presenter = this,
                 onSuccess = {

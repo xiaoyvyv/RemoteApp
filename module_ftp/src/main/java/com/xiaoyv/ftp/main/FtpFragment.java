@@ -2,13 +2,10 @@ package com.xiaoyv.ftp.main;
 
 import android.view.View;
 
-import androidx.annotation.NonNull;
-
 import com.alibaba.android.arouter.facade.annotation.Route;
-import com.github.nukc.stateview.StateView;
 import com.xiaoyv.blueprint.base.BaseFragment;
 import com.xiaoyv.busines.config.NavigationPath;
-import com.xiaoyv.ftp.databinding.FtpFragmentMainBinding;
+import com.xiaoyv.desktop.ftp.databinding.FtpFragmentMainBinding;
 
 /**
  * FtpFragment

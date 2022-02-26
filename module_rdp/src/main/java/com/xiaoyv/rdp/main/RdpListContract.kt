@@ -51,7 +51,7 @@ interface RdpListContract {
         /**
          * 查询全部分组数据
          */
-        fun v2pResolveRdpByGroup()
+        fun v2pQueryGroup()
 
         /**
          * 删除一个配置信息
@@ -77,7 +77,7 @@ interface RdpListContract {
          */
         fun p2mQueryLocalRdpByGroup(group: String): Observable<List<RdpEntity>>
         fun p2mDeleteRdp(dataBean: RdpEntity): Observable<Boolean>
-        fun p2mResolveAllGroup(): Observable<List<String>>
+        fun p2mQueryGroup(): Observable<List<String>>
 
     }
 }

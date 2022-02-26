@@ -100,8 +100,8 @@
 
         <activity-alias
             android:name=".services.SessionRequestHandlerActivity"
-            android:targetActivity="com.freerdp.freerdpcore.services.SessionRequestHandlerActivity"
-            android:exported="true">
+            android:exported="true"
+            android:targetActivity="com.freerdp.freerdpcore.services.SessionRequestHandlerActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
@@ -176,6 +176,7 @@
             android:name=".presentation.SessionActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|density|screenLayout|navigation"
             android:exported="true"
+            android:screenOrientation="landscape"
             android:theme="@style/Theme.Main"
             android:windowSoftInputMode="adjustResize">
             <!--android:configChanges="orientation|keyboardHidden|screenSize|keyboard"-->

@@ -9,8 +9,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
 import com.xiaoyv.busines.config.NavigationKey
-import com.xiaoyv.rdp.R
-import com.xiaoyv.rdp.databinding.RdpActivityScreenLoadingBinding
+import com.xiaoyv.desktop.rdp.R
+import com.xiaoyv.desktop.rdp.databinding.RdpActivityScreenLoadingBinding
 import com.xiaoyv.widget.utils.dpi
 import java.io.Serializable
 

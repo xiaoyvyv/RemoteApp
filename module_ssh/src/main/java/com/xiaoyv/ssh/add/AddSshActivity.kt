@@ -13,8 +13,9 @@ import com.xiaoyv.blueprint.base.rxjava.subscribes
 import com.xiaoyv.busines.config.NavigationPath
 import com.xiaoyv.busines.room.database.DateBaseManger
 import com.xiaoyv.busines.room.entity.SshEntity
-import com.xiaoyv.ssh.R
-import com.xiaoyv.ssh.databinding.SshAddActivitiyBinding
+import com.xiaoyv.desktop.ssh.R
+
+import com.xiaoyv.desktop.ssh.databinding.SshAddActivitiyBinding
 import com.xiaoyv.widget.toolbar.UiToolbar
 import io.reactivex.rxjava3.core.Observable
 
@@ -124,13 +125,13 @@ class AddSshActivity : BaseBindingActivity<SshAddActivitiyBinding>() {
             if (StringUtils.isEmpty(group)) StringUtils.getString(R.string.ssh_add_group_default) else group
 
         val entity = SshEntity().also {
-            it.label = label
-            it.group = group
-            it.ip = ip
-            it.port = port
-            it.account = account
-            it.password = password
-            it.domain = ip
+            it.label = label.orEmpty()
+            it.group = group.orEmpty()
+            it.ip = ip.orEmpty()
+            it.port = port.orEmpty()
+            it.account = account.orEmpty()
+            it.password = password.orEmpty()
+            it.domain = ip.orEmpty()
         }
 
         saveSshBookmark(entity)

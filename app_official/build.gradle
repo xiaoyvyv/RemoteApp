@@ -40,6 +40,8 @@ android {
 }
 
 dependencies {
+    // 框架
+    api "io.github.xiaoyvyv:blueprint:${rootProject.ext.blueprintVersion}"
 
     implementation 'androidx.core:core-ktx:1.7.0'
     implementation 'androidx.appcompat:appcompat:1.4.1'

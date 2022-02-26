@@ -1,6 +1,5 @@
 package com.xiaoyv.ui.setting.item
 
-import android.R
 import android.content.Context
 import android.text.InputFilter
 import android.text.InputType
@@ -11,7 +10,8 @@ import com.blankj.utilcode.util.KeyboardUtils
 import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.ThreadUtils
 import com.blankj.utilcode.util.Utils
-import com.xiaoyv.ui.databinding.UiSettingInputBinding
+import com.xiaoyv.desktop.ui.R
+import com.xiaoyv.desktop.ui.databinding.UiSettingInputBinding
 import com.xiaoyv.ui.dialog.BaseDialog
 import com.xiaoyv.ui.listener.SimpleTextChangeListener
 import me.jessyan.autosize.utils.AutoSizeUtils
@@ -86,7 +86,7 @@ class UiSettingInputView @JvmOverloads constructor(
         inputDialog.show()
         val window = inputDialog.window
         if (window != null) {
-            window.setBackgroundDrawableResource(R.color.transparent)
+            window.setBackgroundDrawableResource(R.color.ui_transparent)
             window.attributes = window.attributes.apply {
                 dimAmount = 0.2f
                 width = ScreenUtils.getAppScreenWidth() - AutoSizeUtils.dp2px(Utils.getApp(), 80f)

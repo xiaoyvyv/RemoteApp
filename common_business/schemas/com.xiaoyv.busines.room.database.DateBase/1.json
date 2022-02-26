@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "fff780e737765070dadfbe27b8f21ea5",
+    "identityHash": "3882c5a9b3067c61421c5a758dd0bfd7",
     "entities": [
       {
         "tableName": "rdp",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lastTime` INTEGER NOT NULL, `label` TEXT, `group` TEXT, `ip` TEXT, `port` TEXT, `account` TEXT, `password` TEXT, `domain` TEXT, `configStr` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lastTime` INTEGER NOT NULL, `label` TEXT NOT NULL, `group` TEXT NOT NULL, `ip` TEXT NOT NULL, `port` TEXT NOT NULL, `account` TEXT NOT NULL, `password` TEXT NOT NULL, `domain` TEXT NOT NULL, `configStr` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -24,49 +24,49 @@
             "fieldPath": "label",
             "columnName": "label",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "group",
             "columnName": "group",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "ip",
             "columnName": "ip",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "port",
             "columnName": "port",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "account",
             "columnName": "account",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "password",
             "columnName": "password",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "domain",
             "columnName": "domain",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "configStr",
             "columnName": "configStr",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -82,6 +82,7 @@
             "columnNames": [
               "ip"
             ],
+            "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_rdp_ip` ON `${TABLE_NAME}` (`ip`)"
           }
         ],
@@ -89,17 +90,11 @@
       },
       {
         "tableName": "ssh",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `authType` INTEGER NOT NULL, `lastTime` INTEGER NOT NULL, `label` TEXT, `group` TEXT, `ip` TEXT, `port` TEXT, `account` TEXT, `password` TEXT, `domain` TEXT, `setting` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lastTime` INTEGER NOT NULL, `authType` INTEGER NOT NULL, `label` TEXT NOT NULL, `group` TEXT NOT NULL, `ip` TEXT NOT NULL, `port` TEXT NOT NULL, `account` TEXT NOT NULL, `password` TEXT NOT NULL, `domain` TEXT NOT NULL, `setting` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
             "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "authType",
-            "columnName": "authType",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -110,52 +105,58 @@
             "notNull": true
           },
           {
+            "fieldPath": "authType",
+            "columnName": "authType",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "label",
             "columnName": "label",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "group",
             "columnName": "group",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "ip",
             "columnName": "ip",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "port",
             "columnName": "port",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "account",
             "columnName": "account",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "password",
             "columnName": "password",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "domain",
             "columnName": "domain",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "setting",
             "columnName": "setting",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -171,6 +172,7 @@
             "columnNames": [
               "ip"
             ],
+            "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ssh_ip` ON `${TABLE_NAME}` (`ip`)"
           }
         ],
@@ -178,7 +180,7 @@
       },
       {
         "tableName": "ftp",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lastTime` INTEGER NOT NULL, `label` TEXT, `group` TEXT, `ip` TEXT, `port` TEXT, `account` TEXT, `password` TEXT, `domain` TEXT, `setting` TEXT)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lastTime` INTEGER NOT NULL, `label` TEXT NOT NULL, `group` TEXT NOT NULL, `ip` TEXT NOT NULL, `port` TEXT NOT NULL, `account` TEXT NOT NULL, `password` TEXT NOT NULL, `domain` TEXT NOT NULL, `setting` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -196,49 +198,49 @@
             "fieldPath": "label",
             "columnName": "label",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "group",
             "columnName": "group",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "ip",
             "columnName": "ip",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "port",
             "columnName": "port",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "account",
             "columnName": "account",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "password",
             "columnName": "password",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "domain",
             "columnName": "domain",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           },
           {
             "fieldPath": "setting",
             "columnName": "setting",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -254,6 +256,7 @@
             "columnNames": [
               "ip"
             ],
+            "orders": [],
             "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_ftp_ip` ON `${TABLE_NAME}` (`ip`)"
           }
         ],
@@ -263,7 +266,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fff780e737765070dadfbe27b8f21ea5')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3882c5a9b3067c61421c5a758dd0bfd7')"
     ]
   }
 }

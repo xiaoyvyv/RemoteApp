@@ -7,9 +7,8 @@ import android.util.AttributeSet;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.LinearLayoutCompat;
-import androidx.core.widget.NestedScrollView;
 
-import com.xiaoyv.ui.R;
+import com.xiaoyv.desktop.ui.R;
 
 /**
  * UiSettingScreen

@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:alpha="0.6"
-        android:background="@color/ui_system_black"
+        android:background="@color/ui_black"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent" />
 
@@ -19,7 +19,7 @@
         android:id="@+id/rsv_scroll"
         android:layout_width="match_parent"
         android:layout_height="@dimen/ui_size_0"
-        android:background="@color/ui_system_black"
+        android:background="@color/ui_black"
         android:drawingCacheQuality="low"
         android:fillViewport="true"
         android:isScrollContainer="true"

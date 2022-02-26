@@ -24,6 +24,7 @@ import com.freerdp.freerdpcore.services.HistoryDB;
 import com.freerdp.freerdpcore.services.LibFreeRDP;
 import com.freerdp.freerdpcore.services.ManualBookmarkGateway;
 import com.freerdp.freerdpcore.services.QuickConnectHistoryGateway;
+import com.xiaoyv.blueprint.BluePrint;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -127,6 +128,7 @@ public class GlobalApp extends Application implements LibFreeRDP.EventListener
 	@Override public void onCreate()
 	{
 		super.onCreate();
+		BluePrint.init(this,true);
 
 		/* Initialize preferences. */
 		ApplicationSettingsActivity.get(this);

@@ -29,16 +29,14 @@ import com.hijamoya.keyboardview.Keyboard
 import com.xiaoyv.blueprint.base.BaseMvpActivity
 import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.busines.room.entity.RdpEntity
-import com.xiaoyv.rdp.R
-import com.xiaoyv.rdp.databinding.RdpActivityScreenBinding
+import com.xiaoyv.desktop.rdp.R
+import com.xiaoyv.desktop.rdp.databinding.RdpActivityScreenBinding
 import com.xiaoyv.rdp.screen.config.RdpBroadcastReceiver
 import com.xiaoyv.rdp.screen.config.RdpKeyboardActionListener
 import com.xiaoyv.rdp.screen.config.RdpScreenZoomListener
 import com.xiaoyv.rdp.screen.contract.ScreenContract
 import com.xiaoyv.rdp.screen.presenter.ScreenPresenter
 import com.xiaoyv.ui.scroll.FreeScrollView
-import com.xiaoyv.widget.utils.autoConvertDensity
-import me.jessyan.autosize.internal.CancelAdapt
 
 
 /**
@@ -49,7 +47,7 @@ import me.jessyan.autosize.internal.CancelAdapt
  */
 class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
     ScreenContract.View, LibRdpUiEventListener, RdpSessionView.SessionViewListener,
-    FreeScrollView.ScrollView2DListener, RdpPointerView.TouchPointerListener, CancelAdapt,
+    FreeScrollView.ScrollView2DListener, RdpPointerView.TouchPointerListener,
     ClipboardManagerProxy.OnClipboardChangedListener, RdpKeyboardMapper.KeyProcessingListener,
     RdpKeyboardActionListener {
     private lateinit var binding: RdpActivityScreenBinding
@@ -602,7 +600,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
             else Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
 
             // 设置画面
-            resources.autoConvertDensity()
+//            resources.autoConvertDensity()
             session.surface = BitmapDrawable(resources, rdpBitmap)
 
             // UI线程更新画面
@@ -621,7 +619,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
             else Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
 
             // 配置画面
-            resources.autoConvertDensity()
+//            resources.autoConvertDensity()
             session.surface = BitmapDrawable(resources, rdpBitmap)
 
             // 判断远程自己是否自动调整了分辨率和色彩配置

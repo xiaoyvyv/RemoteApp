@@ -3,9 +3,9 @@ package com.xiaoyv.rdp.main
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.blankj.utilcode.util.TimeUtils
-import com.xiaoyv.ui.base.BaseItemBindingBinder
 import com.xiaoyv.busines.room.entity.RdpEntity
-import com.xiaoyv.rdp.databinding.RdpFragmentMainItemBinding
+import com.xiaoyv.desktop.rdp.databinding.RdpFragmentMainItemBinding
+import com.xiaoyv.widget.binder.BaseItemBindingBinder
 
 /**
  * RdpListAdapter

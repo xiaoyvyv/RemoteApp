@@ -8,7 +8,7 @@ import android.graphics.Rect
 import android.util.AttributeSet
 import android.view.View
 import android.view.animation.LinearInterpolator
-import com.xiaoyv.ui.R
+import com.xiaoyv.desktop.ui.R
 import com.xiaoyv.widget.utils.getColor
 import com.xiaoyv.widget.utils.getDpx
 

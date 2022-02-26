@@ -13,13 +13,14 @@ import com.google.android.material.tabs.TabLayout
 import com.xiaoyv.blueprint.base.binding.BaseMvpBindingFragment
 import com.xiaoyv.busines.config.NavigationPath
 import com.xiaoyv.busines.room.entity.SshEntity
-import com.xiaoyv.ssh.R
+import com.xiaoyv.desktop.ssh.R
+
 import com.xiaoyv.ssh.add.AddSshActivity
-import com.xiaoyv.ssh.databinding.SshFragmentMainBinding
+import com.xiaoyv.desktop.ssh.databinding.SshFragmentMainBinding
 import com.xiaoyv.ssh.terminal.TerminalActivity
-import com.xiaoyv.ui.base.setOnItemClickListener
 import com.xiaoyv.ui.listener.SimpleRefreshListener
 import com.xiaoyv.ui.listener.SimpleTabSelectListener
+import com.xiaoyv.widget.binder.setOnItemClickListener
 import com.xiaoyv.widget.dialog.UiOptionsDialog
 import com.xiaoyv.widget.toolbar.UiToolbar
 import com.xiaoyv.widget.utils.overScrollV
@@ -134,7 +135,7 @@ class SshListFragment :
                 }
                 itemLastColor = ColorUtils.getColor(R.color.ui_status_error)
 
-                onOptionsClickListener = {dialog, _, position ->
+                onOptionsClickListener = { dialog, _, position ->
                     dialog.dismiss()
                     when (position) {
                         0 -> TerminalActivity.openSelf(dataBean)
@@ -167,7 +168,7 @@ class SshListFragment :
     }
 
     override fun onResumeExceptFirst() {
-        presenter.v2pResolveSshByGroup()
+        presenter.v2pQueryGroup()
     }
 
     override fun removeItem(dataBean: SshEntity, adapterPos: Int) {
@@ -199,7 +200,7 @@ class SshListFragment :
 
     override fun p2vDeleteSshResult(success: Boolean) {
         // 删除后重新查询
-        presenter.v2pResolveSshByGroup()
+        presenter.v2pQueryGroup()
     }
 
     override fun p2vGetTabLayout() = binding.tlGroup

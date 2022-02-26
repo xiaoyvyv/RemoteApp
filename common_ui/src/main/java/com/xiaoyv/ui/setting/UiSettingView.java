@@ -28,9 +28,9 @@ import com.blankj.utilcode.util.KeyboardUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.ScreenUtils;
 import com.blankj.utilcode.util.StringUtils;
-import com.xiaoyv.ui.R;
-import com.xiaoyv.ui.databinding.UiSettingInputBinding;
-import com.xiaoyv.ui.databinding.UiSettingViewBinding;
+import com.xiaoyv.desktop.ui.R;
+import com.xiaoyv.desktop.ui.databinding.UiSettingInputBinding;
+import com.xiaoyv.desktop.ui.databinding.UiSettingViewBinding;
 import com.xiaoyv.ui.listener.SimpleTextChangeListener;
 import com.xiaoyv.widget.dialog.UiOptionsDialog;
 import com.xiaoyv.widget.utils.ActivityKtKt;
@@ -318,7 +318,7 @@ public class UiSettingView extends FrameLayout {
             case UiSettingViewType.TYPE_LIST_INTEGER: {
                 UiOptionsDialog.Builder builder = new UiOptionsDialog.Builder();
                 builder.setItemDataList(toList(uiListTitle));
-                builder.setOnOptionsClickListener((d,s, integer) -> {
+                builder.setOnOptionsClickListener((d, s, integer) -> {
                     d.dismissAllowingStateLoss();
                     try {
                         String input = String.valueOf(uiListValue[integer]);
@@ -334,7 +334,7 @@ public class UiSettingView extends FrameLayout {
             case UiSettingViewType.TYPE_LIST_STRING: {
                 UiOptionsDialog.Builder builder = new UiOptionsDialog.Builder();
                 builder.setItemDataList(toList(uiListTitle));
-                builder.setOnOptionsClickListener((d,s, integer) -> {
+                builder.setOnOptionsClickListener((d, s, integer) -> {
                     d.dismissAllowingStateLoss();
                     try {
                         String input = String.valueOf(uiListValue[integer]);

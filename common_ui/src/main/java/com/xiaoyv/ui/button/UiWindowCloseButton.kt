@@ -5,7 +5,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
 import androidx.appcompat.widget.AppCompatImageView
-import com.xiaoyv.ui.R
+import com.xiaoyv.desktop.ui.R
 
 /**
  * UiWindowCloseButton
@@ -35,7 +35,7 @@ class UiWindowCloseButton @JvmOverloads constructor(
             MotionEvent.ACTION_CANCEL,
             MotionEvent.ACTION_UP -> {
                 l?.onClick(this)
-                setBackgroundResource(R.color.ui_system_translate)
+                setBackgroundResource(R.color.ui_black_bb)
                 setImageResource(R.drawable.ui_shape_window_close_normal)
             }
         }

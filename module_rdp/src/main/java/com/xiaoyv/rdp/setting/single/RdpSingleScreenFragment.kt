@@ -4,7 +4,7 @@ import android.view.View
 import androidx.core.view.isVisible
 import com.freerdp.freerdpcore.domain.RdpConfig
 import com.xiaoyv.blueprint.base.BaseFragment
-import com.xiaoyv.rdp.databinding.RdpSettingSingleScreenBinding
+import com.xiaoyv.desktop.rdp.databinding.RdpSettingSingleScreenBinding
 
 /**
  * RdpSingleScreenFragment

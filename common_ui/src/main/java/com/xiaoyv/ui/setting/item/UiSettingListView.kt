@@ -3,7 +3,7 @@ package com.xiaoyv.ui.setting.item
 import android.content.Context
 import android.util.AttributeSet
 import androidx.fragment.app.FragmentActivity
-import com.xiaoyv.ui.R
+import com.xiaoyv.desktop.ui.R
 import com.xiaoyv.widget.dialog.UiOptionsDialog
 import com.xiaoyv.widget.utils.getActivity
 
@@ -41,7 +41,7 @@ class UiSettingListView @JvmOverloads constructor(
         if (!isInEditMode) {
             this.optionsDialog = UiOptionsDialog.Builder().apply {
                 itemDataList = uiListValueDesc.toList().map { toString() }
-                onOptionsClickListener = {dialog, _, position ->
+                onOptionsClickListener = { dialog, _, position ->
                     dialog.dismiss()
 
                     binding.tvDesc.text = uiListValueDesc[position].toString()

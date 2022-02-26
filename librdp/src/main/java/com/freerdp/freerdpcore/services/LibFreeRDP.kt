@@ -252,7 +252,7 @@ object LibFreeRDP {
     }
 
     @JvmStatic
-    private fun OnVerifyCertificate(
+    private fun OnVerifyCertificateEx(
         inst: Long,
         host: String?,
         port: Long,
@@ -270,7 +270,7 @@ object LibFreeRDP {
 
 
     @JvmStatic
-    private fun OnVerifyChangedCertificate(
+    private fun OnVerifyChangedCertificateEx(
         inst: Long,
         host: String?,
         port: Long,

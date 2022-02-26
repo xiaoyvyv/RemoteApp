@@ -2,15 +2,11 @@ package com.xiaoyv.main.splash;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.blankj.utilcode.util.ActivityUtils;
-import com.xiaoyv.blueprint.base.BaseActivity;
-import com.xiaoyv.main.databinding.MainActivitySplashBinding;
-import com.xiaoyv.main.home.HomeActivity;
+import com.xiaoyv.desktop.main.databinding.MainActivitySplashBinding;
 
 /**
  * SplashActivity

@@ -3,7 +3,7 @@ package com.freerdp.freerdpcore.mapper;
 import android.content.Context;
 import android.view.KeyEvent;
 
-import com.xiaoyv.librdp.R;
+import com.xiaoyv.desktop.librdp.R;
 
 /**
  * 键盘映射器

@@ -2,15 +2,14 @@ package com.xiaoyv.ui.dialog.normal
 
 import android.content.Context
 import android.content.DialogInterface
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import androidx.appcompat.app.AlertDialog
 import com.blankj.utilcode.util.ScreenUtils
 import com.blankj.utilcode.util.StringUtils
 import com.blankj.utilcode.util.Utils
-import com.xiaoyv.ui.R
-import com.xiaoyv.ui.databinding.UiDialogBinding
+import com.xiaoyv.desktop.ui.R
+import com.xiaoyv.desktop.ui.databinding.UiDialogBinding
 import me.jessyan.autosize.utils.AutoSizeUtils
 
 /**
@@ -76,6 +75,7 @@ class NormalDialog : AlertDialog {
                 dismiss()
             }
         }
+
         binding.tvDone.setOnClickListener {
             if (doneClickListener.invoke()) {
                 dismiss()
@@ -86,7 +86,7 @@ class NormalDialog : AlertDialog {
 
     override fun onStart() {
         super.onStart()
-        window?.setBackgroundDrawableResource(R.color.ui_system_translate)
+        window?.setBackgroundDrawableResource(R.color.ui_transparent)
         window?.attributes?.let {
             it.dimAmount = 0.2f
             it.width = ScreenUtils.getScreenWidth() - AutoSizeUtils.dp2px(Utils.getApp(), 80f)

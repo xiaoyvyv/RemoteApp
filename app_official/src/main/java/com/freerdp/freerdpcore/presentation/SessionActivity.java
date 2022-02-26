@@ -49,6 +49,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 import android.widget.ZoomControls;
 
+import com.blankj.utilcode.util.ScreenUtils;
 import com.freerdp.freerdpcore.R;
 import com.freerdp.freerdpcore.application.GlobalApp;
 import com.freerdp.freerdpcore.application.SessionState;
@@ -59,12 +60,15 @@ import com.freerdp.freerdpcore.services.LibFreeRDP;
 import com.freerdp.freerdpcore.utils.ClipboardManagerProxy;
 import com.freerdp.freerdpcore.utils.KeyboardMapper;
 import com.freerdp.freerdpcore.utils.Mouse;
+import com.xiaoyv.blueprint.base.BaseActivity;
+
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-public class SessionActivity extends AppCompatActivity
+public class SessionActivity extends BaseActivity
     implements LibFreeRDP.UIEventListener, KeyboardView.OnKeyboardActionListener,
                ScrollView2D.ScrollView2DListener, KeyboardMapper.KeyProcessingListener,
                SessionView.SessionViewListener, TouchPointerView.TouchPointerListener,
@@ -208,6 +212,7 @@ public class SessionActivity extends AppCompatActivity
 	@Override public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		ScreenUtils.setLandscape(this);
 
 		// show status bar or make fullscreen?
 		if (ApplicationSettingsActivity.getHideStatusBar(this))
@@ -1189,6 +1194,22 @@ public class SessionActivity extends AppCompatActivity
 	{
 		Log.v(TAG, "onClipboardChanged: " + data);
 		LibFreeRDP.sendClipboardData(session.getInstance(), data);
+	}
+
+	@Nullable
+	@Override
+	protected View createContentView() {
+		return null;
+	}
+
+	@Override
+	protected void initData() {
+
+	}
+
+	@Override
+	protected void initView() {
+
 	}
 
 	private class UIHandler extends Handler

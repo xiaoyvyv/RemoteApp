@@ -2,7 +2,7 @@
 <resources>
 
     <style name="RdpKeyboardView">
-        <item name="background">@color/ui_system_translate</item>
+        <item name="background">@color/ui_transparent</item>
         <item name="keyBackground">@drawable/rdp_keyboard_key</item>
         <item name="keyTextSize">@dimen/ui_font_22</item>
         <item name="keyTextColor">@color/ui_text_c1</item>

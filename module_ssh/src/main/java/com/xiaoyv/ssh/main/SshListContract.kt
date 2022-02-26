@@ -43,7 +43,7 @@ interface SshListContract {
         /**
          * 查询全部分组
          */
-        fun v2pResolveSshByGroup()
+        fun v2pQueryGroup()
 
         /**
          * 根据组获取全部 Ssh
@@ -76,7 +76,7 @@ interface SshListContract {
          */
         fun p2mQueryLocalSshByGroup(group: String): Observable<List<SshEntity>>
 
-        fun p2mResolveAllGroup(): Observable<List<String>>
+        fun p2mQueryGroup(): Observable<List<String>>
 
         /**
          * 删除

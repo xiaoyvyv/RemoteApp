@@ -25,7 +25,7 @@
         <item name="android:fitsSystemWindows">false</item>
         <item name="android:windowTranslucentStatus">true</item>
         <item name="android:windowTranslucentNavigation">true</item>
-        <item name="android:windowBackground">@color/ui_system_black</item>
+        <item name="android:windowBackground">@color/ui_black</item>
     </style>
 
     <style name="UiApp.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />

@@ -5,7 +5,8 @@ import com.blankj.utilcode.util.StringUtils
 import com.xiaoyv.blueprint.base.ImplBasePresenter
 import com.xiaoyv.blueprint.base.subscribesWithPresenter
 import com.xiaoyv.busines.room.entity.SshEntity
-import com.xiaoyv.ssh.R
+import com.xiaoyv.desktop.ssh.R
+
 
 /**
  * SshListPresenter
@@ -34,9 +35,8 @@ class SshListPresenter : ImplBasePresenter<SshListContract.View>(), SshListContr
             )
     }
 
-
-    override fun v2pResolveSshByGroup() {
-        model.p2mResolveAllGroup()
+    override fun v2pQueryGroup() {
+        model.p2mQueryGroup()
             .subscribesWithPresenter(
                 presenter = this,
                 onSuccess = {

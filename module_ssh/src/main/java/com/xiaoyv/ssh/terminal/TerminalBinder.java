@@ -10,12 +10,10 @@ import androidx.annotation.NonNull;
 
 import com.blankj.utilcode.util.ColorUtils;
 import com.romide.terminal.emulatorview.EmulatorView;
-import com.xiaoyv.ui.base.BaseItemBindingBinder;
 import com.xiaoyv.busines.bean.ssh.KeyCodeBean;
-import com.xiaoyv.ssh.R;
-import com.xiaoyv.ssh.databinding.SshActivityTerminalKeyBinding;
-
-import org.jetbrains.annotations.NotNull;
+import com.xiaoyv.desktop.ssh.R;
+import com.xiaoyv.desktop.ssh.databinding.SshActivityTerminalKeyBinding;
+import com.xiaoyv.widget.binder.BaseItemBindingBinder;
 
 
 /**

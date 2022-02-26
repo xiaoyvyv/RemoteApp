@@ -21,13 +21,15 @@ import com.trilead.ssh2.Session;
 import com.xiaoyv.blueprint.base.BaseMvpActivity;
 import com.xiaoyv.busines.bean.ssh.KeyCodeBean;
 import com.xiaoyv.busines.room.entity.SshEntity;
-import com.xiaoyv.ssh.R;
-import com.xiaoyv.ssh.databinding.SshActivityTerminalBinding;
+import com.xiaoyv.desktop.ssh.R;
+import com.xiaoyv.desktop.ssh.databinding.SshActivityTerminalBinding;
 import com.xiaoyv.ssh.main.view.EmulatorViewGestureListener;
 
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
+
+;
 
 /**
  * TerminalActivity
@@ -81,8 +83,8 @@ public class TerminalActivity extends BaseMvpActivity<TerminalContract.View, Ter
     @Override
     protected void initData() {
         colorScheme = new ColorScheme(ColorUtils.getColor(R.color.ui_text_c4),
-                ColorUtils.getColor(R.color.ui_system_black),
-                ColorUtils.getColor(R.color.ui_system_black),
+                ColorUtils.getColor(R.color.ui_black),
+                ColorUtils.getColor(R.color.ui_black),
                 ColorUtils.getColor(R.color.ui_text_c4));
 
         binding.evTerminal.setBackgroundColor(colorScheme.getBackColor());

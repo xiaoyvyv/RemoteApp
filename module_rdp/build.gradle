@@ -44,6 +44,7 @@ kapt {
 }
 
 dependencies {
+    api "io.github.xiaoyvyv:widget:${rootProject.ext.blueprintVersion}"
     api project(':librdp')
     implementation project(':common_business')
 

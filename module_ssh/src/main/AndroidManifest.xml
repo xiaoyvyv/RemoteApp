@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.xiaoyv.ssh">
+    package="com.xiaoyv.desktop.ssh">
 
     <application>
         <activity
-            android:name=".terminal.TerminalActivity"
+            android:name="com.xiaoyv.ssh.terminal.TerminalActivity"
             android:windowSoftInputMode="adjustResize|stateHidden" />
-        <activity android:name=".add.AddSshActivity"/>
+        <activity android:name="com.xiaoyv.ssh.add.AddSshActivity"/>
     </application>
 </manifest>

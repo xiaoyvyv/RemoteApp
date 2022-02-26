@@ -18,10 +18,10 @@ import com.xiaoyv.busines.room.entity.SshEntity
 import com.xiaoyv.busines.utils.ExcelUtils
 import com.xiaoyv.busines.utils.SelectUtils
 import com.xiaoyv.busines.utils.ShareUtils
-import com.xiaoyv.mine.R
-import com.xiaoyv.mine.databinding.MineFragmentDialogBinding
-import com.xiaoyv.mine.databinding.MineFragmentDialogHelpBinding
-import com.xiaoyv.mine.databinding.MineFragmentMainBinding
+import com.xiaoyv.desktop.mine.R
+import com.xiaoyv.desktop.mine.databinding.MineFragmentDialogBinding
+import com.xiaoyv.desktop.mine.databinding.MineFragmentDialogHelpBinding
+import com.xiaoyv.desktop.mine.databinding.MineFragmentMainBinding
 import com.xiaoyv.mine.main.adapter.MineItemBindingBinder
 import com.xiaoyv.mine.main.adapter.MineItemHelper
 import com.xiaoyv.ui.dialog.normal.NormalDialog

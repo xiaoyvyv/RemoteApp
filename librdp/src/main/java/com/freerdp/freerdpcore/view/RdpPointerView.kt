@@ -15,9 +15,8 @@ import android.util.AttributeSet
 import android.view.MotionEvent
 import androidx.appcompat.widget.AppCompatImageView
 import com.blankj.utilcode.util.ScreenUtils
-import com.blankj.utilcode.util.ToastUtils
 import com.freerdp.freerdpcore.utils.GestureDetector
-import com.xiaoyv.librdp.R
+import com.xiaoyv.desktop.librdp.R
 import kotlin.math.min
 
 /**

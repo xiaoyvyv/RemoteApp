@@ -10,6 +10,7 @@
       <w>freerdpcore</w>
       <w>libftp</w>
       <w>librdp</w>
+      <w>libssh</w>
       <w>openh</w>
       <w>unicodekey</w>
       <w>verifiy</w>

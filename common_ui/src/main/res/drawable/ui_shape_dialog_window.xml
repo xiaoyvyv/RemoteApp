@@ -5,5 +5,5 @@
 
     <stroke
         android:width="@dimen/ui_size_1"
-        android:color="@color/ui_system_window_border" />
+        android:color="@color/ui_system_divider" />
 </shape>

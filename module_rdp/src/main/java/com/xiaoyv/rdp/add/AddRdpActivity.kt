@@ -1,5 +1,6 @@
 package com.xiaoyv.rdp.add
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
@@ -14,8 +15,8 @@ import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.busines.config.NavigationPath
 import com.xiaoyv.busines.room.database.DateBaseManger
 import com.xiaoyv.busines.room.entity.RdpEntity
-import com.xiaoyv.rdp.R
-import com.xiaoyv.rdp.databinding.RdpActivityAddBinding
+import com.xiaoyv.desktop.rdp.R
+import com.xiaoyv.desktop.rdp.databinding.RdpActivityAddBinding
 import com.xiaoyv.rdp.setting.single.RdpSingleSettingActivity
 import com.xiaoyv.widget.toolbar.UiToolbar
 
@@ -86,7 +87,7 @@ class AddRdpActivity : BaseActivity() {
             }
 
         // 获取配置信息
-        rdpEntity.configStr?.let {
+        rdpEntity.configStr.let {
             if (it.isNotEmpty()) {
                 rdpConfig = GsonUtils.fromJson(it, RdpConfig::class.java)
             }
@@ -95,13 +96,13 @@ class AddRdpActivity : BaseActivity() {
 
 
     override fun initView() {
-        binding.asvLabel.uiValue = rdpEntity.label.orEmpty()
-        binding.asvGroup.uiValue = rdpEntity.group.orEmpty()
-        binding.asvIp.uiValue = rdpEntity.ip.orEmpty()
-        binding.asvDomain.uiValue = rdpEntity.domain.orEmpty()
-        binding.asvPort.uiValue = rdpEntity.port.orEmpty()
-        binding.asvAccount.uiValue = rdpEntity.account.orEmpty()
-        binding.asvPassword.uiValue = rdpEntity.password.orEmpty()
+        binding.asvLabel.uiValue = rdpEntity.label
+        binding.asvGroup.uiValue = rdpEntity.group
+        binding.asvIp.uiValue = rdpEntity.ip
+        binding.asvDomain.uiValue = rdpEntity.domain
+        binding.asvPort.uiValue = rdpEntity.port
+        binding.asvAccount.uiValue = rdpEntity.account
+        binding.asvPassword.uiValue = rdpEntity.password
     }
 
     override fun initData() {
@@ -150,6 +151,7 @@ class AddRdpActivity : BaseActivity() {
         }
     }
 
+    @SuppressLint("MissingSuperCall")
     override fun onBackPressed() {
         if (!isAdd) {
             doSaveConfig()
@@ -160,13 +162,13 @@ class AddRdpActivity : BaseActivity() {
 
 
     private fun doSaveConfig(): Boolean {
-        val label = binding.asvLabel.uiValue
-        val group = binding.asvGroup.uiValue
-        val ip = binding.asvIp.uiValue
-        val domain = binding.asvDomain.uiValue
-        val port = binding.asvPort.uiValue
-        val account = binding.asvAccount.uiValue
-        val password = binding.asvPassword.uiValue
+        val label = binding.asvLabel.uiValue.orEmpty()
+        val group = binding.asvGroup.uiValue.orEmpty()
+        val ip = binding.asvIp.uiValue.orEmpty()
+        val domain = binding.asvDomain.uiValue.orEmpty()
+        val port = binding.asvPort.uiValue.orEmpty()
+        val account = binding.asvAccount.uiValue.orEmpty()
+        val password = binding.asvPassword.uiValue.orEmpty()
 
         if (StringUtils.isEmpty(label)) {
             p2vShowToast(StringUtils.getString(R.string.rdp_add_label_empty))

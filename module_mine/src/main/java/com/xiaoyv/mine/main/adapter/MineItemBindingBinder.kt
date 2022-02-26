@@ -2,10 +2,10 @@ package com.xiaoyv.mine.main.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import com.xiaoyv.ui.base.BaseItemBindingBinder
-import com.xiaoyv.mine.databinding.MineFragmentDialogItemBinding
-import com.xiaoyv.mine.databinding.MineFragmentDialogItemColBinding
+import com.xiaoyv.desktop.mine.databinding.MineFragmentDialogItemBinding
+import com.xiaoyv.desktop.mine.databinding.MineFragmentDialogItemColBinding
 import com.xiaoyv.mine.main.contract.MineContract
+import com.xiaoyv.widget.binder.BaseItemBindingBinder
 import java.util.*
 
 /**

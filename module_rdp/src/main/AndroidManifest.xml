@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.xiaoyv.rdp">
+    package="com.xiaoyv.desktop.rdp">
 
     <application>
         <activity
-            android:name=".screen.view.ScreenActivity"
+            android:name="com.xiaoyv.rdp.screen.view.ScreenActivity"
             android:configChanges="orientation|keyboard|keyboardHidden|screenSize|smallestScreenSize|density|screenLayout|navigation"
             android:exported="true"
             android:screenOrientation="unspecified"
@@ -23,9 +23,9 @@
         </activity>
         <activity
             android:exported="false"
-            android:name=".add.AddRdpActivity"
+            android:name="com.xiaoyv.rdp.add.AddRdpActivity"
             android:windowSoftInputMode="adjustResize" />
-        <activity android:name=".setting.RdpSettingActivity" />
-        <activity android:name=".setting.single.RdpSingleSettingActivity" />
+        <activity android:name="com.xiaoyv.rdp.setting.RdpSettingActivity" />
+        <activity android:name="com.xiaoyv.rdp.setting.single.RdpSingleSettingActivity" />
     </application>
 </manifest>

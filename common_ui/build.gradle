@@ -26,7 +26,7 @@ android {
 }
 
 dependencies {
-    api 'io.github.xiaoyvyv:widget:1.0.16'
+    api 'io.github.xiaoyvyv:widget:1.0.21'
 
     // 常用工具类
     api "com.blankj:utilcodex:${rootProject.ext.utilCodeXVersion}"
@@ -40,13 +40,6 @@ dependencies {
     api "com.hijamoya:keyboardview:${rootProject.ext.keyboardVersion}"
     // 开关
     api "com.github.zcweng:switch-button:${rootProject.ext.buttonVersion}"
-
-    // Kotlin
-    api "androidx.core:core-ktx:${rootProject.ext.kotlinKtxVersion}"
-
-    implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"
-    implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"
-    implementation "androidx.constraintlayout:constraintlayout:${rootProject.ext.constraintlayoutVersion}"
 
     testImplementation "junit:junit:${rootProject.ext.junitVersion}"
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.extJunitVersion}"
