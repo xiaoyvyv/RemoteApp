@@ -1,10 +1,11 @@
 package com.xiaoyv.ssh.terminal
 
+import com.romide.terminal.emulatorview.TermSession
 import com.trilead.ssh2.Session
-import com.xiaoyv.blueprint.base.IBaseView
 import com.xiaoyv.blueprint.base.IBasePresenter
-import com.xiaoyv.busines.room.entity.SshEntity
+import com.xiaoyv.blueprint.base.IBaseView
 import com.xiaoyv.busines.bean.ssh.KeyCodeBean
+import com.xiaoyv.busines.room.entity.SshEntity
 import io.reactivex.rxjava3.core.Observable
 
 /**
@@ -21,6 +22,9 @@ interface TerminalContract {
          * @param session session
          */
         fun p2vConnectSuccess(session: Session)
+        fun p2vConnectFail(errMsg: String)
+
+        fun p2vReleaseSuccess(success: Boolean)
     }
 
     interface Presenter : IBasePresenter {
@@ -37,6 +41,10 @@ interface TerminalContract {
          * @return 符号
          */
         fun v2pGetSymbol(): List<KeyCodeBean>
+
+        fun v2pReleaseSession(termSession: TermSession)
+
+        fun v2pDoCommandLs(dirName: String)
     }
 
     interface Model {
@@ -51,6 +59,9 @@ interface TerminalContract {
         /**
          * 关闭连接
          */
-        fun p2mClose()
+        fun p2mReleaseSession(termSession: TermSession): Observable<Boolean>
+
+        fun p2mDoCommandLs(dirName: String): Observable<List<Any>>
+
     }
 }

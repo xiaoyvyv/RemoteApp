@@ -23,7 +23,7 @@ class RdpListBindingBinder : BaseItemBindingBinder<RdpEntity, RdpFragmentMainIte
         binding.tvAccount.text = String.format("%s：%s", data.account, data.ip)
         binding.tvTime.text = TimeUtils.getFriendlyTimeSpanByNow(data.lastTime)
 
-        holder.addClickListener(binding.root, data)
+        holder.addClickListener(binding.root, data,2500)
     }
 
     override fun onCreateViewBinding(

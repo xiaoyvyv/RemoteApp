@@ -5,7 +5,9 @@ import com.blankj.utilcode.util.StringUtils
 import com.xiaoyv.blueprint.base.ImplBasePresenter
 import com.xiaoyv.blueprint.base.subscribesWithPresenter
 import com.xiaoyv.busines.room.entity.SshEntity
+import com.xiaoyv.busines.utils.HostVerifyUtils
 import com.xiaoyv.desktop.ssh.R
+import com.xiaoyv.ssh.terminal.TerminalActivity
 
 
 /**
@@ -50,6 +52,19 @@ class SshListPresenter : ImplBasePresenter<SshListContract.View>(), SshListContr
                         R.drawable.ui_pic_status_empty_normal
                     )
                     requireView.p2vGetTabLayout().removeAllTabs()
+                }
+            )
+    }
+
+    override fun v2pCheckHost(sshEntity: SshEntity) {
+        HostVerifyUtils.verifyHost(sshEntity.ip, sshEntity.port)
+            .subscribesWithPresenter(
+                presenter = this,
+                onSuccess = {
+                    requireView.p2vCheckHostResult(sshEntity, it)
+                },
+                onError = {
+                    requireView.p2vCheckHostResult(sshEntity, false)
                 }
             )
     }

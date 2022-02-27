@@ -94,7 +94,7 @@ ext {
     espressoVersion = '3.4.0'
 
     // 基础库
-    appcompatVersion = '1.3.1'
+    appcompatVersion = '1.4.1'
     materialVersion = '1.4.0'
     constraintlayoutVersion = '2.1.3'
     refreshVersion = '1.1.0'
@@ -118,7 +118,7 @@ ext {
     keyboardVersion = '0.0.3'
     buttonVersion = '0.0.3'
 
-    blueprintVersion = '1.0.21'
+    blueprintVersion = '1.0.31'
 
 }
 

@@ -24,5 +24,8 @@ android {
 
 dependencies {
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"
-    api files('libs/trilead-ssh2-1.0.0.jar')
+    // api 'com.trilead:trilead-ssh2:1.0.0-build222'
+//    implementation 'com.google.crypto.tink:tink-android:1.6.1'
+    implementation 'org.connectbot:sshlib:2.2.20'
+    implementation 'net.i2p.crypto:eddsa:0.3.0'
 }

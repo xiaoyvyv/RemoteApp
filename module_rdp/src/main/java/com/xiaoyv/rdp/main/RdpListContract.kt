@@ -38,6 +38,11 @@ interface RdpListContract {
          */
         fun p2vGetTabLayout(): TabLayout
 
+        /**
+         * 检测连通性
+         */
+        fun p2vCheckHostResult(rdpEntity: RdpEntity, success: Boolean)
+
     }
 
     interface Presenter : IBasePresenter {
@@ -59,6 +64,8 @@ interface RdpListContract {
          * @param dataBean       配置信息
          */
         fun v2pDeleteRdp(dataBean: RdpEntity)
+
+        fun v2pCheckHost(rdpEntity: RdpEntity)
     }
 
     interface Model {

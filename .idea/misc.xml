@@ -32,19 +32,22 @@
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_mine/src/main/res/layout/mine_fragment_dialog_item.xml" value="0.23958333333333334" />
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_mine/src/main/res/layout/mine_fragment_dialog_item_col.xml" value="0.23958333333333334" />
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_mine/src/main/res/layout/mine_fragment_main.xml" value="0.23958333333333334" />
-        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_activity_add.xml" value="0.20462962962962963" />
+        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_activity_add.xml" value="0.20925925925925926" />
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_activity_screen_credentials.xml" value="0.22870370370370371" />
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_activity_screen_loading.xml" value="0.22870370370370371" />
-        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_fragment_main.xml" value="0.23958333333333334" />
-        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_fragment_main_item.xml" value="0.23958333333333334" />
+        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_fragment_main.xml" value="0.22685185185185186" />
+        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_fragment_main_item.xml" value="0.1" />
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_setting_single.xml" value="0.23958333333333334" />
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_setting_single_advance.xml" value="0.23958333333333334" />
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_setting_single_debug.xml" value="0.23958333333333334" />
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_setting_single_performance.xml" value="0.264" />
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_setting_single_screen.xml" value="0.23958333333333334" />
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_setting_ui.xml" value="0.22037037037037038" />
-        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_ssh/src/main/res/layout/ssh_add_activitiy.xml" value="0.23958333333333334" />
+        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_ssh/src/main/res/layout/ssh_activity_terminal.xml" value="0.18703703703703703" />
+        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_ssh/src/main/res/layout/ssh_activity_terminal_key.xml" value="0.23958333333333334" />
+        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_ssh/src/main/res/layout/ssh_add_activitiy.xml" value="0.21944444444444444" />
         <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_ssh/src/main/res/layout/ssh_fragment_main.xml" value="0.23958333333333334" />
+        <entry key="..\:/Users/Administrator/AndroidStudioProjects/RemoteApp/module_ssh/src/main/res/layout/ssh_fragment_main_item.xml" value="0.1" />
       </map>
     </option>
   </component>

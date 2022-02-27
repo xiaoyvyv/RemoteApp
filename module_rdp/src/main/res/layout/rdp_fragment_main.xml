@@ -42,6 +42,7 @@
         app:tabTextAppearance="@style/UiApp.TabFontBold.12"
         app:tabTextColor="@color/ui_text_c3"
         app:tabUnboundedRipple="true"
+        tools:ignore="SpeakableTextPresentCheck"
         tools:layout_height="@dimen/ui_size_44"
         tools:visibility="visible" />
 
@@ -61,11 +62,19 @@
         android:layout_height="wrap_content"
         android:layout_margin="@dimen/ui_size_16"
         android:contentDescription="@string/rdp_main_title"
+        android:tint="@color/ui_white"
+        app:backgroundTint="@color/ui_theme_c1"
         app:cornerRadius="@dimen/ui_size_18"
+        app:elevation="@dimen/ui_layout_elevation"
+        app:fabCustomSize="@dimen/ui_size_50"
         app:icon="@drawable/ui_icon_add"
         app:iconSize="@dimen/ui_size_24"
         app:iconTint="@color/ui_system_c5"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:maxImageSize="@dimen/ui_size_30"
+        app:rippleColor="@color/ui_transparent"
+        app:srcCompat="@drawable/ui_icon_add"
+        tools:ignore="ImageContrastCheck" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

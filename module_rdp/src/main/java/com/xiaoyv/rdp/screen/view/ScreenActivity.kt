@@ -315,8 +315,7 @@ class ScreenActivity : BaseMvpActivity<ScreenContract.View, ScreenPresenter>(),
 
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
+    override fun onConfigurationChangedAdapt(newConfig: Configuration) {
 
         // 重新加载键盘资源（从横向更改）
         modifiersKeyboard = Keyboard(applicationContext, R.xml.rdp_keyboard_modifiers)

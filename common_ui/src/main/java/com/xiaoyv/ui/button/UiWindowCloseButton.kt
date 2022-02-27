@@ -35,7 +35,7 @@ class UiWindowCloseButton @JvmOverloads constructor(
             MotionEvent.ACTION_CANCEL,
             MotionEvent.ACTION_UP -> {
                 l?.onClick(this)
-                setBackgroundResource(R.color.ui_black_bb)
+                setBackgroundResource(R.color.ui_text_c1)
                 setImageResource(R.drawable.ui_shape_window_close_normal)
             }
         }

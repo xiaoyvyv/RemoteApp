@@ -37,6 +37,8 @@ interface SshListContract {
          * 是否删除成功
          */
         fun p2vDeleteSshResult(success: Boolean)
+
+        fun p2vCheckHostResult(sshEntity: SshEntity, success: Boolean)
     }
 
     interface Presenter : IBasePresenter {
@@ -58,6 +60,8 @@ interface SshListContract {
          * @param dataBean       配置信息
          */
         fun v2pDeleteSsh(dataBean: SshEntity)
+
+        fun v2pCheckHost(sshEntity: SshEntity)
     }
 
     interface Model {

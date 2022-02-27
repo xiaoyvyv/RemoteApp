@@ -20,7 +20,7 @@
     <string name="ssh_add_group_hint">保存至分组以方便管理</string>
     <string name="ssh_add_ip">SSH IP地址或域名</string>
     <string name="ssh_add_ip_empty">IP或域名不能为空</string>
-    <string name="ssh_add_ip_hint">例：192.168.0.1</string>
+    <string name="ssh_add_ip_hint">IP或域名不能为空</string>
     <string name="ssh_add_ip_required">请输入远程地址或域名</string>
     <string name="ssh_add_port">SSH 端口</string>
     <string name="ssh_add_port_empty">端口不能为空</string>
@@ -28,10 +28,10 @@
     <string name="ssh_add_port_hint">请输入远程SSH端口，默认22</string>
     <string name="ssh_add_account">SSH 用户名</string>
     <string name="ssh_add_account_empty">用户名不能为空</string>
-    <string name="ssh_add_account_hint">例：Administrator</string>
+    <string name="ssh_add_account_hint">用户名不能为空</string>
     <string name="ssh_add_account_required">请输入远程用户名</string>
     <string name="ssh_add_password">SSH 密码</string>
-    <string name="ssh_add_password_hint">SSH 密码</string>
+    <string name="ssh_add_password_hint">SSH 远程登录密码</string>
     <string name="ssh_add_success">远程 SSH 保存成功</string>
 
     <!-- 连接ssh -->

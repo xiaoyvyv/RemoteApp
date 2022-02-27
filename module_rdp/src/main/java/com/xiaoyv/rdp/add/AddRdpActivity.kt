@@ -8,17 +8,20 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.blankj.utilcode.util.*
-import com.blankj.utilcode.util.ThreadUtils.SimpleTask
 import com.freerdp.freerdpcore.domain.RdpConfig
 import com.xiaoyv.blueprint.base.BaseActivity
+import com.xiaoyv.blueprint.base.rxjava.subscribes
 import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.busines.config.NavigationPath
 import com.xiaoyv.busines.room.database.DateBaseManger
 import com.xiaoyv.busines.room.entity.RdpEntity
+import com.xiaoyv.busines.rx.RxEventStack
+import com.xiaoyv.busines.rx.RxEventTag
 import com.xiaoyv.desktop.rdp.R
 import com.xiaoyv.desktop.rdp.databinding.RdpActivityAddBinding
 import com.xiaoyv.rdp.setting.single.RdpSingleSettingActivity
-import com.xiaoyv.widget.toolbar.UiToolbar
+import com.xiaoyv.widget.utils.doOnBarClick
+import io.reactivex.rxjava3.core.Observable
 
 /**
  * AddRdpActivity
@@ -96,6 +99,16 @@ class AddRdpActivity : BaseActivity() {
 
 
     override fun initView() {
+        binding.toolbar.title =
+            (if (isAdd) getString(R.string.rdp_add_title) else getString(R.string.rdp_add_edit_title))
+        binding.toolbar.setRightIcon(
+            R.drawable.ui_icon_save,
+            onBarClickListener = doOnBarClick { _, _ ->
+                doSaveConfig()
+            })
+    }
+
+    override fun initData() {
         binding.asvLabel.uiValue = rdpEntity.label
         binding.asvGroup.uiValue = rdpEntity.group
         binding.asvIp.uiValue = rdpEntity.ip
@@ -103,19 +116,6 @@ class AddRdpActivity : BaseActivity() {
         binding.asvPort.uiValue = rdpEntity.port
         binding.asvAccount.uiValue = rdpEntity.account
         binding.asvPassword.uiValue = rdpEntity.password
-    }
-
-    override fun initData() {
-        binding.toolbar.title =
-            (if (isAdd) getString(R.string.rdp_add_title) else getString(R.string.rdp_add_edit_title))
-
-        binding.toolbar.setRightIcon(
-            R.drawable.ui_icon_save,
-            onBarClickListener = object : UiToolbar.OnBarClickListener {
-                override fun onClick(view: View, which: Int) {
-                    doSaveConfig()
-                }
-            })
     }
 
     override fun initListener() {
@@ -153,15 +153,17 @@ class AddRdpActivity : BaseActivity() {
 
     @SuppressLint("MissingSuperCall")
     override fun onBackPressed() {
-        if (!isAdd) {
-            doSaveConfig()
-        } else {
+        if (isAdd) {
             super.onBackPressed()
+        } else {
+            doSaveConfig()
         }
     }
 
-
-    private fun doSaveConfig(): Boolean {
+    /**
+     * 保存
+     */
+    private fun doSaveConfig() {
         val label = binding.asvLabel.uiValue.orEmpty()
         val group = binding.asvGroup.uiValue.orEmpty()
         val ip = binding.asvIp.uiValue.orEmpty()
@@ -172,26 +174,26 @@ class AddRdpActivity : BaseActivity() {
 
         if (StringUtils.isEmpty(label)) {
             p2vShowToast(StringUtils.getString(R.string.rdp_add_label_empty))
-            return false
+            return
         }
         if (StringUtils.isEmpty(group)) {
             p2vShowToast(StringUtils.getString(R.string.rdp_add_group_empty))
-            return false
+            return
         }
         if (StringUtils.isEmpty(ip)) {
             p2vShowToast(StringUtils.getString(R.string.rdp_add_ip_empty))
-            return false
+            return
         }
         if (StringUtils.isEmpty(port)) {
             p2vShowToast(StringUtils.getString(R.string.rdp_add_port_empty))
-            return false
+            return
         }
         if (StringUtils.isEmpty(account)) {
             p2vShowToast(StringUtils.getString(R.string.rdp_add_account_empty))
-            return false
+            return
         }
 
-        saveRdpBookmark(rdpEntity.also {
+        val rdpEntity = rdpEntity.also {
             it.label = label
             it.group = group
             it.ip = ip
@@ -208,8 +210,22 @@ class AddRdpActivity : BaseActivity() {
                 config.username = it.account
                 config.password = it.password
             }.toJson()
-        })
-        return true
+        }
+
+        saveRdpBookmark(rdpEntity)
+            .compose(bindTransformer())
+            .to(bindLifecycle())
+            .subscribes(
+                onSuccess = {
+                    RxEventStack.postEmpty(RxEventTag.EVENT_ADD_RDP_SUCCESS)
+
+                    finish()
+                },
+                onError = {
+                    ToastUtils.showShort("配置添加或更新失败")
+                    finish()
+                }
+            )
     }
 
     /**
@@ -217,22 +233,12 @@ class AddRdpActivity : BaseActivity() {
      *
      * @param rdpEntity 配置的连接信息
      */
-    private fun saveRdpBookmark(rdpEntity: RdpEntity) {
-        ThreadUtils.executeByCached(object : SimpleTask<Boolean>() {
-            @Throws(NumberFormatException::class)
-            override fun doInBackground(): Boolean {
-                DateBaseManger.get().saveRdp(rdpEntity)
-                return true
-            }
-
-            override fun onFail(t: Throwable?) {
-                ToastUtils.showShort("配置添加或更新失败")
-            }
-
-            override fun onSuccess(result: Boolean) {
-                finish()
-            }
-        })
+    private fun saveRdpBookmark(rdpEntity: RdpEntity): Observable<Boolean> {
+        return Observable.create {
+            DateBaseManger.get().saveRdp(rdpEntity)
+            it.onNext(true)
+            it.onComplete()
+        }
     }
 
 

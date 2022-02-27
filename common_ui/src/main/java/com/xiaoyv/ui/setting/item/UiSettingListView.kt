@@ -40,7 +40,9 @@ class UiSettingListView @JvmOverloads constructor(
 
         if (!isInEditMode) {
             this.optionsDialog = UiOptionsDialog.Builder().apply {
-                itemDataList = uiListValueDesc.toList().map { toString() }
+                itemDataList = uiListValueDesc.toList().map { charSequence ->
+                    charSequence.toString()
+                }
                 onOptionsClickListener = { dialog, _, position ->
                     dialog.dismiss()
 

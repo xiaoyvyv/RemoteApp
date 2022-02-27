@@ -13,6 +13,7 @@
     <attr name="ui_value_color" format="color" />
     <attr name="ui_hint" format="string" />
     <attr name="ui_hint_color" format="color" />
+    <attr name="ui_dialog_hint" format="string" />
     <attr name="ui_divider_enable" format="boolean" />
     <attr name="ui_divider_margin" format="dimension" />
 

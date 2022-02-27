@@ -4,19 +4,21 @@ import android.view.LayoutInflater
 import android.view.View
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.alibaba.android.arouter.launcher.ARouter
-import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ColorUtils
 import com.blankj.utilcode.util.ObjectUtils
 import com.blankj.utilcode.util.StringUtils
+import com.blankj.utilcode.util.ToastUtils
 import com.chad.library.adapter.base.BaseBinderAdapter
+import com.github.nukc.stateview.StateView
 import com.google.android.material.tabs.TabLayout
 import com.xiaoyv.blueprint.base.binding.BaseMvpBindingFragment
+import com.xiaoyv.blueprint.base.rxjava.event.RxEvent
 import com.xiaoyv.busines.config.NavigationPath
 import com.xiaoyv.busines.room.entity.SshEntity
+import com.xiaoyv.busines.rx.RxEventTag
 import com.xiaoyv.desktop.ssh.R
-
-import com.xiaoyv.ssh.add.AddSshActivity
 import com.xiaoyv.desktop.ssh.databinding.SshFragmentMainBinding
+import com.xiaoyv.ssh.add.AddSshActivity
 import com.xiaoyv.ssh.terminal.TerminalActivity
 import com.xiaoyv.ui.listener.SimpleRefreshListener
 import com.xiaoyv.ui.listener.SimpleTabSelectListener
@@ -24,7 +26,6 @@ import com.xiaoyv.widget.binder.setOnItemClickListener
 import com.xiaoyv.widget.dialog.UiOptionsDialog
 import com.xiaoyv.widget.toolbar.UiToolbar
 import com.xiaoyv.widget.utils.overScrollV
-import me.everything.android.ui.overscroll.IOverScrollDecor
 
 /**
  * SshFragment
@@ -40,7 +41,7 @@ class SshListFragment :
     private lateinit var multiTypeAdapter: BaseBinderAdapter
     private lateinit var sshListBinder: SshListBindingBinder
 
-    private var scrollDecor: IOverScrollDecor? = null
+    private var currentGroupIndex = 0
 
     override fun createContentBinding(layoutInflater: LayoutInflater): SshFragmentMainBinding {
         return SshFragmentMainBinding.inflate(layoutInflater)
@@ -49,15 +50,17 @@ class SshListFragment :
     override fun createPresenter() = SshListPresenter()
 
     override fun initView() {
+        stateController.fitTitleAndStatusBar = true
         binding.toolbar.title = StringUtils.getString(R.string.ssh_main_title)
         binding.toolbar.setRightIcon(R.drawable.ui_icon_search, onBarClickListener = object :
             UiToolbar.OnBarClickListener {
             override fun onClick(view: View, which: Int) {
-                ActivityUtils.startActivity(AddSshActivity::class.java)
+                ARouter.getInstance().build(NavigationPath.PATH_SSH_ADD_ACTIVITY).navigation()
+//                ActivityUtils.startActivity(AddSshActivity::class.java)
             }
         })
 
-        scrollDecor = binding.rvContent.overScrollV()
+        binding.rvContent.overScrollV()
 
 //
 //        ThreadUtils.getCachedPool().execute(() -> {
@@ -118,27 +121,35 @@ class SshListFragment :
         multiTypeAdapter = BaseBinderAdapter()
         multiTypeAdapter.addItemBinder(sshListBinder)
         binding.rvContent.adapter = multiTypeAdapter
+
+        addReceiveEventTag(RxEventTag.EVENT_ADD_SSH_SUCCESS)
+    }
+
+    override fun initFinish() {
+        presenter.v2pQueryGroup()
     }
 
     override fun initListener() {
         sshListBinder.setOnItemClickListener { _, dataBean, position, isLongClick ->
             // 连接
             if (!isLongClick) {
-                TerminalActivity.openSelf(dataBean)
+                p2vShowLoading("正在校验主机连通性")
+                presenter.v2pCheckHost(dataBean)
                 return@setOnItemClickListener
             }
 
             val optionsDialog = UiOptionsDialog.Builder().apply {
                 backCancelable = true
-                itemDataList = StringUtils.getStringArray(R.array.ui_context_menu).toList().map {
-                    toString()
-                }
+                itemDataList = StringUtils.getStringArray(R.array.ui_context_menu).toList()
                 itemLastColor = ColorUtils.getColor(R.color.ui_status_error)
 
-                onOptionsClickListener = { dialog, _, position ->
+                onOptionsClickListener = { dialog, _, index ->
                     dialog.dismiss()
-                    when (position) {
-                        0 -> TerminalActivity.openSelf(dataBean)
+                    when (index) {
+                        0 -> {
+                            p2vShowLoading("正在校验主机连通性")
+                            presenter.v2pCheckHost(dataBean)
+                        }
                         1 -> AddSshActivity.openSelf(dataBean)
                         2 -> removeItem(dataBean, position)
                     }
@@ -148,27 +159,44 @@ class SshListFragment :
             optionsDialog.show(this)
         }
 
-        binding.fabAddSsh.setOnClickListener {
+        binding.fabAdd.setOnClickListener {
             ARouter.getInstance().build(NavigationPath.PATH_SSH_ADD_ACTIVITY).navigation()
         }
+
         binding.tlGroup.addOnTabSelectedListener(object : SimpleTabSelectListener() {
             override fun onTabSelected(tab: TabLayout.Tab) {
+                currentGroupIndex = tab.position
                 presenter.v2pQueryLocalSshByGroup(tab.text.toString())
             }
         })
 
         // 刷新
-        scrollDecor?.setOverScrollUpdateListener(object : SimpleRefreshListener() {
-            override fun onRefresh() {
-                val tab = binding.tlGroup.getTabAt(binding.tlGroup.selectedTabPosition) ?: return
-                val group = tab.text.toString()
-                presenter.v2pQueryLocalSshByGroup(group)
-            }
-        })
+        binding.rvContent.overScrollV()
+            .setOverScrollUpdateListener(object : SimpleRefreshListener() {
+                override fun onRefresh() {
+                    val tab = binding.tlGroup.getTabAt(currentGroupIndex) ?: return
+                    val group = tab.text.toString()
+                    presenter.v2pQueryLocalSshByGroup(group)
+                }
+            })
     }
 
-    override fun onResumeExceptFirst() {
-        presenter.v2pQueryGroup()
+    override fun p2vCheckHostResult(sshEntity: SshEntity, success: Boolean) {
+        p2vHideLoading()
+        if (success) {
+            TerminalActivity.openSelf(sshEntity)
+        } else {
+            ToastUtils.showShort("%s:%s 连通性校验失败", sshEntity.ip, sshEntity.port)
+        }
+    }
+
+    override fun onReceiveRxEvent(rxEvent: RxEvent, rxEventTag: String) {
+        when (rxEventTag) {
+            RxEventTag.EVENT_ADD_SSH_SUCCESS -> {
+                // 更新查询
+                presenter.v2pQueryGroup()
+            }
+        }
     }
 
     override fun removeItem(dataBean: SshEntity, adapterPos: Int) {
@@ -185,11 +213,16 @@ class SshListFragment :
             binding.tlGroup.visibility = View.GONE
             return
         }
-        binding.tlGroup.visibility = View.VISIBLE
-        for (group in groupNames) {
-            binding.tlGroup.addTab(binding.tlGroup.newTab().setText(group))
+
+        if (currentGroupIndex >= groupNames.size) {
+            currentGroupIndex = groupNames.size - 1
         }
 
+        binding.tlGroup.visibility = View.VISIBLE
+        groupNames.forEachIndexed { index, group ->
+            val newTab = binding.tlGroup.newTab()
+            binding.tlGroup.addTab(newTab.setText(group), currentGroupIndex == index)
+        }
         stateController.showNormalView()
     }
 
@@ -204,4 +237,8 @@ class SshListFragment :
     }
 
     override fun p2vGetTabLayout() = binding.tlGroup
+
+    override fun p2vClickStatusView(stateView: StateView, view: View) {
+        ARouter.getInstance().build(NavigationPath.PATH_SSH_ADD_ACTIVITY).navigation()
+    }
 }

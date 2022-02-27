@@ -4,20 +4,21 @@ import android.view.LayoutInflater
 import android.view.View
 import com.alibaba.android.arouter.facade.annotation.Route
 import com.alibaba.android.arouter.launcher.ARouter
-import com.blankj.utilcode.util.ColorUtils
-import com.blankj.utilcode.util.ObjectUtils
-import com.blankj.utilcode.util.StringUtils
+import com.blankj.utilcode.util.*
 import com.chad.library.adapter.base.BaseBinderAdapter
 import com.github.nukc.stateview.StateView
 import com.google.android.material.tabs.TabLayout
 import com.xiaoyv.blueprint.base.binding.BaseMvpBindingFragment
+import com.xiaoyv.blueprint.base.rxjava.event.RxEvent
 import com.xiaoyv.busines.config.NavigationPath
 import com.xiaoyv.busines.room.entity.RdpEntity
+import com.xiaoyv.busines.rx.RxEventTag
 import com.xiaoyv.desktop.rdp.R
-import com.xiaoyv.rdp.add.AddRdpActivity
 import com.xiaoyv.desktop.rdp.databinding.RdpFragmentMainBinding
+import com.xiaoyv.rdp.add.AddRdpActivity
 import com.xiaoyv.rdp.screen.view.ScreenActivity
 import com.xiaoyv.rdp.setting.RdpSettingActivity
+import com.xiaoyv.ui.listener.SimpleRefreshListener
 import com.xiaoyv.ui.listener.SimpleTabSelectListener
 import com.xiaoyv.widget.binder.setOnItemClickListener
 import com.xiaoyv.widget.dialog.UiOptionsDialog
@@ -38,7 +39,7 @@ class RdpListFragment :
     private lateinit var multiTypeAdapter: BaseBinderAdapter
     private lateinit var rdpBinder: RdpListBindingBinder
 
-    private val currentGroupIndex = 0
+    private var currentGroupIndex = 0
 
     override fun createContentBinding(layoutInflater: LayoutInflater): RdpFragmentMainBinding {
         return RdpFragmentMainBinding.inflate(layoutInflater)
@@ -47,12 +48,14 @@ class RdpListFragment :
     override fun createPresenter() = RdpListPresenter()
 
     override fun initView() {
+        stateController.fitTitleAndStatusBar = true
         binding.toolbar.title = StringUtils.getString(R.string.rdp_main_title)
         binding.toolbar.setRightIcon(
             R.drawable.ui_icon_search,
             onBarClickListener = doOnBarClick { view, which ->
                 RdpSettingActivity.openSelf(RdpSettingActivity.TYPE_SETTING_UI)
             })
+
 //        binding.toolbar
 //            .setTitle(StringUtils.getString(R.string.rdp_main_title))
 //            .setEndIcon(R.drawable.ui_icon_search)
@@ -61,7 +64,6 @@ class RdpListFragment :
 //                RdpSettingActivity.openSelf(RdpSettingActivity.TYPE_SETTING_POWER)
 //                RdpSettingActivity.openSelf(RdpSettingActivity.TYPE_SETTING_SECURITY)
 //            }
-        stateController.fitTitleAndStatusBar = true
 
         binding.rvContent.overScrollV()
     }
@@ -72,13 +74,16 @@ class RdpListFragment :
         multiTypeAdapter.addItemBinder(rdpBinder)
 
         binding.rvContent.adapter = multiTypeAdapter
+
+        addReceiveEventTag(RxEventTag.EVENT_ADD_RDP_SUCCESS)
     }
 
     override fun initListener() {
         rdpBinder.setOnItemClickListener { _, dataBean, position, isLongClick ->
             // 连接
             if (!isLongClick) {
-                ScreenActivity.openSelf(dataBean)
+                p2vShowLoading("正在校验主机连通性")
+                presenter.v2pCheckHost(dataBean)
                 return@setOnItemClickListener
             }
 
@@ -86,10 +91,13 @@ class RdpListFragment :
                 itemDataList = StringUtils.getStringArray(R.array.ui_context_menu).toList()
                 itemLastColor = ColorUtils.getColor(R.color.ui_status_error)
 
-                onOptionsClickListener = { dialog, _, position ->
+                onOptionsClickListener = { dialog, _, index ->
                     dialog.dismiss()
-                    when (position) {
-                        0 -> ScreenActivity.openSelf(dataBean)
+                    when (index) {
+                        0 -> {
+                            p2vShowLoading("正在校验主机连通性")
+                            presenter.v2pCheckHost(dataBean)
+                        }
                         1 -> AddRdpActivity.openSelf(dataBean)
                         2 -> removeItem(dataBean, position)
                     }
@@ -108,22 +116,35 @@ class RdpListFragment :
 
         binding.tlGroup.addOnTabSelectedListener(object : SimpleTabSelectListener() {
             override fun onTabSelected(tab: TabLayout.Tab) {
+                currentGroupIndex = tab.position
                 presenter.v2pQueryLocalRdpByGroup(tab.text.toString())
             }
         })
+
         // 刷新
-//        scrollDecor?.setOverScrollUpdateListener(object : SimpleRefreshListener() {
-//            override fun onRefresh() {
-//                val tab = binding.tlGroup.getTabAt(binding.tlGroup.selectedTabPosition) ?: return
-//                val group = tab.text.toString()
-//                presenter.v2pQueryLocalRdpByGroup(group)
-//            }
-//        })
+        binding.rvContent.overScrollV()
+            .setOverScrollUpdateListener(object : SimpleRefreshListener() {
+                override fun onRefresh() {
+                    val tab = binding.tlGroup.getTabAt(currentGroupIndex) ?: return
+                    val group = tab.text.toString()
+                    presenter.v2pQueryLocalRdpByGroup(group)
+                }
+            })
     }
+
 
     override fun initFinish() {
         // 查询
         presenter.v2pQueryGroup()
+    }
+
+    override fun onReceiveRxEvent(rxEvent: RxEvent, rxEventTag: String) {
+        when (rxEventTag) {
+            RxEventTag.EVENT_ADD_RDP_SUCCESS -> {
+                // 更新查询
+                presenter.v2pQueryGroup()
+            }
+        }
     }
 
     override fun removeItem(dataBean: RdpEntity, adapterPos: Int) {
@@ -132,6 +153,17 @@ class RdpListFragment :
 
         // 删除后重新查询
         presenter.v2pDeleteRdp(dataBean)
+    }
+
+    override fun p2vCheckHostResult(rdpEntity: RdpEntity, success: Boolean) {
+        p2vHideLoading()
+        if (success) {
+            ThreadUtils.runOnUiThreadDelayed({
+                ScreenActivity.openSelf(rdpEntity)
+            }, 200)
+        } else {
+            ToastUtils.showShort("%s:%s 连通性校验失败", rdpEntity.ip, rdpEntity.port)
+        }
     }
 
     /**
@@ -143,11 +175,16 @@ class RdpListFragment :
             binding.tlGroup.visibility = View.GONE
             return
         }
-        binding.tlGroup.visibility = View.VISIBLE
-        for (group in groupNames) {
-            binding.tlGroup.addTab(binding.tlGroup.newTab().setText(group))
+
+        if (currentGroupIndex >= groupNames.size) {
+            currentGroupIndex = groupNames.size - 1
         }
-        binding.tlGroup.selectTab(binding.tlGroup.getTabAt(currentGroupIndex))
+
+        binding.tlGroup.visibility = View.VISIBLE
+        groupNames.forEachIndexed { index, group ->
+            val newTab = binding.tlGroup.newTab()
+            binding.tlGroup.addTab(newTab.setText(group), currentGroupIndex == index)
+        }
         stateController.showNormalView()
     }
 

@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/ui_system_background"
     android:orientation="vertical">
 
-    <com.xiaoyv.widget.toolbar.UiToolbar
-        android:id="@+id/toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
     <androidx.core.widget.NestedScrollView
+        android:id="@+id/nsv_scroll"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="@dimen/ui_size_0"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
 
-        <com.xiaoyv.ui.setting.UiSettingScreen
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:ui_sp="TEMP">
+            android:orientation="vertical">
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_host"
@@ -33,26 +33,45 @@
                 android:textSize="@dimen/ui_font_14"
                 android:textStyle="bold" />
 
-            <com.xiaoyv.ui.setting.UiSettingView
+            <com.xiaoyv.ui.setting.item.UiSettingInputView
                 android:id="@+id/asv_label"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                app:ui_dialog_hint="@string/ssh_add_label_required"
+                app:ui_hint="@string/ssh_add_label_hint"
+                app:ui_hint_color="@color/ui_text_c3"
+                app:ui_title="@string/ssh_add_label"
+                app:ui_value="" />
 
-            <com.xiaoyv.ui.setting.UiSettingView
+            <com.xiaoyv.ui.setting.item.UiSettingInputView
                 android:id="@+id/asv_group"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                app:ui_dialog_hint=""
+                app:ui_hint="@string/ssh_add_group_hint"
+                app:ui_hint_color="@color/ui_text_c3"
+                app:ui_title="@string/ssh_add_group"
+                app:ui_value="" />
 
-            <com.xiaoyv.ui.setting.UiSettingView
+            <com.xiaoyv.ui.setting.item.UiSettingInputView
                 android:id="@+id/asv_ip"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                app:ui_dialog_hint="@string/ssh_add_ip_required"
+                app:ui_hint="@string/ssh_add_ip_hint"
+                app:ui_hint_color="@color/ui_system_error"
+                app:ui_title="@string/ssh_add_ip"
+                app:ui_value="" />
 
-            <com.xiaoyv.ui.setting.UiSettingView
+            <com.xiaoyv.ui.setting.item.UiSettingInputView
                 android:id="@+id/asv_port"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
+                android:layout_height="wrap_content"
+                app:ui_dialog_hint=""
+                app:ui_hint="@string/ssh_add_port_hint"
+                app:ui_hint_color="@color/ui_text_c3"
+                app:ui_title="@string/ssh_add_port"
+                app:ui_value="22" />
 
             <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/tv_credentials"
@@ -68,16 +87,32 @@
                 android:textSize="@dimen/ui_font_14"
                 android:textStyle="bold" />
 
-            <com.xiaoyv.ui.setting.UiSettingView
+            <com.xiaoyv.ui.setting.item.UiSettingInputView
                 android:id="@+id/asv_account"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                app:ui_dialog_hint="@string/ssh_add_account_required"
+                app:ui_hint="@string/ssh_add_account_hint"
+                app:ui_hint_color="@color/ui_system_error"
+                app:ui_title="@string/ssh_add_account"
+                app:ui_value="" />
 
-            <com.xiaoyv.ui.setting.UiSettingView
+            <com.xiaoyv.ui.setting.item.UiSettingInputView
                 android:id="@+id/asv_password"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-        </com.xiaoyv.ui.setting.UiSettingScreen>
-
+                android:layout_height="wrap_content"
+                app:ui_dialog_hint=""
+                app:ui_hint="@string/ssh_add_password_hint"
+                app:ui_hint_color="@color/ui_text_c3"
+                app:ui_title="@string/ssh_add_password"
+                app:ui_value="" />
+        </androidx.appcompat.widget.LinearLayoutCompat>
     </androidx.core.widget.NestedScrollView>
-</androidx.appcompat.widget.LinearLayoutCompat>
+
+    <com.xiaoyv.widget.toolbar.UiToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/ui_system_background"
+        app:layout_constraintTop_toTopOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

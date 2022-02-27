@@ -5,6 +5,7 @@ import com.blankj.utilcode.util.StringUtils
 import com.xiaoyv.blueprint.base.ImplBasePresenter
 import com.xiaoyv.blueprint.base.subscribesWithPresenter
 import com.xiaoyv.busines.room.entity.RdpEntity
+import com.xiaoyv.busines.utils.HostVerifyUtils
 import com.xiaoyv.desktop.rdp.R
 
 /**
@@ -62,6 +63,19 @@ class RdpListPresenter : ImplBasePresenter<RdpListContract.View>(), RdpListContr
                 },
                 onError = {
 
+                }
+            )
+    }
+
+    override fun v2pCheckHost(rdpEntity: RdpEntity) {
+        HostVerifyUtils.verifyHost(rdpEntity.ip, rdpEntity.port)
+            .subscribesWithPresenter(
+                presenter = this,
+                onSuccess = {
+                    requireView.p2vCheckHostResult(rdpEntity, it)
+                },
+                onError = {
+                    requireView.p2vCheckHostResult(rdpEntity, false)
                 }
             )
     }
