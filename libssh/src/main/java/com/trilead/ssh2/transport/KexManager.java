@@ -11,6 +11,7 @@ import com.trilead.ssh2.crypto.cipher.BlockCipherFactory;
 import com.trilead.ssh2.crypto.dh.Curve25519Exchange;
 import com.trilead.ssh2.crypto.dh.DhGroupExchange;
 import com.trilead.ssh2.crypto.dh.GenericDhExchange;
+import com.trilead.ssh2.crypto.digest.MAC;
 import com.trilead.ssh2.crypto.digest.MessageMac;
 import com.trilead.ssh2.log.Logger;
 import com.trilead.ssh2.packets.PacketKexDHInit;
@@ -136,14 +137,14 @@ public class KexManager implements MessageHandler {
             return false;
         }
 
-		return compareFirstOfNameList(cpar.server_host_key_algorithms, spar.server_host_key_algorithms);
+        return compareFirstOfNameList(cpar.server_host_key_algorithms, spar.server_host_key_algorithms);
 
         /*
          * We do NOT check here if the other algorithms can be agreed on, this
          * is just a check if kex_algorithms and server_host_key_algorithms were
          * guessed right!
          */
-	}
+    }
 
     private NegotiatedParameters mergeKexParameters(KexParameters client, KexParameters server) {
         NegotiatedParameters np = new NegotiatedParameters();
@@ -251,13 +252,13 @@ public class KexManager implements MessageHandler {
         tm.sendKexMessage(ign.getPayload());
 
         BlockCipher cbc;
-        MessageMac mac;
+        MAC mac;
 
         try {
             cbc = BlockCipherFactory.createCipher(kxs.np.enc_algo_client_to_server, true, km.enc_key_client_to_server,
                     km.initial_iv_client_to_server);
 
-            mac = new MessageMac(kxs.np.mac_algo_client_to_server, km.integrity_key_client_to_server);
+            mac = new MAC(kxs.np.mac_algo_client_to_server, km.integrity_key_client_to_server);
 
         } catch (IllegalArgumentException e) {
             throw new IOException("Fatal error during MAC startup!", e);
@@ -463,13 +464,13 @@ public class KexManager implements MessageHandler {
                 throw new IOException("Peer sent SSH_MSG_NEWKEYS, but I have no key material ready!");
 
             BlockCipher cbc;
-            MessageMac mac;
+            MAC mac;
 
             try {
                 cbc = BlockCipherFactory.createCipher(kxs.np.enc_algo_server_to_client, false,
                         km.enc_key_server_to_client, km.initial_iv_server_to_client);
 
-                mac = new MessageMac(kxs.np.mac_algo_server_to_client, km.integrity_key_server_to_client);
+                mac = new MAC(kxs.np.mac_algo_server_to_client, km.integrity_key_server_to_client);
 
             } catch (IllegalArgumentException e1) {
                 throw new IOException("Fatal error during MAC startup!");

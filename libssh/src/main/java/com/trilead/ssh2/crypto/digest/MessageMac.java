@@ -7,13 +7,11 @@ import java.util.List;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-public final class MessageMac extends MAC {
+public final class MessageMac  {
 
     private final Mac messageMac;
 
     public MessageMac(String type, byte[] key) {
-        super(type, key);
-
         try {
             messageMac = Mac.getInstance(Hmac.getHmac(type).getAlgorithm());
             messageMac.init(new SecretKeySpec(key, type));

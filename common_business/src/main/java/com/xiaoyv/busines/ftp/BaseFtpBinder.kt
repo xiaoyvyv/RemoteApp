@@ -32,10 +32,16 @@ class BaseFtpBinder : BaseItemBindingBinder<BaseFtpFile, BusinessActivityFtpItem
         data: BaseFtpFile
     ) {
         val fileExtension = FileUtils.getFileExtension(data.fileName)
-        if (data.isDir) {
-            binding.ivIcon.setImageResource(R.drawable.business_icon_file_dir)
-        } else {
-            binding.ivIcon.setImageResource(fileExtension.toTypeIcon())
+        when {
+            data.isDirectory -> {
+                binding.ivIcon.setImageResource(R.drawable.business_icon_file_dir)
+            }
+            data.isSymlink -> {
+                binding.ivIcon.setImageResource(R.drawable.business_icon_file_link)
+            }
+            else -> {
+                binding.ivIcon.setImageResource(fileExtension.toTypeIcon())
+            }
         }
 
         // 权限

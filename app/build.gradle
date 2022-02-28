@@ -3,8 +3,6 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
-    useLibrary 'org.apache.http.legacy'
-
     buildFeatures {
         viewBinding true
     }

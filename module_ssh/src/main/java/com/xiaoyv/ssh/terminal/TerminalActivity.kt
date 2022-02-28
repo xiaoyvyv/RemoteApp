@@ -140,7 +140,7 @@ class TerminalActivity :
             this.setControlKeyCode(KeycodeConstants.KEYCODE_CTRL_LEFT)
             this.setFnKeyCode(KeycodeConstants.KEYCODE_FUNCTION)
             this.setMouseTracking(true)
-            this.setTermType("vt100")
+            this.setTermType("xterm")
             this.setCursorBlink(0)
             this.setCursorBlinkPeriod(250)
             this.setExtGestureListener(EmulatorViewGestureListener(this))

@@ -7,8 +7,7 @@ import com.trilead.ssh2.crypto.cipher.BlockCipherFactory;
 import com.trilead.ssh2.crypto.cipher.CBCMode;
 import com.trilead.ssh2.crypto.cipher.DES;
 import com.trilead.ssh2.packets.TypesReader;
-
-import org.mindrot.jbcrypt.BCrypt;
+import com.xiaoyv.libssh.BCrypt;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

@@ -1,10 +1,7 @@
 package com.trilead.ssh2;
 
 import com.trilead.ssh2.crypto.Base64;
-import com.trilead.ssh2.crypto.digest.Digest;
-import com.trilead.ssh2.crypto.digest.MD5;
 import com.trilead.ssh2.crypto.digest.MessageMac;
-import com.trilead.ssh2.crypto.digest.SHA1;
 import com.trilead.ssh2.log.Logger;
 import com.trilead.ssh2.signature.KeyAlgorithm;
 import com.trilead.ssh2.signature.KeyAlgorithmManager;
@@ -17,10 +14,11 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SecureRandom;
@@ -137,7 +135,12 @@ public class KnownHosts {
      * @return the hashed representation, e.g., "|1|cDhrv7zwEUV3k71CEPHnhHZezhA=|Xo+2y6rUXo2OIWRAYhBOIijbJMA="
      */
     public static String createHashedHostname(String hostname) {
-        SHA1 sha1 = new SHA1();
+        MessageDigest sha1;
+        try {
+            sha1 = MessageDigest.getInstance("SHA1");
+        } catch (NoSuchAlgorithmException e) {
+            return "";
+        }
 
         byte[] salt = new byte[sha1.getDigestLength()];
 
@@ -159,10 +162,10 @@ public class KnownHosts {
 
         MessageMac messageMac = new MessageMac("hmac-sha1", salt);
 
-		byte[] message = hostname.getBytes(StandardCharsets.ISO_8859_1);
-		messageMac.update(message, 0, message.length);
+        byte[] message = hostname.getBytes(StandardCharsets.ISO_8859_1);
+        messageMac.update(message, 0, message.length);
 
-		byte[] dig = new byte[20];
+        byte[] dig = new byte[20];
 
         messageMac.getMac(dig, 0);
 
@@ -191,7 +194,12 @@ public class KnownHosts {
             return false;
         }
 
-        SHA1 sha1 = new SHA1();
+        MessageDigest sha1;
+        try {
+            sha1 = MessageDigest.getInstance("SHA1");
+        } catch (NoSuchAlgorithmException e) {
+            return false;
+        }
 
         if (salt.length != sha1.getDigestLength())
             return false;
@@ -623,12 +631,20 @@ public class KnownHosts {
      * @return the raw fingerprint
      */
     private static byte[] rawFingerPrint(String type, String keyType, byte[] hostkey) {
-        Digest dig;
+        MessageDigest dig;
 
         if ("md5".equals(type)) {
-            dig = new MD5();
+            try {
+                dig = MessageDigest.getInstance("MD5");
+            } catch (NoSuchAlgorithmException e) {
+                throw new IllegalArgumentException("Unknown hash type " + type);
+            }
         } else if ("sha1".equals(type)) {
-            dig = new SHA1();
+            try {
+                dig = MessageDigest.getInstance("SHA1");
+            } catch (NoSuchAlgorithmException e) {
+                throw new IllegalArgumentException("Unknown hash type " + type);
+            }
         } else
             throw new IllegalArgumentException("Unknown hash type " + type);
 

@@ -17,16 +17,6 @@ abstract class BaseFtpActivity<V : BaseFtpContract.View, P : BaseFtpPresenter<V>
 
     private lateinit var fileBinder: BaseFtpBinder
 
-    /**
-     * 当前目录
-     */
-    protected var currentDirName = "/home"
-
-    /**
-     * 操作历史
-     */
-    protected val dirHistory = arrayListOf<String>()
-
     override fun createContentBinding(layoutInflater: LayoutInflater): BusinessActivityFtpBinding {
         return BusinessActivityFtpBinding.inflate(layoutInflater)
     }
@@ -42,6 +32,7 @@ abstract class BaseFtpActivity<V : BaseFtpContract.View, P : BaseFtpPresenter<V>
         fileBinder = BaseFtpBinder()
         binding.rvList.addItemBinder(fileBinder)
 
+        binding.rvList.showLoadingView()
     }
 
     @CallSuper
@@ -49,13 +40,16 @@ abstract class BaseFtpActivity<V : BaseFtpContract.View, P : BaseFtpPresenter<V>
         binding.rvList.setDateListener(
             onRefreshListener = {
                 // 查询当前目录
-                presenter.v2pQueryFileList(currentDirName)
+                presenter.v2pQueryFileList()
             }
         )
 
+        /**
+         * 重试
+         */
         binding.rvList.onRetryListener = { _, _ ->
             // 查询当前目录
-            presenter.v2pQueryFileList(currentDirName)
+            presenter.v2pQueryFileList()
         }
 
         fileBinder.setOnItemClickListener { view, dataBean, position, isLongClick ->
@@ -64,9 +58,8 @@ abstract class BaseFtpActivity<V : BaseFtpContract.View, P : BaseFtpPresenter<V>
                 return@setOnItemClickListener
             }
             // 打开目录
-            if (dataBean.isDir) {
-                currentDirName = "$currentDirName/$fileName"
-                presenter.v2pQueryFileList(currentDirName)
+            if (dataBean.isDirOrDirLink) {
+                presenter.v2pQueryFileList(fileName)
             }
         }
     }
@@ -74,9 +67,20 @@ abstract class BaseFtpActivity<V : BaseFtpContract.View, P : BaseFtpPresenter<V>
     @CallSuper
     override fun onPresenterCreated() {
         // 查询当前目录
-        presenter.v2pQueryFileList(currentDirName)
+        presenter.v2pQueryPwdPath()
     }
 
+    override fun p2vShowPwdPath(pwdPath: String) {
+        // 设置初始工作路径
+        presenter.v2pUpdatePwdPath(pwdPath)
+
+        // 查询目录内容
+        presenter.v2pQueryFileList()
+    }
+
+    override fun p2vUpdatePathBar(pwdPath: String) {
+
+    }
 
     override fun p2vShowFileListSuccess(fileList: List<BaseFtpFile>) {
         binding.rvList.finishAll()
@@ -93,4 +97,14 @@ abstract class BaseFtpActivity<V : BaseFtpContract.View, P : BaseFtpPresenter<V>
         binding.rvList.finishAll()
         binding.rvList.showErrorView(errMsg)
     }
+
+    override fun onBackPressed() {
+        if (presenter.v2pCanBack()) {
+            // 查询上一条
+            presenter.v2pQueryFileList("..")
+        } else {
+            super.onBackPressed()
+        }
+    }
+
 }

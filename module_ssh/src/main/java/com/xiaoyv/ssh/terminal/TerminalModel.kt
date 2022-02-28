@@ -72,7 +72,7 @@ class TerminalModel : TerminalContract.Model {
 
                 // 会话
                 val session = connection.openSession().apply {
-                    requestPTY("vt100")
+                    requestPTY("xterm")
                     startShell()
                 }
 

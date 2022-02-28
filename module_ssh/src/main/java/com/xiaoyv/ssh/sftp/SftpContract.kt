@@ -2,6 +2,7 @@ package com.xiaoyv.ssh.sftp
 
 import com.xiaoyv.busines.ftp.BaseFtpContract
 import com.xiaoyv.busines.ftp.BaseFtpFile
+import io.reactivex.rxjava3.core.Observable
 
 /**
  * SftpContract
@@ -19,6 +20,7 @@ interface SftpContract {
     }
 
     interface Model : BaseFtpContract.Model {
+        fun p2mDoCommand(command: String): Observable<String>
 
         fun convertToFtpFile(any: Any): BaseFtpFile
 
