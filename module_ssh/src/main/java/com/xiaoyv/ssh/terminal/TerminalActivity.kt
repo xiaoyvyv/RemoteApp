@@ -19,6 +19,7 @@ import com.xiaoyv.busines.room.entity.SshEntity
 import com.xiaoyv.desktop.ssh.R
 import com.xiaoyv.desktop.ssh.databinding.SshActivityTerminalBinding
 import com.xiaoyv.ssh.main.view.EmulatorViewGestureListener
+import com.xiaoyv.ssh.sftp.SftpActivity
 import com.xiaoyv.widget.utils.doOnBarClick
 import java.util.*
 
@@ -58,12 +59,12 @@ class TerminalActivity :
     override fun fix5497() = true
 
     override fun initView() {
-        binding.toolbar.title = String.format("%s：%s", sshEntity.account, sshEntity.ip)
+        binding.toolbar.title = String.format("%s@%s", sshEntity.account, sshEntity.ip)
 
         binding.toolbar.setRightIcon(
-            R.drawable.ui_icon_search,
+            R.drawable.business_icon_file_dir,
             onBarClickListener = doOnBarClick { view, which ->
-                presenter.v2pDoCommandLs("/home")
+                SftpActivity.openSelf()
             })
     }
 
@@ -74,7 +75,6 @@ class TerminalActivity :
             ColorUtils.getColor(R.color.ui_black),
             ColorUtils.getColor(R.color.ui_text_c4)
         )
-
         binding.evTerminal.setBackgroundColor(colorScheme.backColor)
         binding.vHr.setBackgroundColor(colorScheme.foreColor)
 
@@ -126,7 +126,6 @@ class TerminalActivity :
             sshEntity.account,
             sshEntity.ip
         )
-
         termSession.setUpdateCallback {
 
         }

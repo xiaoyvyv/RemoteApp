@@ -3,6 +3,8 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
+    useLibrary 'org.apache.http.legacy'
+
     buildFeatures {
         viewBinding true
     }
@@ -13,6 +15,8 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode rootProject.ext.versionCode
         versionName rootProject.ext.versionName
+
+        multiDexEnabled true
 
         ndk {
             // 设置支持的SO库架构
@@ -43,6 +47,8 @@ dependencies {
     implementation project(':module_ssh')
     implementation project(':module_rdp')
     implementation project(':module_mine')
+
+    implementation 'androidx.multidex:multidex:2.0.1'
 
     implementation "androidx.appcompat:appcompat:${rootProject.ext.appcompatVersion}"
     implementation "com.google.android.material:material:${rootProject.ext.materialVersion}"

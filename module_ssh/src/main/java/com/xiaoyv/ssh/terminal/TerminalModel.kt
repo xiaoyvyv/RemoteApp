@@ -1,3 +1,5 @@
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package com.xiaoyv.ssh.terminal
 
 import com.blankj.utilcode.util.ConvertUtils
@@ -22,11 +24,6 @@ import java.io.File
  */
 class TerminalModel : TerminalContract.Model {
     private val sBufferSize = 524288
-
-    private var connection: Connection? = null
-
-    private val requireSftpClient: SFTPClient
-        get() = SFTPClient(connection ?: throw NullPointerException("请先连接SSH客户端"))
 
     /**
      * 连接前验证
@@ -80,11 +77,12 @@ class TerminalModel : TerminalContract.Model {
                 }
 
                 // 缓存对象
-                this.connection = connection
+                sshConnection = connection
 
                 it.onNext(session)
                 it.onComplete()
             } catch (e: Exception) {
+                sshConnection = null
                 it.onError(e)
             }
         }
@@ -93,8 +91,16 @@ class TerminalModel : TerminalContract.Model {
     override fun p2mReleaseSession(termSession: TermSession): Observable<Boolean> {
         return Observable.create {
             termSession.finish()
-            connection?.close()
-            connection = null
+
+            runCatching {
+                sftpClient?.close()
+                sftpClient = null
+            }
+
+            runCatching {
+                sshConnection?.close()
+                sshConnection = null
+            }
 
             it.onNext(true)
             it.onComplete()
@@ -106,7 +112,6 @@ class TerminalModel : TerminalContract.Model {
         return Observable.create { emitter ->
             val files: List<Any> = requireSftpClient.ls(dirName).toList()
 
-//            val createFile = requireSftpClient.createFile("/home/www/test.txt")
             val outputStream = requireSftpClient.writeToFile("/home/www/test.txt")
 
             val progress: (Double) -> Unit = {}
@@ -139,5 +144,25 @@ class TerminalModel : TerminalContract.Model {
             emitter.onNext(files)
             emitter.onComplete()
         }
+    }
+
+
+    companion object {
+        /**
+         * SSH 连接
+         */
+        internal var sshConnection: Connection? = null
+        val requireConnection: Connection
+            get() = sshConnection ?: throw NullPointerException("请先连接SSH客户端")
+
+
+        /**
+         * 获取 Ftp 客户端
+         */
+        internal var sftpClient: SFTPClient? = null
+        val requireSftpClient: SFTPClient
+            get() = sftpClient ?: SFTPClient(requireConnection).apply {
+                sftpClient = this
+            }
     }
 }

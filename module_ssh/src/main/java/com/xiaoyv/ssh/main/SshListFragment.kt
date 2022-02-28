@@ -62,58 +62,6 @@ class SshListFragment :
 
         binding.rvContent.overScrollV()
 
-//
-//        ThreadUtils.getCachedPool().execute(() -> {
-//            try {
-//                Connection conn = new Connection("101.132.108.0");
-//                conn.connect();
-//                boolean authenticate = conn.authenticateWithPassword("root", "Why981229@");
-//                if (!authenticate) {
-//                    LogUtils.e("身份验证失败,请重试");
-//                    return;
-//                }
-//                Session session = conn.openSession();
-//                InputStream stdout = session.getStdout();
-//                OutputStream stdin = session.getStdin();
-//                session.requestDumbPTY();
-//                session.startShell();
-//
-//                TermSession termSession = new TermSession();
-//                termSession.setTermIn(stdout);
-//                termSession.setTermOut(stdin);
-//                termSession.setColorScheme(new ColorScheme(Color.WHITE, Color.BLACK, Color.WHITE, Color.BLACK));
-//                termSession.setDefaultUTF8Mode(true);
-//                termSession.setFinishCallback(session1 -> LogUtils.json(session1));
-//                termSession.setTitle("");
-//                termSession.initializeEmulator(80, 24);
-//                termSession.setUpdateCallback(() -> LogUtils.e("onUpdate"));
-//
-//                UI.post(() -> {
-//                    DisplayMetrics displayMetrics = new DisplayMetrics();
-//                    activity.getDisplay().getRealMetrics(displayMetrics);
-//
-//                    binding.evTerminal.attachSession(termSession);
-//                    binding.evTerminal.setDensity(displayMetrics);
-//                    binding.evTerminal.setTextSize(16);
-//                    binding.evTerminal.setUseCookedIME(true);
-//                    binding.evTerminal.setBackKeyCharacter(32);
-//                    binding.evTerminal.setAltSendsEsc(false);
-//                    binding.evTerminal.setControlKeyCode(0);
-//                    binding.evTerminal.setFnKeyCode(1);
-//                    binding.evTerminal.setMouseTracking(false);
-//                    binding.evTerminal.setOnKeyListener(new View.OnKeyListener() {
-//                        @Override
-//                        public boolean onKey(View v, int keyCode, KeyEvent event) {
-//                            return false;
-//                        }
-//                    });
-//                    binding.evTerminal.setExtGestureListener(new EmulatorViewGestureListener(binding.evTerminal));
-//                    registerForContextMenu(binding.evTerminal);
-//                });
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//            }
-//        });
     }
 
     override fun initData() {
