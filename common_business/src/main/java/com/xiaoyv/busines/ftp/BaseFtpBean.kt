@@ -15,6 +15,7 @@ data class BaseFtpBean(
  */
 data class BaseFtpFile(
     var fileName: String = "",
+    var fileFullName: String = "",
     var longEntry: String = "",
     var size: Long = 0,
     var modifierTime: Long = 0,
@@ -38,7 +39,37 @@ data class BaseFtpFile(
  * 文件属性
  */
 data class BaseFtpStat(
+    var block: Long = 0,
+    var device: String = "",
+    var fileAcTime: Long = 0,
+    var fileGroup: String = "",
+    var fileGroupId: String = "",
+    var fileMoTime: Long = 0,
+    var fileFullName: String = "",
     var fileName: String = "",
-    var isDirectory: Boolean = false,
+    var filePermission: String = "",
+    var filePermissionText: String = "",
+    var fileSize: Long = 0,
+    var fileType: String = "",
+    var fileUser: String = "",
+    var fileUserId: String = "",
+    var hardLink: Int = 0,
+    var inode: Long = 0,
+    var ioBlock: Long = 0
+) : Serializable {
+    val isSymlink: Boolean
+        get() = fileFullName.contains("->")
 
-    ) : Serializable
+    val linkTargetPath: String
+        get() {
+            // ‘/symlink’ -> ‘bin’
+            if (fileFullName.contains("->")) {
+                return fileFullName.split("->")
+                    .lastOrNull()
+                    .orEmpty()
+                    .replace("‘", "")
+                    .trim()
+            }
+            return ""
+        }
+}

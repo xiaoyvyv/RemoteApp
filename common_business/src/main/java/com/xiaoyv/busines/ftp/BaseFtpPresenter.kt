@@ -1,5 +1,6 @@
 package com.xiaoyv.busines.ftp
 
+import com.blankj.utilcode.util.LogUtils
 import com.xiaoyv.blueprint.base.ImplBasePresenter
 import com.xiaoyv.blueprint.base.subscribesWithPresenter
 
@@ -40,7 +41,6 @@ abstract class BaseFtpPresenter<V : BaseFtpContract.View> : ImplBasePresenter<V>
         this.pwdPath = pwdPath
     }
 
-
     override fun v2pQueryFileList(fileName: String, showLoading: Boolean) {
         // 拼接验证路径格式
         val verifyPath = spliceWholePathByPwd(fileName)
@@ -68,18 +68,31 @@ abstract class BaseFtpPresenter<V : BaseFtpContract.View> : ImplBasePresenter<V>
         // 拼接验证路径格式
         val verifyPath = spliceWholePathByPwd(fileName)
 
-        requireView.p2vShowLoading("正在获取文件属于信息")
+        requireView.p2vShowLoading("获取信息中")
 
         sftpModel.p2mQueryFileStat(verifyPath)
             .subscribesWithPresenter(
                 presenter = this,
                 onSuccess = {
                     requireView.p2vHideLoading()
-
+                    requireView.p2vShowFileStat(it)
                 },
                 onError = {
                     requireView.p2vHideLoading()
+                    requireView.p2vShowToast("无法获取文件属性")
+                }
+            )
+    }
 
+    override fun v2pDownloadFile(dataBean: BaseFtpFile) {
+        sftpModel.p2mDownloadFile(dataBean)
+            .subscribesWithPresenter(
+                presenter = this,
+                onSuccess = {
+
+                },
+                onError = {
+                    LogUtils.e(it)
                 }
             )
     }
@@ -93,6 +106,7 @@ abstract class BaseFtpPresenter<V : BaseFtpContract.View> : ImplBasePresenter<V>
         pwdPath == "/" -> "/$filename"
         else -> "$pwdPath/$filename"
     }
+
 
     /**
      * 能否返回上一级

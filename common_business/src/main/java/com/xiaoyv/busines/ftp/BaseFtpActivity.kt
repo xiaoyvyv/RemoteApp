@@ -4,13 +4,17 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.annotation.CallSuper
-import com.blankj.utilcode.util.LogUtils
+import com.blankj.utilcode.util.ConvertUtils
+import com.blankj.utilcode.util.SpanUtils
+import com.blankj.utilcode.util.TimeUtils
 import com.chad.library.adapter.base.BaseBinderAdapter
 import com.xiaoyv.blueprint.base.binding.BaseMvpBindingActivity
 import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.desktop.business.R
 import com.xiaoyv.desktop.business.databinding.BusinessActivityFtpBinding
+import com.xiaoyv.desktop.business.databinding.BusinessActivityFtpStatBinding
 import com.xiaoyv.widget.binder.setOnItemClickListener
+import com.xiaoyv.widget.dialog.UiNormalDialog
 import com.xiaoyv.widget.utils.doOnBarClick
 
 /**
@@ -112,7 +116,8 @@ abstract class BaseFtpActivity<V : BaseFtpContract.View, P : BaseFtpPresenter<V>
         }
     }
 
-    protected open fun processItemClick(dataBean: BaseFtpFile, position: Int) {
+
+    override fun processItemClick(dataBean: BaseFtpFile, position: Int) {
         val fileName = dataBean.fileName
 
         when {
@@ -122,18 +127,20 @@ abstract class BaseFtpActivity<V : BaseFtpContract.View, P : BaseFtpPresenter<V>
             }
             // 链接：则解析
             dataBean.isSymlink -> {
-
+                vClickSymLink(dataBean,position)
             }
             // 文件
             else -> {
-
+                vClickFile(dataBean,position)
             }
         }
     }
 
+    abstract fun vClickSymLink(dataBean: BaseFtpFile, position: Int)
+    abstract fun vClickFile(dataBean: BaseFtpFile, position: Int)
+
     protected open fun processItemLongClick(dataBean: BaseFtpFile, position: Int) {
         val fileName = dataBean.fileName
-
         presenter.v2pQueryFileStat(fileName)
     }
 
@@ -152,8 +159,49 @@ abstract class BaseFtpActivity<V : BaseFtpContract.View, P : BaseFtpPresenter<V>
     }
 
     override fun p2vUpdatePathBar(pwdPath: List<String>) {
-        LogUtils.i(pwdPath)
         filePathAdapter.setList(pwdPath)
+    }
+
+    /**
+     * 文件属性
+     */
+    override fun p2vShowFileStat(ftpStat: BaseFtpStat) {
+        UiNormalDialog.Builder().apply {
+            cancelText = null
+            confirmText = null
+            customView = R.layout.business_activity_ftp_stat
+            onCustomViewInitListener = { _, view ->
+                val binding = BusinessActivityFtpStatBinding.bind(view)
+
+                val memorySize = ConvertUtils.byte2FitMemorySize(ftpStat.fileSize)
+
+                val acTime = TimeUtils.getFriendlyTimeSpanByNow(ftpStat.fileAcTime * 1000)
+                val moTime = TimeUtils.getFriendlyTimeSpanByNow(ftpStat.fileMoTime * 1000)
+
+                val fileUser = "${ftpStat.fileUserId}/${ftpStat.fileUser}"
+                val fileGroup = "${ftpStat.fileGroupId}/${ftpStat.fileGroup}"
+
+                SpanUtils.with(binding.tvStat)
+                    .appendLine(String.format("名称　　　　：%s", ftpStat.fileName))
+                    .appendLine(String.format("类型　　　　：%s", ftpStat.fileType))
+                    .apply {
+                        if (ftpStat.isSymlink) {
+                            appendLine(String.format("链接目标　　：%s", ftpStat.linkTargetPath))
+                        }
+                    }
+                    .appendLine(String.format("大小　　　　：%s", memorySize))
+                    .appendLine(String.format("权限　　　　：%s", ftpStat.filePermission))
+                    .appendLine(String.format("所属用户　　：%s", fileUser))
+                    .appendLine(String.format("所属组　　　：%s", fileGroup))
+                    .appendLine(String.format("访问时间　　：%s", acTime))
+                    .appendLine(String.format("修改时间　　：%s", moTime))
+                    .appendLine(String.format("Inode　　　：%s", ftpStat.inode))
+                    .appendLine(String.format("Block　　　：%s", ftpStat.block))
+                    .appendLine(String.format("Io Block  ：%s", ftpStat.ioBlock))
+                    .create()
+
+            }
+        }.create().show(this)
     }
 
     override fun p2vShowFileListSuccess(fileList: List<BaseFtpFile>) {

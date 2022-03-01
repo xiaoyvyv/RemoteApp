@@ -48,16 +48,12 @@ package com.xiaoyv.ssh.utils
  * - %t     十六进制表示的文件系统类型
  * - %T     可读格式表示的文件系统类型
  */
-private const val FORMAT_SFTP_STAT: String = ""
-/*
-{"fileName":"%N","fileType":"","fileSize":"","filePermission":"","fileUser":"","fileGroup":"","fileAcTime":%Y,"fileMoTime":%Y,
-"fileMd5":"","fileSha1":"","inodeLink":1,"inodeNodeNumber":1,"inodeProtectedMode":1,"inodeResidentDevice":1,}
- */
+private const val FORMAT_SFTP_STAT: String = "{\\\"fileName\\\"\\:\\\"%n\\\"\\,\\\"fileFullName\\\"\\:\\\"%N\\\"\\,\\\"fileType\\\"\\:\\\"%F\\\"\\,\\\"fileSize\\\"\\:%s\\,\\\"filePermission\\\"\\:\\\"%a\\\"\\,\\\"filePermissionText\\\"\\:\\\"%A\\\"\\,\\\"fileUser\\\"\\:\\\"%U\\\"\\,\\\"fileUserId\\\"\\:\\\"%u\\\"\\,\\\"fileGroup\\\"\\:\\\"%G\\\"\\,\\\"fileGroupId\\\"\\:\\\"%g\\\"\\,\\\"fileAcTime\\\"\\:%Y\\,\\\"fileMoTime\\\"\\:%Y\\,\\\"hardLink\\\"\\:%h\\,\\\"device\\\"\\:\\\"%Dh/%dd\\\"\\,\\\"inode\\\"\\:%i\\,\\\"block\\\"\\:%b\\,\\\"ioBlock\\\"\\:%o}"
 
 /**
  * 查询文件状态
  */
-const val CMD_STAT = "stat -c $FORMAT_SFTP_STAT %s"
+const val CMD_STAT = "stat -c $FORMAT_SFTP_STAT "
 
 /**
  * 查询工作目录

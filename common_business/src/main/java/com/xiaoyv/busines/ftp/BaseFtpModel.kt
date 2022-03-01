@@ -1,7 +1,5 @@
 package com.xiaoyv.busines.ftp
 
-import io.reactivex.rxjava3.core.Observer
-
 /**
  * BaseFtpModel
  *
@@ -9,5 +7,4 @@ import io.reactivex.rxjava3.core.Observer
  * @since 2022/2/28
  */
 abstract class BaseFtpModel : BaseFtpContract.Model {
-
 }

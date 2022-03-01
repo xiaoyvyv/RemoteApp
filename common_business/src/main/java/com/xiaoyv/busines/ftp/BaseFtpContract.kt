@@ -3,6 +3,7 @@ package com.xiaoyv.busines.ftp
 import com.xiaoyv.blueprint.base.IBasePresenter
 import com.xiaoyv.blueprint.base.IBaseView
 import io.reactivex.rxjava3.core.Observable
+import java.io.File
 
 /**
  * BaseFtpContract
@@ -27,6 +28,13 @@ interface BaseFtpContract {
          * 更新路径导航
          */
         fun p2vUpdatePathBar(pwdPath: List<String>)
+
+        /**
+         * 显示文件属性
+         */
+        fun p2vShowFileStat(ftpStat: BaseFtpStat)
+
+        fun processItemClick(dataBean: BaseFtpFile, position: Int)
     }
 
     interface Presenter : IBasePresenter {
@@ -43,6 +51,11 @@ interface BaseFtpContract {
          * 链接解析
          */
         fun v2pQueryFileStat(fileName: String)
+
+        /**
+         * 下载文件
+         */
+        fun v2pDownloadFile(dataBean: BaseFtpFile)
     }
 
     interface Model {
@@ -51,5 +64,7 @@ interface BaseFtpContract {
         fun p2mQueryFileStat(verifyPath: String): Observable<BaseFtpStat> {
             return Observable.create { }
         }
+
+        fun p2mDownloadFile(dataBean: BaseFtpFile): Observable<File>
     }
 }

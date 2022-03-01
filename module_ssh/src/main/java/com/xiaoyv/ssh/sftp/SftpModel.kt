@@ -1,6 +1,7 @@
 package com.xiaoyv.ssh.sftp
 
 import com.blankj.utilcode.util.ConvertUtils
+import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
 import com.trilead.ssh2.SFTPv3DirectoryEntry
 import com.xiaoyv.busines.ftp.BaseFtpBean
@@ -11,6 +12,7 @@ import com.xiaoyv.ssh.terminal.TerminalModel
 import com.xiaoyv.ssh.utils.CMD_STAT
 import io.reactivex.rxjava3.core.Observable
 import java.io.ByteArrayOutputStream
+import java.io.File
 import java.nio.charset.StandardCharsets
 
 /**
@@ -49,6 +51,7 @@ class SftpModel : BaseFtpModel(), SftpContract.Model {
                 if (ftpFile.fileName.isBlank() || ftpFile.fileName == "." || ftpFile.fileName == "..") {
                     continue
                 }
+                ftpFile.fileFullName = canonicalPath + "/" + ftpFile.fileName
                 fileList.add(ftpFile)
             }
             // 排序 正序，文件夹在上
@@ -64,17 +67,19 @@ class SftpModel : BaseFtpModel(), SftpContract.Model {
     }
 
     override fun p2mQueryFileStat(verifyPath: String): Observable<BaseFtpStat> {
-        return p2mDoCommand(String.format(CMD_STAT, verifyPath)).map { statInfo ->
-            convertToFtpStat(statInfo)
+        return p2mDoCommand(CMD_STAT + verifyPath).map { statInfo ->
+            GsonUtils.fromJson(statInfo, BaseFtpStat::class.java)
         }
     }
 
+    override fun p2mDownloadFile(dataBean: BaseFtpFile): Observable<File> {
+        return Observable.create {
+            val sftpClient = TerminalModel.requireSftpClient
 
-    /**
-     * a
-     */
-    override fun convertToFtpStat(statInfo: String): BaseFtpStat = BaseFtpStat().apply {
-        LogUtils.e(statInfo)
+
+//            val readLink = sftpClient.readLink(dataBean.fileFullName)
+//            LogUtils.e(readLink)
+        }
     }
 
     override fun convertToFtpFile(any: Any) = BaseFtpFile().apply {
