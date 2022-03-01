@@ -2,6 +2,7 @@ package com.xiaoyv.ssh.sftp
 
 import com.xiaoyv.blueprint.base.subscribesWithPresenter
 import com.xiaoyv.busines.ftp.BaseFtpPresenter
+import com.xiaoyv.ssh.utils.CMD_PWD
 
 /**
  * SftpPresenter
@@ -26,13 +27,4 @@ class SftpPresenter : BaseFtpPresenter<SftpContract.View>(), SftpContract.Presen
                 }
             )
     }
-
-    companion object {
-        /**
-         * 查询工作目录
-         */
-        private const val CMD_PWD = "pwd"
-
-    }
-
 }

@@ -1,13 +1,14 @@
 package com.xiaoyv.ssh.sftp
 
-import android.util.Log
 import com.blankj.utilcode.util.ConvertUtils
 import com.blankj.utilcode.util.LogUtils
 import com.trilead.ssh2.SFTPv3DirectoryEntry
 import com.xiaoyv.busines.ftp.BaseFtpBean
 import com.xiaoyv.busines.ftp.BaseFtpFile
 import com.xiaoyv.busines.ftp.BaseFtpModel
+import com.xiaoyv.busines.ftp.BaseFtpStat
 import com.xiaoyv.ssh.terminal.TerminalModel
+import com.xiaoyv.ssh.utils.CMD_STAT
 import io.reactivex.rxjava3.core.Observable
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
@@ -36,42 +37,45 @@ class SftpModel : BaseFtpModel(), SftpContract.Model {
             val sftpClient = TerminalModel.requireSftpClient
             val canonicalPath = sftpClient.canonicalPath(dirName)
 
-            LogUtils.i("列出目录： canonicalPath: $canonicalPath")
-
+            // 列出目录
             val vector = sftpClient.ls(canonicalPath)
             val elements = vector.elements()
             val fileList = arrayListOf<BaseFtpFile>()
             while (elements.hasMoreElements()) {
                 val element: Any = elements.nextElement()
-                fileList.add(convertToFtpFile(element))
+
+                // 不显示 [.|..] 两个目录
+                val ftpFile = convertToFtpFile(element)
+                if (ftpFile.fileName.isBlank() || ftpFile.fileName == "." || ftpFile.fileName == "..") {
+                    continue
+                }
+                fileList.add(ftpFile)
             }
             // 排序 正序，文件夹在上
             val sortFileList = fileList.sortedWith { o1, o2 ->
                 o1.fileName.compareTo(o2.fileName)
             }.sortedBy { file ->
-                !file.isDirectory
+                file.isDirectory.not()
             }
-            sortFileList.forEach { file ->
-                Log.e(
-                    "TTT", String.format(
-                        "fileName: %10s, " +
-                                "isDirectory: %10s, " +
-                                "isSymlink: %10s, " +
-                                "isRegularFile: %10s, " +
-                                "longEntry: %s, ",
-                        file.fileName,
-                        file.isDirectory,
-                        file.isSymlink,
-                        file.isRegularFile,
-                        file.longEntry
-                    )
-                )
-            }
+
             it.onNext(BaseFtpBean(dirName = canonicalPath, data = sortFileList))
             it.onComplete()
         }
     }
 
+    override fun p2mQueryFileStat(verifyPath: String): Observable<BaseFtpStat> {
+        return p2mDoCommand(String.format(CMD_STAT, verifyPath)).map { statInfo ->
+            convertToFtpStat(statInfo)
+        }
+    }
+
+
+    /**
+     * a
+     */
+    override fun convertToFtpStat(statInfo: String): BaseFtpStat = BaseFtpStat().apply {
+        LogUtils.e(statInfo)
+    }
 
     override fun convertToFtpFile(any: Any) = BaseFtpFile().apply {
         if (any is SFTPv3DirectoryEntry) {
@@ -112,10 +116,6 @@ class SftpModel : BaseFtpModel(), SftpContract.Model {
             size = attributes?.size ?: 0
             permission = attributes.octalPermissions.orEmpty()
             modifierTime = (attributes?.mtime ?: 0L) * 1000L
-//            isDirectory = attributes.isDirectory
-//            isRegularFile = attributes.isRegularFile
-//            isSymlink = attributes.isSymlink
-            isDirOrDirLink = isDirectory || isSymlink && !isRegularFile
         }
     }
 }

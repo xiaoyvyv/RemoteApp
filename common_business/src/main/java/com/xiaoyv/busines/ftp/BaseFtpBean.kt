@@ -25,7 +25,6 @@ data class BaseFtpFile(
     var gid: Long = 0,
     var group: String = "",
 
-    var isDirOrDirLink: Boolean = false,
     var isDirectory: Boolean = false,
     var isRegularFile: Boolean = false,
     var isSymlink: Boolean = false,
@@ -33,3 +32,13 @@ data class BaseFtpFile(
     var isChar: Boolean = false,
     var isPipe: Boolean = false
 ) : Serializable
+
+
+/**
+ * 文件属性
+ */
+data class BaseFtpStat(
+    var fileName: String = "",
+    var isDirectory: Boolean = false,
+
+    ) : Serializable

@@ -8,6 +8,7 @@ import com.blankj.utilcode.util.FileUtils
 import com.blankj.utilcode.util.TimeUtils
 import com.xiaoyv.desktop.business.R
 import com.xiaoyv.desktop.business.databinding.BusinessActivityFtpItemBinding
+import com.xiaoyv.desktop.business.databinding.BusinessActivityFtpPathBinding
 import com.xiaoyv.widget.binder.BaseItemBindingBinder
 
 /**
@@ -74,4 +75,29 @@ class BaseFtpBinder : BaseItemBindingBinder<BaseFtpFile, BusinessActivityFtpItem
             else -> R.drawable.business_icon_file_unknown
         }
     }
+}
+
+/**
+ * 路径 Binder
+ */
+class BaseFtpPathBinder : BaseItemBindingBinder<String, BusinessActivityFtpPathBinding>() {
+
+    override fun convert(
+        holder: BinderVBHolder<BusinessActivityFtpPathBinding>,
+        binding: BusinessActivityFtpPathBinding,
+        data: String
+    ) {
+        binding.tvPath.text = data
+
+        holder.addClickListener(binding.tvPath, data)
+    }
+
+    override fun onCreateViewBinding(
+        layoutInflater: LayoutInflater,
+        parent: ViewGroup,
+        viewType: Int
+    ): BusinessActivityFtpPathBinding {
+        return BusinessActivityFtpPathBinding.inflate(layoutInflater, parent, false)
+    }
+
 }

@@ -26,22 +26,30 @@ interface BaseFtpContract {
         /**
          * 更新路径导航
          */
-        fun p2vUpdatePathBar(pwdPath: String)
+        fun p2vUpdatePathBar(pwdPath: List<String>)
     }
 
     interface Presenter : IBasePresenter {
         /**
          * 查询当前目录
          */
-        fun v2pQueryFileList(filename: String = "")
+        fun v2pQueryFileList(fileName: String = "", showLoading: Boolean = true)
 
         fun v2pUpdatePwdPath(pwdPath: String)
 
         fun v2pCanBack(): Boolean
+
+        /**
+         * 链接解析
+         */
+        fun v2pQueryFileStat(fileName: String)
     }
 
     interface Model {
         fun p2mQueryFileList(dirName: String): Observable<BaseFtpBean>
 
+        fun p2mQueryFileStat(verifyPath: String): Observable<BaseFtpStat> {
+            return Observable.create { }
+        }
     }
 }

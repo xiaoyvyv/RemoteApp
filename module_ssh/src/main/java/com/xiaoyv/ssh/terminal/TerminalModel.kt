@@ -75,7 +75,6 @@ class TerminalModel : TerminalContract.Model {
                     requestPTY("xterm")
                     startShell()
                 }
-
                 // 缓存对象
                 sshConnection = connection
 
@@ -92,15 +91,8 @@ class TerminalModel : TerminalContract.Model {
         return Observable.create {
             termSession.finish()
 
-            runCatching {
-                sftpClient?.close()
-                sftpClient = null
-            }
-
-            runCatching {
-                sshConnection?.close()
-                sshConnection = null
-            }
+            closeSftp()
+            closeConnection()
 
             it.onNext(true)
             it.onComplete()
@@ -164,5 +156,22 @@ class TerminalModel : TerminalContract.Model {
             get() = sftpClient ?: SFTPClient(requireConnection).apply {
                 sftpClient = this
             }
+
+        @JvmStatic
+        private fun closeSftp() {
+            runCatching {
+                sftpClient?.close()
+                sftpClient = null
+            }
+        }
+
+        @JvmStatic
+        private fun closeConnection() {
+            runCatching {
+                sshConnection?.close()
+                sshConnection = null
+            }
+        }
+
     }
 }
