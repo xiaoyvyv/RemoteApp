@@ -23,5 +23,6 @@ interface SftpContract {
         fun p2mDoCommand(command: String): Observable<String>
 
         fun convertToFtpFile(any: Any): BaseFtpFile
+
     }
 }

@@ -3,7 +3,6 @@ package com.xiaoyv.busines.ftp
 import com.xiaoyv.blueprint.base.IBasePresenter
 import com.xiaoyv.blueprint.base.IBaseView
 import io.reactivex.rxjava3.core.Observable
-import java.io.File
 
 /**
  * BaseFtpContract
@@ -56,6 +55,11 @@ interface BaseFtpContract {
          * 下载文件
          */
         fun v2pDownloadFile(dataBean: BaseFtpFile)
+
+        /**
+         * 取消下载
+         */
+        fun v2pCancelDownloadFile(dataBean: BaseFtpFile)
     }
 
     interface Model {
@@ -65,6 +69,13 @@ interface BaseFtpContract {
             return Observable.create { }
         }
 
-        fun p2mDownloadFile(dataBean: BaseFtpFile): Observable<File>
+        fun p2mDownloadFile(dataBean: BaseFtpFile): Observable<BaseFtpDownloadFile>
+
+        fun p2mCleanDownloadFile(dataBean: BaseFtpFile)
+
+        /**
+         * 关闭 FTP
+         */
+        fun v2mCloseFtp()
     }
 }

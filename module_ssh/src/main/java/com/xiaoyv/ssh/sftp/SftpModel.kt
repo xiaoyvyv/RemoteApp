@@ -1,19 +1,22 @@
 package com.xiaoyv.ssh.sftp
 
+import android.util.Log
 import com.blankj.utilcode.util.ConvertUtils
+import com.blankj.utilcode.util.FileUtils
 import com.blankj.utilcode.util.GsonUtils
-import com.blankj.utilcode.util.LogUtils
+import com.trilead.ssh2.SCPClient
 import com.trilead.ssh2.SFTPv3DirectoryEntry
-import com.xiaoyv.busines.ftp.BaseFtpBean
-import com.xiaoyv.busines.ftp.BaseFtpFile
-import com.xiaoyv.busines.ftp.BaseFtpModel
-import com.xiaoyv.busines.ftp.BaseFtpStat
+import com.trilead.ssh2.jenkins.SFTPClient
+import com.xiaoyv.busines.ftp.*
+import com.xiaoyv.busines.utils.PathKt
 import com.xiaoyv.ssh.terminal.TerminalModel
 import com.xiaoyv.ssh.utils.CMD_STAT
 import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import java.io.ByteArrayOutputStream
-import java.io.File
 import java.nio.charset.StandardCharsets
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 /**
  * SftpModel
@@ -22,6 +25,32 @@ import java.nio.charset.StandardCharsets
  * @since 2022/2/28
  */
 class SftpModel : BaseFtpModel(), SftpContract.Model {
+
+    /**
+     * 获取 SFTP 客户端
+     */
+    private var sftpClient: SFTPClient? = null
+
+    private val requireSftpClient: SFTPClient
+        get() = sftpClient ?: SFTPClient(TerminalModel.requireConnection).apply {
+            sftpClient = this
+        }
+
+    /**
+     * 获取 SCP 客户端
+     */
+    private var scpClient: SCPClient? = null
+
+    private val requireScpClient: SCPClient
+        get() = scpClient ?: SCPClient(TerminalModel.requireConnection).apply {
+            scpClient = this
+        }
+
+
+    /**
+     * SFTP 最大一次读取长度
+     */
+    private val sBufferSize = 32768
 
     override fun p2mDoCommand(command: String): Observable<String> {
         return Observable.create {
@@ -36,11 +65,10 @@ class SftpModel : BaseFtpModel(), SftpContract.Model {
 
     override fun p2mQueryFileList(dirName: String): Observable<BaseFtpBean> {
         return Observable.create {
-            val sftpClient = TerminalModel.requireSftpClient
-            val canonicalPath = sftpClient.canonicalPath(dirName)
+            val canonicalPath = requireSftpClient.canonicalPath(dirName)
 
             // 列出目录
-            val vector = sftpClient.ls(canonicalPath)
+            val vector = requireSftpClient.ls(canonicalPath)
             val elements = vector.elements()
             val fileList = arrayListOf<BaseFtpFile>()
             while (elements.hasMoreElements()) {
@@ -72,14 +100,85 @@ class SftpModel : BaseFtpModel(), SftpContract.Model {
         }
     }
 
-    override fun p2mDownloadFile(dataBean: BaseFtpFile): Observable<File> {
-        return Observable.create {
-            val sftpClient = TerminalModel.requireSftpClient
+    override fun p2mDownloadFile(dataBean: BaseFtpFile): Observable<BaseFtpDownloadFile> {
+        return Observable.create { emitter ->
+            val fileFullName = dataBean.fileFullName
 
+            val downloadFile = BaseFtpDownloadFile(dataBean.fileName)
 
-//            val readLink = sftpClient.readLink(dataBean.fileFullName)
-//            LogUtils.e(readLink)
+            // 本地创建目标空白文件
+            val localFilePath = PathKt.downloadDirPath + fileFullName
+            FileUtils.createFileByDeleteOldFile(localFilePath)
+
+            var last = 0L
+            // 下载速率检测
+            val threadPool = Executors.newScheduledThreadPool(1)
+            threadPool.scheduleAtFixedRate({
+
+            }, 0, 1000, TimeUnit.MILLISECONDS)
+
+            requireScpClient.get(
+                fileFullName,
+                PathKt.downloadDirPath
+            ) { srcFile: String, targetFile: String, current: Long, total: Long ->
+                last = current
+
+                Log.e(
+                    "Download",
+                    "srcFile:$srcFile, targetFile:$targetFile, current:$current, total:$total"
+                )
+            }
+
+            downloadFile.downloadFilePath = localFilePath
+
+            emitter.onNext(downloadFile)
+            emitter.onComplete()
+//
+//            // 打开远程和本地文件流
+//            val inputStream = requireSftpClient.read(fileFullName)
+//            val outputStream = FileOutputStream(localFilePath)
+//
+//
+//            inputStream.runCatching {
+//                // 总长度
+//                downloadFile.total = dataBean.size
+//                downloadFile.current = 0
+//
+//                var len: Int
+//                val tempArray = ByteArray(sBufferSize)
+//                while (read(tempArray).apply { len = this } != -1) {
+//                    outputStream.write(tempArray, 0, len)
+//                    downloadFile.current += len
+//
+//                    // 回调进度
+//                    emitter.onNext(downloadFile)
+//                }
+//            }.onSuccess {
+//                IOUtils.closeQuietly(outputStream)
+//                IOUtils.closeQuietly(inputStream)
+//
+//                downloadFile.downloadFilePath = localFilePath
+//
+//                emitter.onNext(downloadFile)
+//                emitter.onComplete()
+//            }.onFailure {
+//                IOUtils.closeQuietly(outputStream)
+//                IOUtils.closeQuietly(inputStream)
+//
+//                // 重置 SFTP 客户端
+//                closeFtpQuietly()
+//
+//                emitter.onError(it)
+//            }
         }
+    }
+
+    /**
+     * 重置 SFTP 客户端
+     */
+    private fun closeFtpQuietly() = runCatching {
+        sftpClient?.close()
+        sftpClient = null
     }
 
     override fun convertToFtpFile(any: Any) = BaseFtpFile().apply {
@@ -122,5 +221,17 @@ class SftpModel : BaseFtpModel(), SftpContract.Model {
             permission = attributes.octalPermissions.orEmpty()
             modifierTime = (attributes?.mtime ?: 0L) * 1000L
         }
+    }
+
+    override fun v2mCloseFtp() {
+        Observable.create<Boolean> {
+            // 关闭 SFTP 客户端
+            closeFtpQuietly()
+
+            it.onNext(true)
+            it.onComplete()
+        }.observeOn(Schedulers.io())
+            .subscribeOn(Schedulers.io())
+            .subscribe()
     }
 }

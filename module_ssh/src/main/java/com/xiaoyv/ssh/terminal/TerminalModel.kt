@@ -2,14 +2,10 @@
 
 package com.xiaoyv.ssh.terminal
 
-import com.blankj.utilcode.util.ConvertUtils
-import com.blankj.utilcode.util.LogUtils
 import com.romide.terminal.emulatorview.TermSession
 import com.trilead.ssh2.Connection
 import com.trilead.ssh2.ServerHostKeyVerifier
 import com.trilead.ssh2.Session
-import com.trilead.ssh2.jenkins.SFTPClient
-import com.trilead.ssh2.util.IOUtils
 import com.xiaoyv.blueprint.exception.RxException
 import com.xiaoyv.busines.config.SshLoginType
 import com.xiaoyv.busines.room.entity.SshEntity
@@ -23,7 +19,6 @@ import java.io.File
  * @since 2020/12/06
  */
 class TerminalModel : TerminalContract.Model {
-    private val sBufferSize = 524288
 
     /**
      * 连接前验证
@@ -91,7 +86,6 @@ class TerminalModel : TerminalContract.Model {
         return Observable.create {
             termSession.finish()
 
-            closeSftp()
             closeConnection()
 
             it.onNext(true)
@@ -102,39 +96,40 @@ class TerminalModel : TerminalContract.Model {
 
     override fun p2mDoCommandLs(dirName: String): Observable<List<Any>> {
         return Observable.create { emitter ->
-            val files: List<Any> = requireSftpClient.ls(dirName).toList()
+//            val files: List<Any> = requireSftpClient.ls(dirName).toList()
+//
+//            val outputStream = requireSftpClient.writeToFile("/home/www/test.txt")
+//
+//            val progress: (Double) -> Unit = {}
+//
+//            val inputStream = ConvertUtils.string2InputStream("xxxxxxxx", "UTF-8")
+//
+//            var success = false
+//            outputStream.runCatching {
+//                val totalSize: Double = inputStream.available().toDouble()
+//                var curSize = 0
+//                progress.invoke(0.0)
+//
+//                val data = ByteArray(sBufferSize)
+//                var len: Int
+//                while (inputStream.read(data).apply { len = this } != -1) {
+//                    outputStream.write(data, 0, len)
+//                    curSize += len
+//                    progress.invoke(curSize / totalSize)
+//                }
+//            }.onSuccess {
+//                IOUtils.closeQuietly(outputStream)
+//                IOUtils.closeQuietly(inputStream)
+//                success = true
+//            }.onFailure {
+//                IOUtils.closeQuietly(outputStream)
+//                IOUtils.closeQuietly(inputStream)
+//                success = false
+//            }
+//            LogUtils.e("上传：$success")
+//            emitter.onNext(files)
+//            emitter.onComplete()
 
-            val outputStream = requireSftpClient.writeToFile("/home/www/test.txt")
-
-            val progress: (Double) -> Unit = {}
-
-            val inputStream = ConvertUtils.string2InputStream("xxxxxxxx", "UTF-8")
-
-            var success = false
-            outputStream.runCatching {
-                val totalSize: Double = inputStream.available().toDouble()
-                var curSize = 0
-                progress.invoke(0.0)
-
-                val data = ByteArray(sBufferSize)
-                var len: Int
-                while (inputStream.read(data).apply { len = this } != -1) {
-                    outputStream.write(data, 0, len)
-                    curSize += len
-                    progress.invoke(curSize / totalSize)
-                }
-            }.onSuccess {
-                IOUtils.closeQuietly(outputStream)
-                IOUtils.closeQuietly(inputStream)
-                success = true
-            }.onFailure {
-                IOUtils.closeQuietly(outputStream)
-                IOUtils.closeQuietly(inputStream)
-                success = false
-            }
-            LogUtils.e("上传：$success")
-            emitter.onNext(files)
-            emitter.onComplete()
         }
     }
 
@@ -147,23 +142,6 @@ class TerminalModel : TerminalContract.Model {
         val requireConnection: Connection
             get() = sshConnection ?: throw NullPointerException("请先连接SSH客户端")
 
-
-        /**
-         * 获取 Ftp 客户端
-         */
-        internal var sftpClient: SFTPClient? = null
-        val requireSftpClient: SFTPClient
-            get() = sftpClient ?: SFTPClient(requireConnection).apply {
-                sftpClient = this
-            }
-
-        @JvmStatic
-        private fun closeSftp() {
-            runCatching {
-                sftpClient?.close()
-                sftpClient = null
-            }
-        }
 
         @JvmStatic
         private fun closeConnection() {

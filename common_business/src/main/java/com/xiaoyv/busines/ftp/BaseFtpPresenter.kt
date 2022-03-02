@@ -1,8 +1,11 @@
 package com.xiaoyv.busines.ftp
 
+import android.util.Log
+import com.blankj.utilcode.util.GsonUtils
 import com.blankj.utilcode.util.LogUtils
 import com.xiaoyv.blueprint.base.ImplBasePresenter
 import com.xiaoyv.blueprint.base.subscribesWithPresenter
+import io.reactivex.rxjava3.observers.DisposableObserver
 
 /**
  * BaseFtpPresenter
@@ -12,6 +15,12 @@ import com.xiaoyv.blueprint.base.subscribesWithPresenter
  */
 abstract class BaseFtpPresenter<V : BaseFtpContract.View> : ImplBasePresenter<V>(),
     BaseFtpContract.Presenter {
+
+    /**
+     * 下载订阅者缓存集合，若取消则 disposable 后移除
+     */
+    private val downloadSubscriberMap =
+        hashMapOf<String, DisposableObserver<BaseFtpDownloadFile>>()
 
     abstract val sftpModel: BaseFtpContract.Model
 
@@ -85,16 +94,36 @@ abstract class BaseFtpPresenter<V : BaseFtpContract.View> : ImplBasePresenter<V>
     }
 
     override fun v2pDownloadFile(dataBean: BaseFtpFile) {
-        sftpModel.p2mDownloadFile(dataBean)
+        // 若已经有该下载任务，先清理
+        v2pCancelDownloadFile(dataBean)
+
+        val downloadSubscriber = sftpModel.p2mDownloadFile(dataBean)
             .subscribesWithPresenter(
                 presenter = this,
                 onSuccess = {
-
+                    Log.e("下载进度", "pro： " + GsonUtils.toJson(it))
                 },
                 onError = {
                     LogUtils.e(it)
                 }
             )
+
+        // 缓存
+        downloadSubscriberMap[dataBean.fileFullName] = downloadSubscriber
+    }
+
+    override fun v2pCancelDownloadFile(dataBean: BaseFtpFile) {
+        val fileFullName = dataBean.fileFullName
+
+        // 取消下载
+        if (downloadSubscriberMap.containsKey(fileFullName)) {
+            val disposableObserver = downloadSubscriberMap[fileFullName]
+            disposableObserver?.dispose()
+            downloadSubscriberMap.remove(fileFullName)
+
+            // 清除下载的半成品数据
+            sftpModel.p2mCleanDownloadFile(dataBean)
+        }
     }
 
     /**

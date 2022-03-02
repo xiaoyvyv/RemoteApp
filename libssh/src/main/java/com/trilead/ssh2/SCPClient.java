@@ -51,7 +51,7 @@ public class SCPClient {
     }
 
     private String receiveLine(InputStream is) throws IOException {
-        StringBuffer sb = new StringBuffer(30);
+        StringBuilder sb = new StringBuilder(30);
 
         while (true) {
             /*
@@ -59,16 +59,19 @@ public class SCPClient {
              * adjust it
              */
 
-            if (sb.length() > 8192)
+            if (sb.length() > 8192) {
                 throw new IOException("Remote scp sent a too long line");
+            }
 
             int c = is.read();
 
-            if (c < 0)
+            if (c < 0) {
                 throw new IOException("Remote scp terminated unexpectedly.");
+            }
 
-            if (c == '\n')
+            if (c == '\n') {
                 break;
+            }
 
             sb.append((char) c);
 
@@ -200,7 +203,7 @@ public class SCPClient {
         os.flush();
     }
 
-    private void receiveFiles(Session sess, OutputStream[] targets) throws IOException {
+    private void receiveFiles(Session sess, OutputStream[] targets, SCPStreamProgressListener listener) throws IOException {
         byte[] buffer = new byte[8192];
 
         OutputStream os = new BufferedOutputStream(sess.getStdin(), 512);
@@ -209,13 +212,14 @@ public class SCPClient {
         os.write(0x0);
         os.flush();
 
-        for (int i = 0; i < targets.length; i++) {
-            LenNamePair lnp = null;
+        for (OutputStream target : targets) {
+            LenNamePair lnp;
 
             while (true) {
                 int c = is.read();
-                if (c < 0)
+                if (c < 0) {
                     throw new IOException("Remote scp terminated unexpectedly.");
+                }
 
                 String line = receiveLine(is);
 
@@ -225,8 +229,9 @@ public class SCPClient {
                     continue;
                 }
 
-                if ((c == 1) || (c == 2))
+                if ((c == 1) || (c == 2)) {
                     throw new IOException("Remote SCP error: " + line);
+                }
 
                 if (c == 'C') {
                     lnp = parseCLine(line);
@@ -241,12 +246,16 @@ public class SCPClient {
 
             long remain = lnp.length;
 
+            // download start
+            listener.onProgress(lnp.filename, 0L, lnp.length);
+
             while (remain > 0) {
                 int trans;
-                if (remain > buffer.length)
+                if (remain > buffer.length) {
                     trans = buffer.length;
-                else
+                } else {
                     trans = (int) remain;
+                }
 
                 int this_time_received = is.read(buffer, 0, trans);
 
@@ -254,9 +263,11 @@ public class SCPClient {
                     throw new IOException("Remote scp terminated connection unexpectedly");
                 }
 
-                targets[i].write(buffer, 0, this_time_received);
+                target.write(buffer, 0, this_time_received);
 
                 remain -= this_time_received;
+
+                listener.onProgress(lnp.filename, lnp.length - remain, lnp.length);
             }
 
             readResponse(is);
@@ -266,22 +277,23 @@ public class SCPClient {
         }
     }
 
-    private void receiveFiles(Session sess, String[] files, String target) throws IOException {
+    private void receiveFiles(Session session, String[] files, String target, SCPFileProgressListener listener) throws IOException {
         byte[] buffer = new byte[8192];
 
-        OutputStream os = new BufferedOutputStream(sess.getStdin(), 512);
-        InputStream is = new BufferedInputStream(sess.getStdout(), 40000);
+        OutputStream os = new BufferedOutputStream(session.getStdin(), 512);
+        InputStream is = new BufferedInputStream(session.getStdout(), 40000);
 
         os.write(0x0);
         os.flush();
 
-        for (int i = 0; i < files.length; i++) {
-            LenNamePair lnp = null;
+        for (int a = 0; a < files.length; a++) {
+            LenNamePair lnp;
 
             while (true) {
                 int c = is.read();
-                if (c < 0)
+                if (c < 0) {
                     throw new IOException("Remote scp terminated unexpectedly.");
+                }
 
                 String line = receiveLine(is);
 
@@ -291,8 +303,9 @@ public class SCPClient {
                     continue;
                 }
 
-                if ((c == 1) || (c == 2))
+                if ((c == 1) || (c == 2)) {
                     throw new IOException("Remote SCP error: " + line);
+                }
 
                 if (c == 'C') {
                     lnp = parseCLine(line);
@@ -306,19 +319,21 @@ public class SCPClient {
             os.flush();
 
             File f = new File(target + File.separatorChar + lnp.filename);
-            FileOutputStream fop = null;
 
-            try {
-                fop = new FileOutputStream(f);
+            // download start
+            listener.onProgress(lnp.filename, f.getAbsolutePath(), 0L, lnp.length);
+
+            try (FileOutputStream fop = new FileOutputStream(f)) {
 
                 long remain = lnp.length;
 
                 while (remain > 0) {
                     int trans;
-                    if (remain > buffer.length)
+                    if (remain > buffer.length) {
                         trans = buffer.length;
-                    else
+                    } else {
                         trans = (int) remain;
+                    }
 
                     int this_time_received = is.read(buffer, 0, trans);
 
@@ -329,10 +344,9 @@ public class SCPClient {
                     fop.write(buffer, 0, this_time_received);
 
                     remain -= this_time_received;
+
+                    listener.onProgress(lnp.filename, f.getAbsolutePath(), lnp.length - remain, lnp.length);
                 }
-            } finally {
-                if (fop != null)
-                    fop.close();
             }
 
             readResponse(is);
@@ -517,16 +531,6 @@ public class SCPClient {
         }
     }
 
-    /**
-     * Download a file from the remote server to a local directory.
-     *
-     * @param remoteFile           Path and name of the remote file.
-     * @param localTargetDirectory Local directory to put the downloaded file.
-     * @throws IOException the io exception
-     */
-    public void get(String remoteFile, String localTargetDirectory) throws IOException {
-        get(new String[]{remoteFile}, localTargetDirectory);
-    }
 
     /**
      * Download a file from the remote server and pipe its contents into an
@@ -536,14 +540,15 @@ public class SCPClient {
      *
      * @param remoteFile Path and name of the remote file.
      * @param target     OutputStream where the contents of the file will be sent to.
+     * @param listener   progress listener
      * @throws IOException the io exception
      */
-    public void get(String remoteFile, OutputStream target) throws IOException {
-        get(new String[]{remoteFile}, new OutputStream[]{target});
+    public void get(String remoteFile, OutputStream target, SCPStreamProgressListener listener) throws IOException {
+        get(new String[]{remoteFile}, new OutputStream[]{target}, listener);
     }
 
-    private void get(String[] remoteFiles, OutputStream[] targets) throws IOException {
-        Session sess = null;
+    private void get(String[] remoteFiles, OutputStream[] targets, SCPStreamProgressListener listener) throws IOException {
+        Session session = null;
 
         if ((remoteFiles == null) || (targets == null))
             throw new IllegalArgumentException("Null argument.");
@@ -554,30 +559,46 @@ public class SCPClient {
         if (remoteFiles.length == 0)
             return;
 
-        String cmd = "scp -f";
+        StringBuilder cmd = new StringBuilder("scp -f");
 
-        for (int i = 0; i < remoteFiles.length; i++) {
-            if (remoteFiles[i] == null)
+        for (String remoteFile : remoteFiles) {
+            if (remoteFile == null) {
                 throw new IllegalArgumentException("Cannot accept null filename.");
+            }
 
-            String tmp = remoteFiles[i].trim();
+            String tmp = remoteFile.trim();
 
-            if (tmp.length() == 0)
+            if (tmp.length() == 0) {
                 throw new IllegalArgumentException("Cannot accept empty filename.");
+            }
 
-            cmd += (" " + tmp);
+            cmd.append(" ");
+            cmd.append(tmp);
         }
 
         try {
-            sess = conn.openSession();
-            sess.execCommand(cmd);
-            receiveFiles(sess, targets);
+            session = conn.openSession();
+            session.execCommand(cmd.toString());
+            receiveFiles(session, targets, listener);
         } catch (IOException e) {
             throw (IOException) new IOException("Error during SCP transfer.", e);
         } finally {
-            if (sess != null)
-                sess.close();
+            if (session != null) {
+                session.close();
+            }
         }
+    }
+
+    /**
+     * Download a file from the remote server to a local directory.
+     *
+     * @param remoteFile           Path and name of the remote file.
+     * @param localTargetDirectory Local directory to put the downloaded file.
+     * @param listener             progress listener
+     * @throws IOException the io exception
+     */
+    public void get(String remoteFile, String localTargetDirectory, SCPFileProgressListener listener) throws IOException {
+        get(new String[]{remoteFile}, localTargetDirectory, listener);
     }
 
     /**
@@ -585,40 +606,47 @@ public class SCPClient {
      *
      * @param remoteFiles          Paths and names of the remote files.
      * @param localTargetDirectory Local directory to put the downloaded files.
+     * @param listener             progress listener
      * @throws IOException the io exception
      */
-    public void get(String[] remoteFiles, String localTargetDirectory) throws IOException {
+    public void get(String[] remoteFiles, String localTargetDirectory, SCPFileProgressListener listener) throws IOException {
         Session sess = null;
 
-        if ((remoteFiles == null) || (localTargetDirectory == null))
+        if ((remoteFiles == null) || (localTargetDirectory == null)) {
             throw new IllegalArgumentException("Null argument.");
+        }
 
-        if (remoteFiles.length == 0)
+        if (remoteFiles.length == 0) {
             return;
+        }
 
-        String cmd = "scp -f";
+        StringBuilder cmd = new StringBuilder("scp -f");
 
-        for (int i = 0; i < remoteFiles.length; i++) {
-            if (remoteFiles[i] == null)
+        for (String remoteFile : remoteFiles) {
+            if (remoteFile == null) {
                 throw new IllegalArgumentException("Cannot accept null filename.");
+            }
 
-            String tmp = remoteFiles[i].trim();
+            String tmp = remoteFile.trim();
 
-            if (tmp.length() == 0)
+            if (tmp.length() == 0) {
                 throw new IllegalArgumentException("Cannot accept empty filename.");
+            }
 
-            cmd += (" " + tmp);
+            cmd.append(" ");
+            cmd.append(tmp);
         }
 
         try {
             sess = conn.openSession();
-            sess.execCommand(cmd);
-            receiveFiles(sess, remoteFiles, localTargetDirectory);
+            sess.execCommand(cmd.toString());
+            receiveFiles(sess, remoteFiles, localTargetDirectory, listener);
         } catch (IOException e) {
             throw (IOException) new IOException("Error during SCP transfer.", e);
         } finally {
-            if (sess != null)
+            if (sess != null) {
                 sess.close();
+            }
         }
     }
 }

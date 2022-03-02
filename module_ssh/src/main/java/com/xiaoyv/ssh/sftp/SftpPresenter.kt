@@ -1,7 +1,6 @@
 package com.xiaoyv.ssh.sftp
 
 import com.xiaoyv.blueprint.base.subscribesWithPresenter
-import com.xiaoyv.busines.ftp.BaseFtpFile
 import com.xiaoyv.busines.ftp.BaseFtpPresenter
 import com.xiaoyv.ssh.utils.CMD_PWD
 
@@ -29,4 +28,7 @@ class SftpPresenter : BaseFtpPresenter<SftpContract.View>(), SftpContract.Presen
             )
     }
 
+    override fun v2pOnDestroy() {
+        sftpModel.v2mCloseFtp()
+    }
 }

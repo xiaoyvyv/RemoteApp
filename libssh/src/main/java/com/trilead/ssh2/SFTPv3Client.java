@@ -1264,7 +1264,7 @@ public class SFTPv3Client {
             throw new IllegalArgumentException("the handle argument may not be null");
 
         try {
-            if (handle.isClosed == false) {
+            if (!handle.isClosed) {
                 closeHandle(handle.fileHandle);
             }
         } finally {

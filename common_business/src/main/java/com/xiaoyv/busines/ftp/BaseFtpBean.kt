@@ -73,3 +73,22 @@ data class BaseFtpStat(
             return ""
         }
 }
+
+data class BaseFtpDownloadFile(
+    var fileName: String = "",
+    var current: Long = 0,
+    var total: Long = 0,
+    var downloadFilePath: String? = null,
+) : Serializable {
+    /**
+     * 是否下载完成
+     */
+    val finish: Boolean
+        get() = current == total && total != 0L && downloadFilePath != null
+
+    /**
+     * 下载进度
+     */
+    val progress: Float
+        get() = if (total == 0L) 0f else current / total.toFloat()
+}
