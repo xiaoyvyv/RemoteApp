@@ -71,6 +71,7 @@ abstract class BaseFtpPresenter<V : BaseFtpContract.View> : ImplBasePresenter<V>
                     requireView.p2vShowFileListError(it.message.orEmpty())
                 }
             )
+
     }
 
     override fun v2pQueryFileStat(fileName: String) {
@@ -93,27 +94,27 @@ abstract class BaseFtpPresenter<V : BaseFtpContract.View> : ImplBasePresenter<V>
             )
     }
 
-    override fun v2pDownloadFile(dataBean: BaseFtpFile) {
+    override fun v2pDownloadFile(baseFtpFile: BaseFtpFile) {
         // 若已经有该下载任务，先清理
-        v2pCancelDownloadFile(dataBean)
+        v2pCancelDownloadFile(baseFtpFile)
 
-        val downloadSubscriber = sftpModel.p2mDownloadFile(dataBean)
+        val downloadSubscriber = sftpModel.p2mDownloadFile(baseFtpFile)
             .subscribesWithPresenter(
                 presenter = this,
                 onSuccess = {
-                    Log.e("下载进度", "pro： " + GsonUtils.toJson(it))
+                    requireView.p2vShowDownloadProgress(it)
                 },
                 onError = {
-                    LogUtils.e(it)
+                    requireView.p2vShowDownloadError(it.message.orEmpty())
                 }
             )
 
         // 缓存
-        downloadSubscriberMap[dataBean.fileFullName] = downloadSubscriber
+        downloadSubscriberMap[baseFtpFile.fileFullName] = downloadSubscriber
     }
 
-    override fun v2pCancelDownloadFile(dataBean: BaseFtpFile) {
-        val fileFullName = dataBean.fileFullName
+    override fun v2pCancelDownloadFile(baseFtpFile: BaseFtpFile) {
+        val fileFullName = baseFtpFile.fileFullName
 
         // 取消下载
         if (downloadSubscriberMap.containsKey(fileFullName)) {
@@ -122,7 +123,7 @@ abstract class BaseFtpPresenter<V : BaseFtpContract.View> : ImplBasePresenter<V>
             downloadSubscriberMap.remove(fileFullName)
 
             // 清除下载的半成品数据
-            sftpModel.p2mCleanDownloadFile(dataBean)
+            sftpModel.p2mCleanDownloadFile(baseFtpFile)
         }
     }
 

@@ -1,9 +1,12 @@
 package com.xiaoyv.busines.ftp
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import androidx.annotation.CallSuper
+import androidx.core.view.isGone
+import androidx.core.view.isVisible
 import com.blankj.utilcode.util.ConvertUtils
 import com.blankj.utilcode.util.SpanUtils
 import com.blankj.utilcode.util.TimeUtils
@@ -12,7 +15,9 @@ import com.xiaoyv.blueprint.base.binding.BaseMvpBindingActivity
 import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.desktop.business.R
 import com.xiaoyv.desktop.business.databinding.BusinessActivityFtpBinding
+import com.xiaoyv.desktop.business.databinding.BusinessActivityFtpDownloadBinding
 import com.xiaoyv.desktop.business.databinding.BusinessActivityFtpStatBinding
+import com.xiaoyv.desktop.ui.databinding.UiDialogBinding
 import com.xiaoyv.widget.binder.setOnItemClickListener
 import com.xiaoyv.widget.dialog.UiNormalDialog
 import com.xiaoyv.widget.utils.doOnBarClick
@@ -30,12 +35,15 @@ abstract class BaseFtpActivity<V : BaseFtpContract.View, P : BaseFtpPresenter<V>
     private lateinit var filePathBinder: BaseFtpPathBinder
     private lateinit var filePathAdapter: BaseBinderAdapter
 
+    private var downloadDialog: UiNormalDialog? = null
+
     private var title = "SFTP | FTP"
 
     override fun createContentBinding(layoutInflater: LayoutInflater): BusinessActivityFtpBinding {
         return BusinessActivityFtpBinding.inflate(layoutInflater)
     }
 
+    @CallSuper
     override fun initIntentData(intent: Intent, bundle: Bundle, isNewIntent: Boolean) {
         title = intent.getStringExtra(NavigationKey.KEY_STRING) ?: title
     }
@@ -117,31 +125,110 @@ abstract class BaseFtpActivity<V : BaseFtpContract.View, P : BaseFtpPresenter<V>
     }
 
 
-    override fun processItemClick(dataBean: BaseFtpFile, position: Int) {
-        val fileName = dataBean.fileName
+    override fun processItemClick(baseFtpFile: BaseFtpFile, position: Int) {
+        val fileName = baseFtpFile.fileName
 
         when {
             // 文件：打开目录
-            dataBean.isDirectory -> {
+            baseFtpFile.isDirectory -> {
                 presenter.v2pQueryFileList(fileName, showLoading = true)
             }
             // 链接：则解析
-            dataBean.isSymlink -> {
-                vClickSymLink(dataBean,position)
+            baseFtpFile.isSymlink -> {
+                vClickSymLink(baseFtpFile, position)
             }
             // 文件
             else -> {
-                vClickFile(dataBean,position)
+                vClickFile(baseFtpFile, position)
             }
         }
     }
 
-    abstract fun vClickSymLink(dataBean: BaseFtpFile, position: Int)
-    abstract fun vClickFile(dataBean: BaseFtpFile, position: Int)
+    abstract fun vClickSymLink(baseFtpFile: BaseFtpFile, position: Int)
+    abstract fun vClickFile(baseFtpFile: BaseFtpFile, position: Int)
 
-    protected open fun processItemLongClick(dataBean: BaseFtpFile, position: Int) {
-        val fileName = dataBean.fileName
+    protected open fun processItemLongClick(baseFtpFile: BaseFtpFile, position: Int) {
+        val fileName = baseFtpFile.fileName
         presenter.v2pQueryFileStat(fileName)
+    }
+
+    @SuppressLint("SetTextI18n")
+    fun vStartDownload(baseFtpFile: BaseFtpFile) {
+        UiNormalDialog.Builder()
+            .apply {
+                cancelText = null
+                confirmText = null
+                customView = R.layout.ui_dialog
+                onCustomViewInitListener = { dialog, view ->
+                    val dialogBinding = UiDialogBinding.bind(view)
+                    dialogBinding.tvMsg.text = String.format("是否下载该文件：%s ?", baseFtpFile.fileName)
+                    dialogBinding.tvDone.setOnClickListener {
+                        dialog.dismissAllowingStateLoss()
+                        // 下载中对话框
+                        vShowDownloadingDialog(baseFtpFile)
+
+                        // 下载中
+                        presenter.v2pDownloadFile(baseFtpFile)
+                    }
+                    dialogBinding.tvTemp.setOnClickListener {
+                        dialog.dismissAllowingStateLoss()
+                    }
+                }
+            }
+            .create()
+            .show(this)
+    }
+
+    private fun vShowDownloadingDialog(baseFtpFile: BaseFtpFile) {
+        downloadDialog = UiNormalDialog.Builder()
+            .apply {
+                cancelText = null
+                confirmText = null
+                customView = R.layout.business_activity_ftp_download
+                touchOutsideCancelable = false
+                backCancelable = false
+                onCustomViewInitListener = { dialog, view ->
+                    val downloadBinding = BusinessActivityFtpDownloadBinding.bind(view)
+
+                    downloadBinding.tvMsg.text = String.format("正在下载文件：%s", baseFtpFile.fileName)
+                    downloadBinding.tvTemp.setOnClickListener {
+                        dialog.dismissAllowingStateLoss()
+                        presenter.v2pCancelDownloadFile(baseFtpFile)
+                    }
+                }
+            }.create()
+
+        downloadDialog?.show(this)
+    }
+
+    override fun p2vShowDownloadError(errMsg: String) {
+        downloadDialog?.dismissAllowingStateLoss()
+    }
+
+    override fun p2vShowDownloadProgress(downloadFile: BaseFtpDownloadFile) {
+        val view = downloadDialog?.requireCustomView ?: return
+        val downloadBinding = BusinessActivityFtpDownloadBinding.bind(view)
+        val current = ConvertUtils.byte2FitMemorySize(downloadFile.current, 2)
+        val total = ConvertUtils.byte2FitMemorySize(downloadFile.total, 2)
+        val downloadSpeed = ConvertUtils.byte2FitMemorySize(downloadFile.downloadSpeed, 2)
+
+        downloadBinding.pbProgress.progress = (downloadFile.progress * 100).toInt()
+        downloadBinding.tvSpeed.text = String.format("%s | %s %s/s", total, current, downloadSpeed)
+
+        if (downloadFile.finish) {
+            downloadBinding.tvMsg.text = "下载完成"
+            downloadBinding.pbProgress.isGone = true
+            downloadBinding.tvSpeed.isGone = true
+            downloadBinding.tvDone.isVisible = true
+
+            downloadBinding.tvTemp.setOnClickListener {
+                downloadDialog?.dismissAllowingStateLoss()
+            }
+            downloadBinding.tvDone.text = "打开"
+            downloadBinding.tvDone.setOnClickListener {
+                downloadDialog?.dismissAllowingStateLoss()
+            }
+        }
     }
 
     @CallSuper
@@ -173,7 +260,7 @@ abstract class BaseFtpActivity<V : BaseFtpContract.View, P : BaseFtpPresenter<V>
             onCustomViewInitListener = { _, view ->
                 val binding = BusinessActivityFtpStatBinding.bind(view)
 
-                val memorySize = ConvertUtils.byte2FitMemorySize(ftpStat.fileSize)
+                val memorySize = ConvertUtils.byte2FitMemorySize(ftpStat.fileSize, 2)
 
                 val acTime = TimeUtils.getFriendlyTimeSpanByNow(ftpStat.fileAcTime * 1000)
                 val moTime = TimeUtils.getFriendlyTimeSpanByNow(ftpStat.fileMoTime * 1000)

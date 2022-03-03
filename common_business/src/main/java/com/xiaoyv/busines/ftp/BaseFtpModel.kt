@@ -16,9 +16,9 @@ abstract class BaseFtpModel : BaseFtpContract.Model {
     /**
      * 清除下载临时数据
      */
-    override fun p2mCleanDownloadFile(dataBean: BaseFtpFile) {
+    override fun p2mCleanDownloadFile(baseFtpFile: BaseFtpFile) {
         Observable.create<Boolean> {
-            val fileFullName = dataBean.fileFullName
+            val fileFullName = baseFtpFile.fileFullName
             val localFilePath = PathKt.downloadDirPath + fileFullName
             FileUtils.delete(localFilePath)
         }.observeOn(Schedulers.io())

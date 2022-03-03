@@ -23,8 +23,6 @@ interface TerminalContract {
          */
         fun p2vConnectSuccess(session: Session)
         fun p2vConnectFail(errMsg: String)
-
-        fun p2vReleaseSuccess(success: Boolean)
     }
 
     interface Presenter : IBasePresenter {
@@ -44,7 +42,7 @@ interface TerminalContract {
 
         fun v2pReleaseSession(termSession: TermSession)
 
-        fun v2pDoCommandLs(dirName: String)
+        fun pStartHeartbeat()
     }
 
     interface Model {
@@ -59,9 +57,11 @@ interface TerminalContract {
         /**
          * 关闭连接
          */
-        fun p2mReleaseSession(termSession: TermSession): Observable<Boolean>
+        fun p2mReleaseSession()
 
-        fun p2mDoCommandLs(dirName: String): Observable<List<Any>>
-
+        /**
+         * 心跳包
+         */
+        fun p2mSendHeartbeatPackets()
     }
 }

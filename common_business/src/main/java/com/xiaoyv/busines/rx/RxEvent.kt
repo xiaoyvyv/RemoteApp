@@ -14,6 +14,8 @@ object RxEventTag {
     const val EVENT_ADD_SSH_SUCCESS = "EVENT_ADD_SSH_SUCCESS"
     const val EVENT_ADD_FTP_SUCCESS = "EVENT_ADD_FTP_SUCCESS"
 
+
+    const val EVENT_SSH_DISCONNECT = "EVENT_SSH_DISCONNECT"
 }
 
 /**

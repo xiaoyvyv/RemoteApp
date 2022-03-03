@@ -16,7 +16,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_path"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/ui_size_30"
         android:clipToPadding="false"
         android:orientation="horizontal"
         android:overScrollMode="never"

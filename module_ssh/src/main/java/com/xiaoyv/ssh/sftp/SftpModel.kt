@@ -1,13 +1,15 @@
 package com.xiaoyv.ssh.sftp
 
-import android.util.Log
 import com.blankj.utilcode.util.ConvertUtils
 import com.blankj.utilcode.util.FileUtils
 import com.blankj.utilcode.util.GsonUtils
+import com.blankj.utilcode.util.LogUtils
+import com.trilead.ssh2.Connection
 import com.trilead.ssh2.SCPClient
 import com.trilead.ssh2.SFTPv3DirectoryEntry
 import com.trilead.ssh2.jenkins.SFTPClient
 import com.xiaoyv.busines.ftp.*
+import com.xiaoyv.busines.room.entity.SshEntity
 import com.xiaoyv.busines.utils.PathKt
 import com.xiaoyv.ssh.terminal.TerminalModel
 import com.xiaoyv.ssh.utils.CMD_STAT
@@ -15,7 +17,6 @@ import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.io.ByteArrayOutputStream
 import java.nio.charset.StandardCharsets
-import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
 
 /**
@@ -25,38 +26,51 @@ import java.util.concurrent.TimeUnit
  * @since 2022/2/28
  */
 class SftpModel : BaseFtpModel(), SftpContract.Model {
+    private var sshEntity: SshEntity = SshEntity()
+
+    /**
+     * 获取 SFTP 客户端
+     */
+    private var connection: Connection? = null
+    private val requireConnection: Connection
+        get() = connection ?: TerminalModel.createConnect(sshEntity).also {
+            it.addConnectionMonitor {
+                runCatching {
+                    connection?.close()
+                    connection = null
+                }
+            }
+            connection = it
+        }
 
     /**
      * 获取 SFTP 客户端
      */
     private var sftpClient: SFTPClient? = null
-
     private val requireSftpClient: SFTPClient
-        get() = sftpClient ?: SFTPClient(TerminalModel.requireConnection).apply {
-            sftpClient = this
+        get() = sftpClient ?: SFTPClient(requireConnection).also {
+            sftpClient = it
         }
 
     /**
      * 获取 SCP 客户端
      */
     private var scpClient: SCPClient? = null
-
     private val requireScpClient: SCPClient
-        get() = scpClient ?: SCPClient(TerminalModel.requireConnection).apply {
+        get() = scpClient ?: SCPClient(requireConnection).apply {
             scpClient = this
         }
 
-
-    /**
-     * SFTP 最大一次读取长度
-     */
-    private val sBufferSize = 32768
+    override fun p2mInitConnection(sshEntity: SshEntity) {
+        this.sshEntity = sshEntity
+    }
 
     override fun p2mDoCommand(command: String): Observable<String> {
         return Observable.create {
             val outputStream = ByteArrayOutputStream()
             val charsetName = StandardCharsets.UTF_8.name()
-            TerminalModel.requireConnection.exec(command, outputStream)
+            requireConnection.exec(command, outputStream)
+
             val result = ConvertUtils.outputStream2String(outputStream, charsetName).trim()
             it.onNext(result)
             it.onComplete()
@@ -94,91 +108,83 @@ class SftpModel : BaseFtpModel(), SftpContract.Model {
         }
     }
 
+    override fun isConnect(): Boolean {
+        return connection != null
+    }
+
     override fun p2mQueryFileStat(verifyPath: String): Observable<BaseFtpStat> {
         return p2mDoCommand(CMD_STAT + verifyPath).map { statInfo ->
             GsonUtils.fromJson(statInfo, BaseFtpStat::class.java)
         }
     }
 
-    override fun p2mDownloadFile(dataBean: BaseFtpFile): Observable<BaseFtpDownloadFile> {
+    override fun p2mDownloadFile(baseFtpFile: BaseFtpFile): Observable<BaseFtpDownloadFile> {
         return Observable.create { emitter ->
-            val fileFullName = dataBean.fileFullName
+            val fileFullName = baseFtpFile.fileFullName
 
-            val downloadFile = BaseFtpDownloadFile(dataBean.fileName)
+            val downloadFile = BaseFtpDownloadFile(baseFtpFile.fileName)
 
             // 本地创建目标空白文件
             val localFilePath = PathKt.downloadDirPath + fileFullName
             FileUtils.createFileByDeleteOldFile(localFilePath)
 
-            var last = 0L
+            var preTimeLength = 0L
+
             // 下载速率检测
-            val threadPool = Executors.newScheduledThreadPool(1)
-            threadPool.scheduleAtFixedRate({
+            val speedListen = Observable.interval(1000, TimeUnit.MILLISECONDS, Schedulers.io())
+                .subscribe({
+                    if (emitter.isDisposed) {
+                        throw InterruptedException("Download service is end!")
+                    }
+                    synchronized(downloadFile) {
+                        val nowLength = downloadFile.current
+                        // 下载速度
+                        val speed = nowLength - preTimeLength
+                        downloadFile.downloadSpeed = speed
+                        emitter.onNext(downloadFile)
 
-            }, 0, 1000, TimeUnit.MILLISECONDS)
+                        preTimeLength = nowLength
+                    }
+                }, {
+                    LogUtils.e("Download Speed: $it")
+                })
 
-            requireScpClient.get(
-                fileFullName,
-                PathKt.downloadDirPath
-            ) { srcFile: String, targetFile: String, current: Long, total: Long ->
-                last = current
+            // 下载
+            runCatching {
+                requireScpClient.get(
+                    fileFullName,
+                    PathKt.downloadDirPath
+                ) { srcFile: String, _: String, current: Long, total: Long ->
+                    synchronized(downloadFile) {
+                        downloadFile.fileName = srcFile
+                        downloadFile.current = current
+                        downloadFile.total = total
 
-                Log.e(
-                    "Download",
-                    "srcFile:$srcFile, targetFile:$targetFile, current:$current, total:$total"
-                )
+                        // 停止速率监听
+                        if (current >= total) {
+                            speedListen.dispose()
+                        }
+                    }
+                }
+
+            }.onFailure {
+                if (emitter.isDisposed) {
+                    LogUtils.e("Download service is end! ==> $it")
+                    return@create
+                }
+                throw it
+            }
+
+            if (!speedListen.isDisposed) {
+                speedListen.dispose()
             }
 
             downloadFile.downloadFilePath = localFilePath
 
             emitter.onNext(downloadFile)
             emitter.onComplete()
-//
-//            // 打开远程和本地文件流
-//            val inputStream = requireSftpClient.read(fileFullName)
-//            val outputStream = FileOutputStream(localFilePath)
-//
-//
-//            inputStream.runCatching {
-//                // 总长度
-//                downloadFile.total = dataBean.size
-//                downloadFile.current = 0
-//
-//                var len: Int
-//                val tempArray = ByteArray(sBufferSize)
-//                while (read(tempArray).apply { len = this } != -1) {
-//                    outputStream.write(tempArray, 0, len)
-//                    downloadFile.current += len
-//
-//                    // 回调进度
-//                    emitter.onNext(downloadFile)
-//                }
-//            }.onSuccess {
-//                IOUtils.closeQuietly(outputStream)
-//                IOUtils.closeQuietly(inputStream)
-//
-//                downloadFile.downloadFilePath = localFilePath
-//
-//                emitter.onNext(downloadFile)
-//                emitter.onComplete()
-//            }.onFailure {
-//                IOUtils.closeQuietly(outputStream)
-//                IOUtils.closeQuietly(inputStream)
-//
-//                // 重置 SFTP 客户端
-//                closeFtpQuietly()
-//
-//                emitter.onError(it)
-//            }
-        }
-    }
 
-    /**
-     * 重置 SFTP 客户端
-     */
-    private fun closeFtpQuietly() = runCatching {
-        sftpClient?.close()
-        sftpClient = null
+        }
     }
 
     override fun convertToFtpFile(any: Any) = BaseFtpFile().apply {
@@ -223,6 +229,10 @@ class SftpModel : BaseFtpModel(), SftpContract.Model {
         }
     }
 
+    override fun p2mSendHeartbeatPackets() {
+        connection?.sendIgnorePacket()
+    }
+
     override fun v2mCloseFtp() {
         Observable.create<Boolean> {
             // 关闭 SFTP 客户端
@@ -234,4 +244,20 @@ class SftpModel : BaseFtpModel(), SftpContract.Model {
             .subscribeOn(Schedulers.io())
             .subscribe()
     }
+
+    /**
+     * 重置 SFTP 客户端
+     */
+    private fun closeFtpQuietly() {
+        runCatching {
+            sftpClient?.close()
+            sftpClient = null
+        }
+
+        runCatching {
+            connection?.close()
+            connection = null
+        }
+    }
+
 }

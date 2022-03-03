@@ -13,9 +13,11 @@ import com.romide.terminal.emulatorview.TermSession
 import com.romide.terminal.emulatorview.compat.KeycodeConstants
 import com.trilead.ssh2.Session
 import com.xiaoyv.blueprint.base.binding.BaseMvpBindingActivity
+import com.xiaoyv.blueprint.base.rxjava.event.RxEvent
 import com.xiaoyv.busines.bean.ssh.KeyCodeBean
 import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.busines.room.entity.SshEntity
+import com.xiaoyv.busines.rx.RxEventTag
 import com.xiaoyv.desktop.ssh.R
 import com.xiaoyv.desktop.ssh.databinding.SshActivityTerminalBinding
 import com.xiaoyv.ssh.main.view.EmulatorViewGestureListener
@@ -38,7 +40,6 @@ class TerminalActivity :
     private lateinit var colorScheme: ColorScheme
 
     private var emulatorView: EmulatorView? = null
-    private val session: Session? = null
     private var sshEntity: SshEntity = SshEntity()
 
     override fun createPresenter() = TerminalPresenter()
@@ -64,7 +65,7 @@ class TerminalActivity :
         binding.toolbar.setRightIcon(
             R.drawable.business_icon_file_dir,
             onBarClickListener = doOnBarClick { view, which ->
-                SftpActivity.openSelf()
+                SftpActivity.openSelf(sshEntity)
             })
     }
 
@@ -85,6 +86,8 @@ class TerminalActivity :
 
         typeAdapter.setList(presenter.v2pGetSymbol())
         typeAdapter.notifyItemRangeChanged(0, typeAdapter.itemCount)
+
+        addReceiveEventTag(RxEventTag.EVENT_SSH_DISCONNECT)
     }
 
     override fun onPresenterCreated() {
@@ -99,6 +102,14 @@ class TerminalActivity :
     override fun onPause() {
         super.onPause()
         emulatorView?.onPause()
+    }
+
+    override fun onReceiveRxEvent(rxEvent: RxEvent, rxEventTag: String) {
+        if (rxEventTag == RxEventTag.EVENT_SSH_DISCONNECT) {
+            p2vShowToast("SSH 已经断开")
+
+            onBackPressed()
+        }
     }
 
     override fun p2vConnectFail(errMsg: String) {
@@ -153,18 +164,11 @@ class TerminalActivity :
         registerForContextMenu(binding.evTerminal)
     }
 
-    override fun onBackPressed() {
-        val session = emulatorView?.termSession
-        if (session == null) {
-            super.onBackPressed()
-            return
+    override fun onDestroy() {
+        runCatching {
+            emulatorView?.termSession?.finish()
         }
-        presenter.v2pReleaseSession(session)
-    }
-
-
-    override fun p2vReleaseSuccess(success: Boolean) {
-        super.onBackPressed()
+        super.onDestroy()
     }
 
     companion object {

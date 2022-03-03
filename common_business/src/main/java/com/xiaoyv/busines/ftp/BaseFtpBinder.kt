@@ -58,7 +58,7 @@ class BaseFtpBinder : BaseItemBindingBinder<BaseFtpFile, BusinessActivityFtpItem
         binding.tvLabel.text = data.fileName
         binding.tvTime.text = TimeUtils.getFriendlyTimeSpanByNow(data.modifierTime)
         binding.tvPermission.text = String.format("%s/%s", permission, data.user)
-        binding.tvSize.text = ConvertUtils.byte2FitMemorySize(data.size)
+        binding.tvSize.text = ConvertUtils.byte2FitMemorySize(data.size,2)
 
         holder.addClickListener(binding.root, data)
     }

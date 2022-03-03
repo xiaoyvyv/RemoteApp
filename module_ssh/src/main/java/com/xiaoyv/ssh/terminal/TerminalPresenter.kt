@@ -7,6 +7,8 @@ import com.xiaoyv.blueprint.base.ImplBasePresenter
 import com.xiaoyv.blueprint.base.subscribesWithPresenter
 import com.xiaoyv.busines.bean.ssh.KeyCodeBean
 import com.xiaoyv.busines.room.entity.SshEntity
+import io.reactivex.rxjava3.core.Observable
+import java.util.concurrent.TimeUnit
 
 /**
  * TerminalPresenter
@@ -18,13 +20,22 @@ class TerminalPresenter : ImplBasePresenter<TerminalContract.View>(), TerminalCo
     private val model = TerminalModel()
 
     override fun v2pConnectSsh(sshEntity: SshEntity) {
+        requireView.p2vShowLoading("正在连接 SSH")
+
         model.p2mConnectSsh(sshEntity)
             .subscribesWithPresenter(
                 presenter = this,
                 onSuccess = {
+                    requireView.p2vHideLoading()
+
+                    // 开启心跳
+                    pStartHeartbeat()
+
                     requireView.p2vConnectSuccess(it)
                 },
                 onError = {
+                    requireView.p2vHideLoading()
+
                     requireView.p2vConnectFail(it.message.orEmpty())
                 }
             )
@@ -48,27 +59,28 @@ class TerminalPresenter : ImplBasePresenter<TerminalContract.View>(), TerminalCo
     }
 
     override fun v2pReleaseSession(termSession: TermSession) {
-        model.p2mReleaseSession(termSession)
-            .subscribesWithPresenter(
-                presenter = this,
-                onSuccess = {
-                    getView().p2vReleaseSuccess(true)
-                },
-                onError = {
-                    getView().p2vReleaseSuccess(false)
-                }
-            )
+
     }
 
-    override fun v2pDoCommandLs(dirName: String) {
-        model.p2mDoCommandLs(dirName)
+    override fun v2pOnDestroy() {
+        model.p2mReleaseSession()
+    }
+
+    override fun pStartHeartbeat() {
+        Observable.interval(10, TimeUnit.SECONDS)
+            .flatMap {
+                Observable.create<Boolean> {
+                    model.p2mSendHeartbeatPackets()
+                    it.onNext(true)
+                }
+            }
             .subscribesWithPresenter(
                 presenter = this,
                 onSuccess = {
-                    LogUtils.json(it)
+                    LogUtils.i("TERMINAL SSH 心跳包")
                 },
                 onError = {
-                    LogUtils.e(it.message)
+                    LogUtils.e("TERMINAL SSH 心跳结束")
                 }
             )
     }

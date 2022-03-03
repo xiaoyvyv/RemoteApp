@@ -33,7 +33,11 @@ interface BaseFtpContract {
          */
         fun p2vShowFileStat(ftpStat: BaseFtpStat)
 
-        fun processItemClick(dataBean: BaseFtpFile, position: Int)
+        fun processItemClick(baseFtpFile: BaseFtpFile, position: Int)
+
+        fun p2vShowDownloadProgress(downloadFile: BaseFtpDownloadFile)
+
+        fun p2vShowDownloadError(errMsg: String)
     }
 
     interface Presenter : IBasePresenter {
@@ -54,12 +58,12 @@ interface BaseFtpContract {
         /**
          * 下载文件
          */
-        fun v2pDownloadFile(dataBean: BaseFtpFile)
+        fun v2pDownloadFile(baseFtpFile: BaseFtpFile)
 
         /**
          * 取消下载
          */
-        fun v2pCancelDownloadFile(dataBean: BaseFtpFile)
+        fun v2pCancelDownloadFile(baseFtpFile: BaseFtpFile)
     }
 
     interface Model {
@@ -69,9 +73,9 @@ interface BaseFtpContract {
             return Observable.create { }
         }
 
-        fun p2mDownloadFile(dataBean: BaseFtpFile): Observable<BaseFtpDownloadFile>
+        fun p2mDownloadFile(baseFtpFile: BaseFtpFile): Observable<BaseFtpDownloadFile>
 
-        fun p2mCleanDownloadFile(dataBean: BaseFtpFile)
+        fun p2mCleanDownloadFile(baseFtpFile: BaseFtpFile)
 
         /**
          * 关闭 FTP

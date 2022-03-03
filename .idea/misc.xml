@@ -7,8 +7,15 @@
         <entry key="..\:/Users/Admin/AndroidStudioProjects/RemoteApp/app_official/src/main/res/layout/activity_about.xml" value="0.3359375" />
         <entry key="..\:/Users/Admin/AndroidStudioProjects/RemoteApp/app_official/src/main/res/layout/bookmark_list_item.xml" value="0.15677083333333333" />
         <entry key="..\:/Users/Admin/AndroidStudioProjects/RemoteApp/app_official/src/main/res/layout/credentials.xml" value="0.15677083333333333" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/RemoteApp/common_business/src/main/res/layout/business_activity_ftp.xml" value="0.33177083333333335" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/RemoteApp/common_business/src/main/res/layout/business_activity_ftp_download.xml" value="0.33177083333333335" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/RemoteApp/common_business/src/main/res/layout/business_activity_ftp_path.xml" value="0.33177083333333335" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/RemoteApp/common_business/src/main/res/layout/business_activity_ftp_stat.xml" value="0.33177083333333335" />
         <entry key="..\:/Users/Admin/AndroidStudioProjects/RemoteApp/common_ui/src/main/res/drawable/ui_shape_window_button.xml" value="0.252" />
         <entry key="..\:/Users/Admin/AndroidStudioProjects/RemoteApp/common_ui/src/main/res/layout/ui_dialog.xml" value="0.3359375" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/RemoteApp/common_ui/src/main/res/layout/ui_setting_input.xml" value="0.33177083333333335" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/RemoteApp/common_ui/src/main/res/layout/ui_setting_text.xml" value="0.33177083333333335" />
+        <entry key="..\:/Users/Admin/AndroidStudioProjects/RemoteApp/common_ui/src/main/res/layout/ui_setting_view.xml" value="0.33177083333333335" />
         <entry key="..\:/Users/Admin/AndroidStudioProjects/RemoteApp/module_main/src/main/res/layout/main_activity_home.xml" value="0.3359375" />
         <entry key="..\:/Users/Admin/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_activity_screen.xml" value="0.3359375" />
         <entry key="..\:/Users/Admin/AndroidStudioProjects/RemoteApp/module_rdp/src/main/res/layout/rdp_activity_screen_certificate.xml" value="0.3359375" />
