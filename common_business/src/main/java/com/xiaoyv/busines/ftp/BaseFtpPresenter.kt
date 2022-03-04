@@ -1,8 +1,5 @@
 package com.xiaoyv.busines.ftp
 
-import android.util.Log
-import com.blankj.utilcode.util.GsonUtils
-import com.blankj.utilcode.util.LogUtils
 import com.xiaoyv.blueprint.base.ImplBasePresenter
 import com.xiaoyv.blueprint.base.subscribesWithPresenter
 import io.reactivex.rxjava3.observers.DisposableObserver
@@ -110,17 +107,17 @@ abstract class BaseFtpPresenter<V : BaseFtpContract.View> : ImplBasePresenter<V>
             )
 
         // 缓存
-        downloadSubscriberMap[baseFtpFile.fileFullName] = downloadSubscriber
+        downloadSubscriberMap[baseFtpFile.filePath] = downloadSubscriber
     }
 
     override fun v2pCancelDownloadFile(baseFtpFile: BaseFtpFile) {
-        val fileFullName = baseFtpFile.fileFullName
+        val filePath = baseFtpFile.filePath
 
         // 取消下载
-        if (downloadSubscriberMap.containsKey(fileFullName)) {
-            val disposableObserver = downloadSubscriberMap[fileFullName]
+        if (downloadSubscriberMap.containsKey(filePath)) {
+            val disposableObserver = downloadSubscriberMap[filePath]
             disposableObserver?.dispose()
-            downloadSubscriberMap.remove(fileFullName)
+            downloadSubscriberMap.remove(filePath)
 
             // 清除下载的半成品数据
             sftpModel.p2mCleanDownloadFile(baseFtpFile)

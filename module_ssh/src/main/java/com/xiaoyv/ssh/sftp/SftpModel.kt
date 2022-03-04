@@ -79,21 +79,21 @@ class SftpModel : BaseFtpModel(), SftpContract.Model {
 
     override fun p2mQueryFileList(dirName: String): Observable<BaseFtpBean> {
         return Observable.create {
-            val canonicalPath = requireSftpClient.canonicalPath(dirName)
+            val dirPath = requireSftpClient.canonicalPath(dirName)
 
             // 列出目录
-            val vector = requireSftpClient.ls(canonicalPath)
+            val vector = requireSftpClient.ls(dirPath)
             val elements = vector.elements()
             val fileList = arrayListOf<BaseFtpFile>()
             while (elements.hasMoreElements()) {
-                val element: Any = elements.nextElement()
+                val element = elements.nextElement()
 
                 // 不显示 [.|..] 两个目录
                 val ftpFile = convertToFtpFile(element)
                 if (ftpFile.fileName.isBlank() || ftpFile.fileName == "." || ftpFile.fileName == "..") {
                     continue
                 }
-                ftpFile.fileFullName = canonicalPath + "/" + ftpFile.fileName
+                ftpFile.filePath = dirPath + (if (dirPath == "/") "" else "/") + ftpFile.fileName
                 fileList.add(ftpFile)
             }
             // 排序 正序，文件夹在上
@@ -103,7 +103,7 @@ class SftpModel : BaseFtpModel(), SftpContract.Model {
                 file.isDirectory.not()
             }
 
-            it.onNext(BaseFtpBean(dirName = canonicalPath, data = sortFileList))
+            it.onNext(BaseFtpBean(dirName = dirPath, data = sortFileList))
             it.onComplete()
         }
     }
@@ -114,18 +114,52 @@ class SftpModel : BaseFtpModel(), SftpContract.Model {
 
     override fun p2mQueryFileStat(verifyPath: String): Observable<BaseFtpStat> {
         return p2mDoCommand(CMD_STAT + verifyPath).map { statInfo ->
-            GsonUtils.fromJson(statInfo, BaseFtpStat::class.java)
+            LogUtils.e("文件路径：$verifyPath", "属性：$statInfo")
+
+            GsonUtils.fromJson(statInfo, BaseFtpStat::class.java).also {
+                it.filePath = verifyPath
+            }
+        }.flatMap {
+            val filePath = it.filePath
+            val fileLink = it.fileLink
+
+            Observable.create { emitter ->
+                // ‘/symlink’ -> ‘bin’
+                if (fileLink.contains("->")) {
+                    val linkPath = fileLink.split("->")
+                        .lastOrNull()
+                        .orEmpty()
+                        .replace("‘", "")
+                        .replace("’", "")
+                        .trim()
+
+                    // 绝对路径
+                    if (linkPath.startsWith("/")) {
+                        it.linkTargetPath = linkPath
+                    } else {
+                        val temp = FileUtils.getDirName(filePath) + linkPath
+
+                        // 规整路径
+                        it.linkTargetPath = requireSftpClient.canonicalPath(temp)
+
+                        LogUtils.e("链接目标原路径：$temp", "链接目标规整路径：${it.linkTargetPath}")
+                    }
+                }
+
+                emitter.onNext(it)
+                emitter.onComplete()
+            }
         }
     }
 
     override fun p2mDownloadFile(baseFtpFile: BaseFtpFile): Observable<BaseFtpDownloadFile> {
         return Observable.create { emitter ->
-            val fileFullName = baseFtpFile.fileFullName
+            val filePath = baseFtpFile.filePath
 
             val downloadFile = BaseFtpDownloadFile(baseFtpFile.fileName)
 
             // 本地创建目标空白文件
-            val localFilePath = PathKt.downloadDirPath + fileFullName
+            val localFilePath = PathKt.downloadDirPath + filePath
             FileUtils.createFileByDeleteOldFile(localFilePath)
 
             var preTimeLength = 0L
@@ -152,7 +186,7 @@ class SftpModel : BaseFtpModel(), SftpContract.Model {
             // 下载
             runCatching {
                 requireScpClient.get(
-                    fileFullName,
+                    filePath,
                     PathKt.downloadDirPath
                 ) { srcFile: String, _: String, current: Long, total: Long ->
                     synchronized(downloadFile) {

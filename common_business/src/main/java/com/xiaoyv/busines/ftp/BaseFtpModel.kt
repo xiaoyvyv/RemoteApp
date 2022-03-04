@@ -18,8 +18,8 @@ abstract class BaseFtpModel : BaseFtpContract.Model {
      */
     override fun p2mCleanDownloadFile(baseFtpFile: BaseFtpFile) {
         Observable.create<Boolean> {
-            val fileFullName = baseFtpFile.fileFullName
-            val localFilePath = PathKt.downloadDirPath + fileFullName
+            val filePath = baseFtpFile.filePath
+            val localFilePath = PathKt.downloadDirPath + filePath
             FileUtils.delete(localFilePath)
         }.observeOn(Schedulers.io())
             .subscribeOn(Schedulers.io())

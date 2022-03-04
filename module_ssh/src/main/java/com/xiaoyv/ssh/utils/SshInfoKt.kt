@@ -48,7 +48,7 @@ package com.xiaoyv.ssh.utils
  * - %t     十六进制表示的文件系统类型
  * - %T     可读格式表示的文件系统类型
  */
-private const val FORMAT_SFTP_STAT: String = "{\\\"fileName\\\"\\:\\\"%n\\\"\\,\\\"fileFullName\\\"\\:\\\"%N\\\"\\,\\\"fileType\\\"\\:\\\"%F\\\"\\,\\\"fileSize\\\"\\:%s\\,\\\"filePermission\\\"\\:\\\"%a\\\"\\,\\\"filePermissionText\\\"\\:\\\"%A\\\"\\,\\\"fileUser\\\"\\:\\\"%U\\\"\\,\\\"fileUserId\\\"\\:\\\"%u\\\"\\,\\\"fileGroup\\\"\\:\\\"%G\\\"\\,\\\"fileGroupId\\\"\\:\\\"%g\\\"\\,\\\"fileAcTime\\\"\\:%Y\\,\\\"fileMoTime\\\"\\:%Y\\,\\\"hardLink\\\"\\:%h\\,\\\"device\\\"\\:\\\"%Dh/%dd\\\"\\,\\\"inode\\\"\\:%i\\,\\\"block\\\"\\:%b\\,\\\"ioBlock\\\"\\:%o}"
+private const val FORMAT_SFTP_STAT: String = "{\\\"fileName\\\"\\:\\\"%n\\\"\\,\\\"fileLink\\\"\\:\\\"%N\\\"\\,\\\"fileType\\\"\\:\\\"%F\\\"\\,\\\"fileSize\\\"\\:%s\\,\\\"filePermission\\\"\\:\\\"%a\\\"\\,\\\"filePermissionText\\\"\\:\\\"%A\\\"\\,\\\"fileUser\\\"\\:\\\"%U\\\"\\,\\\"fileUserId\\\"\\:\\\"%u\\\"\\,\\\"fileGroup\\\"\\:\\\"%G\\\"\\,\\\"fileGroupId\\\"\\:\\\"%g\\\"\\,\\\"fileAcTime\\\"\\:%Y\\,\\\"fileMoTime\\\"\\:%Y\\,\\\"hardLink\\\"\\:%h\\,\\\"device\\\"\\:\\\"%Dh/%dd\\\"\\,\\\"inode\\\"\\:%i\\,\\\"block\\\"\\:%b\\,\\\"ioBlock\\\"\\:%o}"
 
 /**
  * 查询文件状态

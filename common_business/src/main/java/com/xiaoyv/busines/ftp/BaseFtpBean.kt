@@ -15,7 +15,7 @@ data class BaseFtpBean(
  */
 data class BaseFtpFile(
     var fileName: String = "",
-    var fileFullName: String = "",
+    var filePath: String = "",
     var longEntry: String = "",
     var size: Long = 0,
     var modifierTime: Long = 0,
@@ -39,13 +39,14 @@ data class BaseFtpFile(
  * 文件属性
  */
 data class BaseFtpStat(
+    var filePath: String = "",
     var block: Long = 0,
     var device: String = "",
     var fileAcTime: Long = 0,
     var fileGroup: String = "",
     var fileGroupId: String = "",
     var fileMoTime: Long = 0,
-    var fileFullName: String = "",
+    var fileLink: String = "",
     var fileName: String = "",
     var filePermission: String = "",
     var filePermissionText: String = "",
@@ -57,21 +58,27 @@ data class BaseFtpStat(
     var inode: Long = 0,
     var ioBlock: Long = 0
 ) : Serializable {
-    val isSymlink: Boolean
-        get() = fileFullName.contains("->")
+    var linkTargetPath: String = ""
 
-    val linkTargetPath: String
-        get() {
-            // ‘/symlink’ -> ‘bin’
-            if (fileFullName.contains("->")) {
-                return fileFullName.split("->")
-                    .lastOrNull()
-                    .orEmpty()
-                    .replace("‘", "")
-                    .trim()
-            }
-            return ""
-        }
+    val isSymlink: Boolean
+        get() = fileType.lowercase().contains("link") && !isPipe
+
+    val isPipe: Boolean
+        get() = fileLink.contains("pipe:")
+
+    /**
+     * 是否为文件夹
+     */
+    val isDir: Boolean
+        get() = fileType.lowercase().startsWith("dir")
+
+
+    fun toFtpFile() = BaseFtpFile().also {
+        it.filePath = filePath
+        it.fileName = fileName
+        it.isDirectory = isDir
+        it.isSymlink = isSymlink
+    }
 }
 
 data class BaseFtpDownloadFile(

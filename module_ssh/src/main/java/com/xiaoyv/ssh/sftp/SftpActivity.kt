@@ -8,6 +8,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.xiaoyv.busines.config.NavigationKey
 import com.xiaoyv.busines.ftp.BaseFtpActivity
 import com.xiaoyv.busines.ftp.BaseFtpFile
+import com.xiaoyv.busines.ftp.BaseFtpStat
 import com.xiaoyv.busines.room.entity.SshEntity
 import java.io.Serializable
 
@@ -39,7 +40,25 @@ class SftpActivity : BaseFtpActivity<SftpContract.View, SftpPresenter>(), SftpCo
     }
 
     override fun vClickSymLink(baseFtpFile: BaseFtpFile, position: Int) {
-        presenter.v2pDownloadFile(baseFtpFile)
+        presenter.v2pCheckSymLinkType(baseFtpFile)
+    }
+
+    override fun p2vShowLinkInfo(ftpStat: BaseFtpStat) {
+        when {
+            ftpStat.isDir -> {
+                presenter.v2pQueryFileList(ftpStat.filePath, true)
+            }
+            ftpStat.isPipe -> {
+                ToastUtils.showShort("Pipe 文件无法打开")
+            }
+            ftpStat.isSymlink -> {
+                ToastUtils.showShort("链接重定向")
+                presenter.v2pCheckSymLinkType(ftpStat.toFtpFile())
+            }
+            else -> {
+                vStartDownload(ftpStat.toFtpFile())
+            }
+        }
     }
 
     override fun vClickFile(baseFtpFile: BaseFtpFile, position: Int) {
