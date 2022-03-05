@@ -5,8 +5,8 @@ import com.romide.terminal.emulatorview.TermSession
 import com.romide.terminal.emulatorview.compat.KeycodeConstants
 import com.xiaoyv.blueprint.base.ImplBasePresenter
 import com.xiaoyv.blueprint.base.subscribesWithPresenter
-import com.xiaoyv.busines.bean.ssh.KeyCodeBean
-import com.xiaoyv.busines.room.entity.SshEntity
+import com.xiaoyv.business.bean.ssh.KeyCodeBean
+import com.xiaoyv.business.room.entity.SshEntity
 import io.reactivex.rxjava3.core.Observable
 import java.util.concurrent.TimeUnit
 

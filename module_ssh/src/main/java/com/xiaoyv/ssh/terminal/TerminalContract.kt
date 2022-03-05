@@ -4,8 +4,8 @@ import com.romide.terminal.emulatorview.TermSession
 import com.trilead.ssh2.Session
 import com.xiaoyv.blueprint.base.IBasePresenter
 import com.xiaoyv.blueprint.base.IBaseView
-import com.xiaoyv.busines.bean.ssh.KeyCodeBean
-import com.xiaoyv.busines.room.entity.SshEntity
+import com.xiaoyv.business.bean.ssh.KeyCodeBean
+import com.xiaoyv.business.room.entity.SshEntity
 import io.reactivex.rxjava3.core.Observable
 
 /**

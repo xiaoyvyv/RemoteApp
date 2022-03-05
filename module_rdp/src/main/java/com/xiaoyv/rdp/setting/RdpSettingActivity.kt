@@ -7,7 +7,7 @@ import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.StringUtils
 import com.blankj.utilcode.util.Utils
 import com.xiaoyv.blueprint.base.BaseActivity
-import com.xiaoyv.busines.config.NavigationKey
+import com.xiaoyv.business.config.NavigationKey
 import com.xiaoyv.desktop.rdp.R
 import com.xiaoyv.desktop.rdp.databinding.RdpSettingClientBinding
 import com.xiaoyv.desktop.rdp.databinding.RdpSettingPowerBinding

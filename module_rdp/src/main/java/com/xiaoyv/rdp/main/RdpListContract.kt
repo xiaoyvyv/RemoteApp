@@ -3,7 +3,7 @@ package com.xiaoyv.rdp.main
 import com.google.android.material.tabs.TabLayout
 import com.xiaoyv.blueprint.base.IBasePresenter
 import com.xiaoyv.blueprint.base.IBaseView
-import com.xiaoyv.busines.room.entity.RdpEntity
+import com.xiaoyv.business.room.entity.RdpEntity
 import io.reactivex.rxjava3.core.Observable
 
 /**

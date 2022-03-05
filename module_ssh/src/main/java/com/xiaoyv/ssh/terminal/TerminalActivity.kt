@@ -14,10 +14,10 @@ import com.romide.terminal.emulatorview.compat.KeycodeConstants
 import com.trilead.ssh2.Session
 import com.xiaoyv.blueprint.base.binding.BaseMvpBindingActivity
 import com.xiaoyv.blueprint.base.rxjava.event.RxEvent
-import com.xiaoyv.busines.bean.ssh.KeyCodeBean
-import com.xiaoyv.busines.config.NavigationKey
-import com.xiaoyv.busines.room.entity.SshEntity
-import com.xiaoyv.busines.rx.RxEventTag
+import com.xiaoyv.business.bean.ssh.KeyCodeBean
+import com.xiaoyv.business.config.NavigationKey
+import com.xiaoyv.business.room.entity.SshEntity
+import com.xiaoyv.business.rx.RxEventTag
 import com.xiaoyv.desktop.ssh.R
 import com.xiaoyv.desktop.ssh.databinding.SshActivityTerminalBinding
 import com.xiaoyv.ssh.main.view.EmulatorViewGestureListener

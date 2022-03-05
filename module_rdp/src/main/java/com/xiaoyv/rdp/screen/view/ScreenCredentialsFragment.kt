@@ -3,14 +3,12 @@ package com.xiaoyv.rdp.screen.view
 import android.os.Bundle
 import android.os.Parcel
 import android.os.Parcelable
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import com.blankj.utilcode.util.ScreenUtils
-import com.xiaoyv.busines.config.NavigationKey
+import com.xiaoyv.business.config.NavigationKey
 import com.xiaoyv.desktop.rdp.R
 import com.xiaoyv.desktop.rdp.databinding.RdpActivityScreenCredentialsBinding
 

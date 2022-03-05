@@ -1,9 +1,9 @@
 package com.xiaoyv.ssh.sftp
 
-import com.xiaoyv.busines.ftp.BaseFtpContract
-import com.xiaoyv.busines.ftp.BaseFtpFile
-import com.xiaoyv.busines.ftp.BaseFtpStat
-import com.xiaoyv.busines.room.entity.SshEntity
+import com.xiaoyv.business.global.ftp.BaseFtpContract
+import com.xiaoyv.business.global.ftp.BaseFtpFile
+import com.xiaoyv.business.global.ftp.BaseFtpStat
+import com.xiaoyv.business.room.entity.SshEntity
 import io.reactivex.rxjava3.core.Observable
 
 /**

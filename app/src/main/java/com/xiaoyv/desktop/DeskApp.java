@@ -6,7 +6,7 @@ import android.content.Context;
 import androidx.multidex.MultiDex;
 
 import com.freerdp.freerdpcore.application.RdpApp;
-import com.xiaoyv.busines.BaseApp;
+import com.xiaoyv.business.BaseApp;
 
 /**
  * DeskApp

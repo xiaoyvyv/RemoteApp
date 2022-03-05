@@ -8,9 +8,9 @@ import com.trilead.ssh2.Connection
 import com.trilead.ssh2.SCPClient
 import com.trilead.ssh2.SFTPv3DirectoryEntry
 import com.trilead.ssh2.jenkins.SFTPClient
-import com.xiaoyv.busines.ftp.*
-import com.xiaoyv.busines.room.entity.SshEntity
-import com.xiaoyv.busines.utils.PathKt
+import com.xiaoyv.business.global.ftp.*
+import com.xiaoyv.business.room.entity.SshEntity
+import com.xiaoyv.business.utils.PathKt
 import com.xiaoyv.ssh.terminal.TerminalModel
 import com.xiaoyv.ssh.utils.CMD_STAT
 import io.reactivex.rxjava3.core.Observable

@@ -5,11 +5,11 @@ import android.os.Bundle
 import com.blankj.utilcode.constant.MemoryConstants
 import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ToastUtils
-import com.xiaoyv.busines.config.NavigationKey
-import com.xiaoyv.busines.ftp.BaseFtpActivity
-import com.xiaoyv.busines.ftp.BaseFtpFile
-import com.xiaoyv.busines.ftp.BaseFtpStat
-import com.xiaoyv.busines.room.entity.SshEntity
+import com.xiaoyv.business.config.NavigationKey
+import com.xiaoyv.business.global.ftp.BaseFtpActivity
+import com.xiaoyv.business.global.ftp.BaseFtpFile
+import com.xiaoyv.business.global.ftp.BaseFtpStat
+import com.xiaoyv.business.room.entity.SshEntity
 import java.io.Serializable
 
 /**

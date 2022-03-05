@@ -4,10 +4,9 @@ import com.blankj.utilcode.util.ObjectUtils
 import com.blankj.utilcode.util.StringUtils
 import com.xiaoyv.blueprint.base.ImplBasePresenter
 import com.xiaoyv.blueprint.base.subscribesWithPresenter
-import com.xiaoyv.busines.room.entity.SshEntity
-import com.xiaoyv.busines.utils.HostVerifyUtils
+import com.xiaoyv.business.room.entity.SshEntity
+import com.xiaoyv.business.utils.HostVerifyUtils
 import com.xiaoyv.desktop.ssh.R
-import com.xiaoyv.ssh.terminal.TerminalActivity
 
 
 /**

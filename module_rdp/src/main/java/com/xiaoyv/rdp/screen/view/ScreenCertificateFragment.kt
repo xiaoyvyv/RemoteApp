@@ -8,8 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.FragmentManager
-import com.blankj.utilcode.util.ScreenUtils
-import com.xiaoyv.busines.config.NavigationKey
+import com.xiaoyv.business.config.NavigationKey
 import com.xiaoyv.desktop.rdp.R
 import com.xiaoyv.desktop.rdp.databinding.RdpActivityScreenCertificateBinding
 

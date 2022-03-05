@@ -27,8 +27,8 @@ import com.gyf.immersionbar.BarHide
 import com.gyf.immersionbar.ImmersionBar
 import com.hijamoya.keyboardview.Keyboard
 import com.xiaoyv.blueprint.base.BaseMvpActivity
-import com.xiaoyv.busines.config.NavigationKey
-import com.xiaoyv.busines.room.entity.RdpEntity
+import com.xiaoyv.business.config.NavigationKey
+import com.xiaoyv.business.room.entity.RdpEntity
 import com.xiaoyv.desktop.rdp.R
 import com.xiaoyv.desktop.rdp.databinding.RdpActivityScreenBinding
 import com.xiaoyv.rdp.screen.config.RdpBroadcastReceiver

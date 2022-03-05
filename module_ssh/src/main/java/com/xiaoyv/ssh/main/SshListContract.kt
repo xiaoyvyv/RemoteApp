@@ -3,7 +3,7 @@ package com.xiaoyv.ssh.main
 import com.google.android.material.tabs.TabLayout
 import com.xiaoyv.blueprint.base.IBasePresenter
 import com.xiaoyv.blueprint.base.IBaseView
-import com.xiaoyv.busines.room.entity.SshEntity
+import com.xiaoyv.business.room.entity.SshEntity
 import io.reactivex.rxjava3.core.Observable
 
 /**

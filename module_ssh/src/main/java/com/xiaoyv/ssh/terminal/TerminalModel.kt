@@ -8,9 +8,9 @@ import com.trilead.ssh2.ServerHostKeyVerifier
 import com.trilead.ssh2.Session
 import com.xiaoyv.blueprint.base.rxjava.event.RxEvent
 import com.xiaoyv.blueprint.rxbus.RxBus
-import com.xiaoyv.busines.config.SshLoginType
-import com.xiaoyv.busines.room.entity.SshEntity
-import com.xiaoyv.busines.rx.RxEventTag
+import com.xiaoyv.business.config.SshLoginType
+import com.xiaoyv.business.room.entity.SshEntity
+import com.xiaoyv.business.rx.RxEventTag
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import java.io.File

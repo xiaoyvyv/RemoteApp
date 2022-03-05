@@ -32,6 +32,27 @@ allprojects {
                     kotlinOptions {
                         jvmTarget = '1.8'
                     }
+
+
+                    packagingOptions {
+                        resources {
+                            exclude 'META-INF/DEPENDENCIES'
+                            exclude 'META-INF/LICENSE'
+                            exclude 'META-INF/LICENSE.txt'
+                            exclude 'META-INF/license.txt'
+                            exclude 'META-INF/NOTICE'
+                            exclude 'META-INF/NOTICE.txt'
+                            exclude 'META-INF/notice.txt'
+                            exclude 'META-INF/ASL2.0'
+                            exclude 'META-INF/lib_ui_release.kotlin_module'
+                            exclude 'license/NOTICE'
+                            exclude 'license/LICENSE'
+                            exclude 'license/README.dom.txt'
+                            exclude 'license/LICENSE.dom-software.txt'
+                            exclude 'license/LICENSE.dom-documentation.txt'
+                            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+                        }
+                    }
                 }
             }
         }
@@ -117,6 +138,7 @@ ext {
     autoSizeVersion = '1.2.1'
     keyboardVersion = '0.0.3'
     buttonVersion = '0.0.3'
+    editorVersion='0.10.3'
 
     blueprintVersion = '1.0.32'
 

@@ -6,7 +6,7 @@ import com.alibaba.android.arouter.launcher.ARouter
 import com.xiaoyv.blueprint.base.binding.BaseBindingActivity
 import com.xiaoyv.blueprint.utils.LazyUtils.loadFragments
 import com.xiaoyv.blueprint.utils.LazyUtils.showHideFragment
-import com.xiaoyv.busines.config.NavigationPath
+import com.xiaoyv.business.config.NavigationPath
 import com.xiaoyv.desktop.main.R
 import com.xiaoyv.desktop.main.databinding.MainActivityHomeBinding
 

@@ -11,7 +11,7 @@ import com.blankj.utilcode.util.ToastUtils
 import com.freerdp.freerdpcore.domain.RdpConfig
 import com.xiaoyv.blueprint.base.BaseActivity
 import com.xiaoyv.blueprint.utils.LazyUtils.loadRootFragment
-import com.xiaoyv.busines.config.NavigationKey
+import com.xiaoyv.business.config.NavigationKey
 import com.xiaoyv.desktop.rdp.R
 import com.xiaoyv.desktop.rdp.databinding.RdpSettingSingleBinding
 

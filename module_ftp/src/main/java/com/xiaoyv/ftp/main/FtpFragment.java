@@ -4,7 +4,7 @@ import android.view.View;
 
 import com.alibaba.android.arouter.facade.annotation.Route;
 import com.xiaoyv.blueprint.base.BaseFragment;
-import com.xiaoyv.busines.config.NavigationPath;
+import com.xiaoyv.business.config.NavigationPath;
 import com.xiaoyv.desktop.ftp.databinding.FtpFragmentMainBinding;
 
 /**

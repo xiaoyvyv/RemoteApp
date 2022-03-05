@@ -3,8 +3,8 @@ package com.xiaoyv.rdp.main
 import com.blankj.utilcode.util.GsonUtils
 import com.freerdp.freerdpcore.domain.RdpConfig
 import com.xiaoyv.blueprint.exception.RxException
-import com.xiaoyv.busines.room.database.DateBaseManger
-import com.xiaoyv.busines.room.entity.RdpEntity
+import com.xiaoyv.business.room.database.DateBaseManger
+import com.xiaoyv.business.room.entity.RdpEntity
 import io.reactivex.rxjava3.core.Observable
 
 /**

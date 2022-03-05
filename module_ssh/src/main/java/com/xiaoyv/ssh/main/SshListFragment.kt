@@ -13,9 +13,9 @@ import com.github.nukc.stateview.StateView
 import com.google.android.material.tabs.TabLayout
 import com.xiaoyv.blueprint.base.binding.BaseMvpBindingFragment
 import com.xiaoyv.blueprint.base.rxjava.event.RxEvent
-import com.xiaoyv.busines.config.NavigationPath
-import com.xiaoyv.busines.room.entity.SshEntity
-import com.xiaoyv.busines.rx.RxEventTag
+import com.xiaoyv.business.config.NavigationPath
+import com.xiaoyv.business.room.entity.SshEntity
+import com.xiaoyv.business.rx.RxEventTag
 import com.xiaoyv.desktop.ssh.R
 import com.xiaoyv.desktop.ssh.databinding.SshFragmentMainBinding
 import com.xiaoyv.ssh.add.AddSshActivity

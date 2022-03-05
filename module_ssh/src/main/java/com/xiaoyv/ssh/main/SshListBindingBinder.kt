@@ -3,7 +3,7 @@ package com.xiaoyv.ssh.main
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.blankj.utilcode.util.TimeUtils
-import com.xiaoyv.busines.room.entity.SshEntity
+import com.xiaoyv.business.room.entity.SshEntity
 import com.xiaoyv.desktop.ssh.databinding.SshFragmentMainItemBinding
 import com.xiaoyv.widget.binder.BaseItemBindingBinder
 import java.util.*
