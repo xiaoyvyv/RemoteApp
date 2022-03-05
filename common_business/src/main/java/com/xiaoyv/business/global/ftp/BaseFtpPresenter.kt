@@ -1,7 +1,9 @@
 package com.xiaoyv.business.global.ftp
 
+import com.blankj.utilcode.util.FileUtils
 import com.xiaoyv.blueprint.base.ImplBasePresenter
 import com.xiaoyv.blueprint.base.subscribesWithPresenter
+import com.xiaoyv.business.utils.PathKt
 import io.reactivex.rxjava3.observers.DisposableObserver
 
 /**
@@ -122,6 +124,40 @@ abstract class BaseFtpPresenter<V : BaseFtpContract.View> : ImplBasePresenter<V>
             // 清除下载的半成品数据
             sftpModel.p2mCleanDownloadFile(baseFtpFile)
         }
+    }
+
+    override fun v2pUploadFile(filePath: String, targetPath: String) {
+        if (FileUtils.isFileExists(filePath).not()) {
+            requireView.p2vShowToast("上传的文件不存在")
+            return
+        }
+
+        val saveFilePath = targetPath.ifBlank {
+            filePath.replace(PathKt.downloadDirPath, "")
+        }
+
+        requireView.p2vShowLoading("上传中...")
+
+        sftpModel.p2mUploadFile(filePath, saveFilePath)
+            .subscribesWithPresenter(
+                presenter = this,
+                onSuccess = {
+                    requireView.p2vHideLoading()
+                    requireView.p2vShowToast("上传成功")
+
+                    // 刷新目录
+                    v2pQueryFileList(showLoading = true)
+                },
+                onError = {
+                    val errMsg = it.cause?.cause?.message
+                        ?: it.cause?.message
+                        ?: it.message
+                        ?: "上传失败"
+
+                    requireView.p2vHideLoading()
+                    requireView.p2vShowToast(errMsg)
+                }
+            )
     }
 
     /**

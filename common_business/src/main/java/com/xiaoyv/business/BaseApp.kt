@@ -1,30 +1,37 @@
-package com.xiaoyv.business;
+package com.xiaoyv.business
 
-import android.app.Application;
-
-import com.alibaba.android.arouter.launcher.ARouter;
-import com.blankj.utilcode.util.ProcessUtils;
-import com.tencent.bugly.crashreport.CrashReport;
-import com.xiaoyv.blueprint.BluePrint;
+import android.app.Application
+import com.alibaba.android.arouter.launcher.ARouter
+import com.blankj.utilcode.util.AppUtils
+import com.blankj.utilcode.util.ProcessUtils
+import com.tencent.bugly.crashreport.CrashReport
+import com.xiaoyv.blueprint.BluePrint.init
 
 /**
  * BaseApp
  *
  * @author why
  * @since 2020/11/28
- **/
-public class BaseApp {
-    public static void init(Application application) {
+ */
+object BaseApp {
+
+    @JvmStatic
+    fun init(application: Application) {
         // 框架初始化
-        BluePrint.init(application, true);
+        init(application, true)
 
         // 非主进程不初始化
         if (!ProcessUtils.isMainProcess()) {
-            return;
+            return
         }
         // 腾讯Bugly
-        CrashReport.initCrashReport(application, "c22595ab77", false);
+        CrashReport.initCrashReport(application, "c22595ab77", false)
+
         // 路由
-        ARouter.init(application);
+        if (AppUtils.isAppDebug()) {
+            ARouter.openLog()
+            ARouter.openDebug()
+        }
+        ARouter.init(application)
     }
 }

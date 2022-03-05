@@ -59,6 +59,7 @@ allprojects {
     }
 
     repositories {
+        mavenCentral()
         maven {
             url 'https://maven.aliyun.com/repository/public/'
         }
@@ -71,7 +72,6 @@ allprojects {
         maven {
             url 'https://jitpack.io'
         }
-        mavenCentral()
         google()
     }
 }
@@ -128,7 +128,7 @@ ext {
     utilCodeXVersion = '1.31.0'
     multitypeVersion = '4.2.0'
     arouterVersion = '1.5.1'
-    roomVersion = '2.4.1'
+    roomVersion = '2.4.2'
     debugDbVersion = '1.0.6'
     rxAndroidVersion = '3.0.0'
     autoDisposeVersion = '2.1.0'

@@ -15,8 +15,8 @@ android {
 
         javaCompileOptions {
             annotationProcessorOptions {
-                arguments = [AROUTER_MODULE_NAME: project.getName()]
                 arguments += [
+                        "AROUTER_MODULE_NAME"  : project.getName(),
                         "room.schemaLocation"  : "$projectDir/schemas".toString(),
                         "room.incremental"     : "true",
                         "room.expandProjection": "true"]
@@ -39,6 +39,7 @@ android {
     // 限定资源前缀
     resourcePrefix "business_"
 }
+
 // ARouter Kotlin 配置
 kapt {
     arguments {

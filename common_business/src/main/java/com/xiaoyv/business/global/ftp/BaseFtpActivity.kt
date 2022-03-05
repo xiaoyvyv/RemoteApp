@@ -7,15 +7,17 @@ import android.view.LayoutInflater
 import androidx.annotation.CallSuper
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import com.blankj.utilcode.util.ActivityUtils
 import com.blankj.utilcode.util.ConvertUtils
 import com.blankj.utilcode.util.SpanUtils
 import com.blankj.utilcode.util.TimeUtils
 import com.chad.library.adapter.base.BaseBinderAdapter
 import com.xiaoyv.blueprint.base.binding.BaseMvpBindingActivity
+import com.xiaoyv.blueprint.base.rxjava.event.RxEvent
+import com.xiaoyv.business.config.EditorType
 import com.xiaoyv.business.config.NavigationKey
-import com.xiaoyv.business.global.editor.FileEditorActivity
 import com.xiaoyv.business.nav.NavHelper
+import com.xiaoyv.business.rx.RxEventTag
+import com.xiaoyv.business.utils.showDialog
 import com.xiaoyv.desktop.business.R
 import com.xiaoyv.desktop.business.databinding.BusinessActivityFtpBinding
 import com.xiaoyv.desktop.business.databinding.BusinessActivityFtpDownloadBinding
@@ -75,6 +77,9 @@ abstract class BaseFtpActivity<V : BaseFtpContract.View, P : BaseFtpPresenter<V>
         filePathAdapter = BaseBinderAdapter()
         filePathAdapter.addItemBinder(filePathBinder)
         binding.rvPath.adapter = filePathAdapter
+
+
+        addReceiveEventTag(RxEventTag.EVENT_EDITOR_SAVE_SUCCESS)
     }
 
     @CallSuper
@@ -127,6 +132,32 @@ abstract class BaseFtpActivity<V : BaseFtpContract.View, P : BaseFtpPresenter<V>
         }
     }
 
+    override fun onReceiveRxEvent(rxEvent: RxEvent, rxEventTag: String) {
+        when (rxEventTag) {
+            RxEventTag.EVENT_EDITOR_SAVE_SUCCESS -> {
+                val editorType = rxEvent.dataInt
+                val isEdit = rxEvent.dataBoolean
+                val filePath = rxEvent.dataSerializable.toString()
+
+                if (isEdit.not()) {
+                    return
+                }
+
+                when (editorType) {
+                    EditorType.TYPE_SFTP -> {
+                        showDialog(content = "是否上传该更改后的文件？", onConfirmListener = {
+                            it.dismissAllowingStateLoss()
+
+                            presenter.v2pUploadFile(filePath, "")
+                        })
+                    }
+                    EditorType.TYPE_FTP -> {
+
+                    }
+                }
+            }
+        }
+    }
 
     override fun processItemClick(baseFtpFile: BaseFtpFile, position: Int) {
         val fileName = baseFtpFile.fileName
@@ -233,8 +264,7 @@ abstract class BaseFtpActivity<V : BaseFtpContract.View, P : BaseFtpPresenter<V>
 
                 val downloadFilePath = downloadFile.downloadFilePath.orEmpty()
                 if (downloadFilePath.isNotBlank()) {
-                    NavHelper.jumpFileEditorActivity(downloadFilePath)
-//                    ActivityUtils.startActivity(FileEditorActivity::class.java)
+                    NavHelper.jumpFileEditorActivity(downloadFilePath, EditorType.TYPE_SFTP)
                 }
             }
         }

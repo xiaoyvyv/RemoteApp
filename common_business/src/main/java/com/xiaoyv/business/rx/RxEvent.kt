@@ -16,6 +16,7 @@ object RxEventTag {
 
 
     const val EVENT_SSH_DISCONNECT = "EVENT_SSH_DISCONNECT"
+    const val EVENT_EDITOR_SAVE_SUCCESS = "EVENT_EDITOR_SAVE_SUCCESS"
 }
 
 /**

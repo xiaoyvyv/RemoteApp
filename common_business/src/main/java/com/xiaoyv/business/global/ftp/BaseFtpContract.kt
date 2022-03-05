@@ -64,6 +64,8 @@ interface BaseFtpContract {
          * 取消下载
          */
         fun v2pCancelDownloadFile(baseFtpFile: BaseFtpFile)
+
+        fun v2pUploadFile(filePath: String, targetPath: String = "")
     }
 
     interface Model {
@@ -81,5 +83,7 @@ interface BaseFtpContract {
          * 关闭 FTP
          */
         fun v2mCloseFtp()
+
+        fun p2mUploadFile(filePath: String, targetFilePath: String): Observable<Boolean>
     }
 }

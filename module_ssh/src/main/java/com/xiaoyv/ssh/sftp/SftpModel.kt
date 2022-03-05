@@ -160,6 +160,7 @@ class SftpModel : BaseFtpModel(), SftpContract.Model {
 
             // 本地创建目标空白文件
             val localFilePath = PathKt.downloadDirPath + filePath
+            val fileSaveDir = FileUtils.getDirName(localFilePath)
             FileUtils.createFileByDeleteOldFile(localFilePath)
 
             var preTimeLength = 0L
@@ -187,7 +188,7 @@ class SftpModel : BaseFtpModel(), SftpContract.Model {
             runCatching {
                 requireScpClient.get(
                     filePath,
-                    PathKt.downloadDirPath
+                    fileSaveDir
                 ) { srcFile: String, _: String, current: Long, total: Long ->
                     synchronized(downloadFile) {
                         downloadFile.fileName = srcFile
@@ -277,6 +278,19 @@ class SftpModel : BaseFtpModel(), SftpContract.Model {
         }.observeOn(Schedulers.io())
             .subscribeOn(Schedulers.io())
             .subscribe()
+    }
+
+    override fun p2mUploadFile(filePath: String, targetFilePath: String): Observable<Boolean> {
+        return Observable.create {
+            var saveDirName = FileUtils.getDirName(targetFilePath)
+            if (saveDirName != "/" && saveDirName.endsWith("/")) {
+                saveDirName = saveDirName.substring(0, saveDirName.lastIndexOf("/"))
+            }
+            requireScpClient.put(filePath, saveDirName, "0755")
+
+            it.onNext(true)
+            it.onComplete()
+        }
     }
 
     /**
