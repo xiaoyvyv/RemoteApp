@@ -25,6 +25,12 @@ android {
     resourcePrefix "ui_"
 }
 
+configurations {
+    all {
+        exclude group: 'com.android.support'
+    }
+}
+
 dependencies {
     api "io.github.xiaoyvyv:widget:${rootProject.ext.blueprintVersion}"
 

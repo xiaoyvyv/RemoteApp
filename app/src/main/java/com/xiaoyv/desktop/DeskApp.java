@@ -2,6 +2,8 @@ package com.xiaoyv.desktop;
 
 import android.app.Application;
 import android.content.Context;
+import android.os.Looper;
+import android.os.MessageQueue;
 
 import androidx.multidex.MultiDex;
 
@@ -20,6 +22,14 @@ public class DeskApp extends Application {
         super.onCreate();
         BaseApp.init(this);
         RdpApp.init(this);
+
+        Looper.myLooper().getQueue().addIdleHandler(new MessageQueue.IdleHandler() {
+            @Override
+            public boolean queueIdle() {
+
+                return false;
+            }
+        });
     }
 
     @Override

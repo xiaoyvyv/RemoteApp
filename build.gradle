@@ -138,7 +138,7 @@ ext {
     autoSizeVersion = '1.2.1'
     keyboardVersion = '0.0.3'
     buttonVersion = '0.0.3'
-    editorVersion='0.10.3'
+    editorVersion='0.10.5'
 
     blueprintVersion = '1.0.32'
 
